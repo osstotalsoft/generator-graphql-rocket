@@ -1,0 +1,72 @@
+{
+  "name": "@totalsoft/generator-graphql-rocket",
+  "version": "1.0.0",
+  "description": "GraphQL server sample with Apollo Server, Koa and token validation.",
+  "homepage": "https://github.com/osstotalsoft/generator-graphql-rocket",
+  "author": {
+    "name": "Totalsoft",
+    "url": "https://github.com/osstotalsoft"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "generators"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "GraphQL",
+    "Apollo-Server",
+    "Koa",
+    "yeoman-generator"
+  ],
+  "devDependencies": {
+    "yeoman-test": "^3.0.0",
+    "yeoman-assert": "^3.1.0",
+    "coveralls": "^3.0.7",
+    "eslint": "^7.7.0",
+    "prettier": "^2.0.5",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "eslint-config-prettier": "^6.6.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "eslint-config-xo": "^0.32.1",
+    "jest": "^26.4.0"
+  },
+  "engines": {
+    "npm": ">= 4.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "jest-cli": "^26.4.0",
+    "ramda": "^0.27.1",
+    "rimraf": "^3.0.2",
+    "yeoman-generator": "^4.11.0",
+    "yo": "^3.1.1",
+    "yosay": "^2.0.1"
+  },
+  "scripts": {
+    "test": "jest --runInBand --detectOpenHandles --collectCoverage",
+    "test:coverage": "jest --collectCoverage",
+    "eslint:report": "eslint --fix --ext .js ."
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/generators/app/templates",
+      "<rootDir>/.tmp"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/generators/app/templates",
+      "<rootDir>/.tmp"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/generators/app/templates",
+      "<rootDir>/.tmp"
+    ]
+  },
+  "repository": "https://github.com/osstotalsoft/generator-graphql-rocket.git",
+  "license": "MIT"
+}

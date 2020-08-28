@@ -1,0 +1,123 @@
+{{- $current := .Values.gql -}}
+{{- $global := .Values.global -}}
+{{- if $current.enabled -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "Gql.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "Gql.fullname" . }}
+    helm.sh/chart: {{ include "Gql.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+<%_ if(addTracing){ _%>
+  {{- if and (eq $global.jaeger.enabled true) (eq $global.jaeger.agentAutoInject true) }}
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+  {{- else }}
+  annotations:
+    "sidecar.jaegertracing.io/inject": "false"
+  {{- end }}
+<%_} else {_%>
+  annotations:
+    "sidecar.jaegertracing.io/inject": "false"
+<%_}_%>
+spec:
+  replicas: {{ $current.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "Gql.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "Gql.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with $current.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ $current.name }}
+          image: "{{ $current.image.repository }}{{ $current.image.name}}:{{ $current.image.tag }}"
+          imagePullPolicy: {{ $current.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $current.service.targetPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml $current.resources | trim | nindent 12 }}
+          env:
+          - name: DB_HOST
+            value: {{ $global.db.host | quote }}
+          - name: DB_PORT
+            value: {{ $global.db.port | quote }}
+          - name: DB_USER
+            value: {{ $global.db.user | quote }}
+          - name: DB_PASSWORD
+            value: {{ $global.db.password | quote }}
+          - name: DB_DATABASE
+            value: {{ $global.db.database | quote }}
+<%_ if(addSubscriptions && addMessaging) { _%>
+          - name: Messaging__TopicPrefix
+            value: {{ $global.messaging.topicPrefix | quote }}
+          - name: Messaging__Source
+            value: {{ $current.messaging.source | quote }}
+          - name: NATS_URL
+            value: {{ $global.messaging.natsUrl | quote }}
+          - name: NATS_CLUSTER
+            value: {{ $global.messaging.natsCluster | quote }}
+          - name: NATS_DURABLE_NAME
+            value: {{ $global.messaging.natsDurableName | quote }}
+          - name: NATS_CLIENT_ID
+            value: {{ $current.messaging.clientId | quote }}
+          - name: NATS_Q_GROUP
+            value: {{ $current.messaging.natsQGroup | quote }}
+<%_}_%>
+<%_ if(addTracing){ _%>
+          - name: JAEGER_SERVICE_NAME
+            value: {{ $global.jaeger.serviceName | quote }}
+          - name: JAEGER_AGENT_HOST
+            value: {{ $global.jaeger.agentHost | quote }}
+          - name: JAEGER_AGENT_PORT
+            value: {{ $global.jaeger.agentPort | quote }}
+          - name: JAEGER_SAMPLER_TYPE
+            value: {{ $global.jaeger.samplerType | quote }}
+          - name: JAEGER_SAMPLER_PARAM
+            value: $global.jaeger.samplerParam
+          - name: JAEGER_DISABLED
+          {{- if $global.jaeger.enabled }}
+            value: "false"
+          {{- else }}
+            value: "true"
+          {{- end }}
+<%_}_%>
+          {{- range $key, $value := $current.env }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}
+<%_ if(addTracing){ _%>
+          {{- if and (eq $global.jaeger.enabled true) (eq $global.jaeger.agentAutoInject false) }}
+        - image: jaegertracing/jaeger-agent:{{ $global.jaeger.agentImageTag }}
+          name: jaeger-agent{{ $current.nameSuffix}}
+          ports:
+          - containerPort: 5775
+            protocol: UDP
+          - containerPort: 6831
+            protocol: UDP
+          - containerPort: 6832
+            protocol: UDP
+          - containerPort: 5778
+            protocol: TCP
+          args: ["--collector.host-port={{ $global.jaeger.collectorHost }}:{{ $global.jaeger.collectorPort }}"]
+        {{- end -}}
+<%_}_%>
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml $global.imagePullSecrets | trim | nindent 8 }}
+      {{- end }}
+      {{- with $current.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end -}}

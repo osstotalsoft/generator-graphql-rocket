@@ -1,0 +1,74 @@
+# Default values for tasks-gql.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+
+  imagePullSecrets:
+  - name: "registrykey"
+
+<%_ if(addTracing){ _%>
+  jaeger:
+    enabled: true
+    agentAutoInject: false
+    agentHost: localhost
+    agentPort: 6832
+    agentImageTag: 1.16.0
+    collectorHost: "[COLECTOR_SERVICE_NAME].[NAMESPACE]"
+    collectorPort: 14267
+    serviceName: <%= projectName %>
+    samplerType: const
+    samplerParam: 1
+<%_}_%>
+<%_ if(addSubscriptions && addMessaging) { _%>
+  messaging:
+    topicPrefix: <%= projectName %>.
+    natsUrl: nats://[SERVICE].[NAMESPACE]:[PORT]
+    natsCluster: "[CLUSTER_NAME]"
+    natsDurableName: durable
+<%_}_%>
+  db:
+    host: "[DB_HOST]"
+    database: "[DB_NAME]"
+    port: 0 # [DB_PORT] here
+    user: "[DB_USER]"
+    password: "[DB_PASSWORD]"
+
+gql:
+  enabled: true
+  replicaCount: 1
+  name: "gql"
+  image:
+    repository: "[ORGANIZATION].azurecr.io/"
+    pullPolicy: IfNotPresent
+    name: <%= helmChartName %>
+    tag: latest # overwrite from pipeline
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 4000
+
+  resources:
+    limits:
+      memory: 512Mi
+<%_ if(addSubscriptions && addMessaging) { _%>
+  messaging:
+    source: <%= projectName %>
+    clientId: <%= projectName %>
+    natsQGroup: <%= projectName %>
+<%_}_%>
+
+  # Additional environment variables
+  env:
+<%_ if(addSubscriptions) { _%>
+    REDIS_DOMAIN_NAME: "[REDIS_DOMAIN_NAME]"
+    REDIS_PORT_NUMBER: "[REDIS_PORT_NUMBER]"
+<%_}_%>
+    IDENTITY_API_URL: "[IDENTITY_API_URI]"
+    IDENTITY_AUTHORITY: "[IDENTITY_AUTHORITY_URL]"
+<%_ if(addGqlLogging){ _%>
+    APOLLO_LOGGING_LEVEL: "DEBUG"
+<%_}_%>
+    KNEX_LOGGING: "true"
+    PORT: "4000"
+    #
