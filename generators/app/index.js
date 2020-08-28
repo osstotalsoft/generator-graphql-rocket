@@ -18,7 +18,6 @@ module.exports = class extends Generator {
   writing() {
     const { projectName, addSubscriptions, addMessaging, addHelm, withMultiTenancy, addTracing, addGqlLogging, withRights, packageManager } = this.answers
 
-    let packageManagerVersion
     const templatePath = this.templatePath(this.templatePath("infrastructure/**/*"))
     const destinationPath = this.destinationPath(projectName)
 
@@ -31,11 +30,11 @@ module.exports = class extends Generator {
     if (!addGqlLogging) ignoreFiles = concat(["**/plugins/logging/**"], ignoreFiles)
     if (!withRights) ignoreFiles = concat(["**/middleware/permissions/**", "**/constants/permissions.js", "**/constants/identityUserRoles.js"], ignoreFiles)
 
-    packageManager === 'npm'
-      ? packageManagerVersion = "10.0.0"
+    const packageManagerVersion = packageManager === 'npm'
+      ? "10.0.0"
       : packageManager === 'yarn'
-        ? packageManagerVersion = "1.22.4"
-        : packageManagerVersion = "10.0.0"
+        ? "1.22.4"
+        : "10.0.0"
 
     this.fs.copyTpl(templatePath, destinationPath, { ...this.answers, packageManagerVersion }, {},
       { globOptions: { ignore: ignoreFiles, dot: true } }
