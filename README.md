@@ -33,7 +33,7 @@ You will be prompted to introduce the following information:
  10. Identity API url, your Identity server API url.
  11. Identity openId configuration.
  12. Identity authority.
- 13. What package manager you wish to use to install the application dependencies. (npm, yarn or bower).
+ 13. What package manager you wish to use to install the application dependencies. (npm or yarn).
  
 If you would like to start the application, simply run ``npm start`` in the newly created folder, otherwise you can begin editing and writing your application!
 
