@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "type": "commonjs",
   "engines": {
+    "node": ">=10.0.0",
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
