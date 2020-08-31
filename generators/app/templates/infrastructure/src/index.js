@@ -44,8 +44,8 @@ const tenantService = require('./multiTenancy/tenantService');
 
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken');
-const { dbInstanceFactory } = require("./db");
 <%_}_%>
+const { dbInstanceFactory } = require("./db");
 const { contextDbInstance, <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
     <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
 const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources, getDataLoaders } = require('./startup/index');

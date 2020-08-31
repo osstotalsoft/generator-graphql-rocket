@@ -9,6 +9,7 @@ input UserInputType {
 
 type User {
     id: ID!
+    userName: String
     firstName: String
     lastName: String
     rights: [String!]

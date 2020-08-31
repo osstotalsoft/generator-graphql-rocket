@@ -57,4 +57,4 @@ const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()
     <%_}_%>
 }
 
-module.exports = { getDbConfig }
+module.exports = { getDbConfig, generateKnexConfig }

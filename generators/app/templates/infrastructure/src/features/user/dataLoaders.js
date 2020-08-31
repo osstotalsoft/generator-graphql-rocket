@@ -7,6 +7,7 @@ const getUserDataLoaders = dbInstance => {
         .select(
           "Id",
           "ExternalId",
+          "UserName",
           "FirstName",
           "LastName")
         .from("User")
@@ -17,6 +18,7 @@ const getUserDataLoaders = dbInstance => {
       dbInstance.select(
         "Id",
         "ExternalId",
+        "UserName",
         "FirstName",
         "LastName")
         .from("User")

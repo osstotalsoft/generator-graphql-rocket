@@ -18,7 +18,7 @@ const logger = (_format, duration, query) => {
 let cachedDbInstance
 const dbInstanceFactory = async () => {
 
-    const dbInstance = dbInstanceGetOrAdd()
+    const dbInstance = await  dbInstanceGetOrAdd()
 
     if (!dbInstance) {
         throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
