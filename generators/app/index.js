@@ -8,6 +8,12 @@ const questions = require('./questions');
 module.exports = class extends Generator {
 
   async prompting() {
+    const notifier = updateNotifier();
+    if (notifier.update) {
+      notifier.notify();
+    }
+    this.log(notifier.update);
+
     this.log(
       yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
      Out of the box I include Apollo Server, Koa and token validation.`)
