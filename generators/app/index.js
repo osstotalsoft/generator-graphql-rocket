@@ -1,5 +1,6 @@
 'use strict';
 const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
@@ -9,11 +10,11 @@ const questions = require('./questions');
 module.exports = class extends Generator {
 
   async prompting() {
-    const notifier = updateNotifier();
-    if (notifier.update) {
-      notifier.notify();
-    }
-    this.log(notifier.update);
+    this.log(`Name: ${pkg.name}, Version: ${pkg.version}`);
+    const notifier = updateNotifier({
+      packageName: pkg.name,
+      packageVersion: pkg.version
+    }).notify()
 
     this.log(
       yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
