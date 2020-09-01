@@ -1,6 +1,6 @@
 {
   "name": "@totalsoft/generator-graphql-rocket",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "GraphQL server sample with Apollo Server, Koa and token validation.",
   "homepage": "https://github.com/osstotalsoft/generator-graphql-rocket",
   "author": {
@@ -39,6 +39,7 @@
     "npm": ">= 4.0.0"
   },
   "dependencies": {
+    "boxen": "^4.2.0",
     "chalk": "^4.1.0",
     "jest-cli": "^26.4.0",
     "ramda": "^0.27.1",

@@ -1,29 +1,28 @@
 'use strict';
-const updateNotifier = require('update-notifier');
-const pkg = require('../../package.json');
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const { append, concat } = require('ramda');
 const questions = require('./questions');
+const { checkForLatestVersion } = require('../utils');
 
 module.exports = class extends Generator {
 
   async prompting() {
-    this.log(`Name: ${pkg.name}, Version: ${pkg.version}`);
-    const notifier = updateNotifier({
-      packageName: pkg.name,
-      packageVersion: pkg.version
-    }).notify()
+    this.isLatest = await checkForLatestVersion()
+
+    if (!this.isLatest) return
 
     this.log(
-      yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
+      yosay(`Welcome to the fantabulous ${chalk.redBright('TotalSoft GraphQL Server')} generator! (⌐■_■)
      Out of the box I include Apollo Server, Koa and token validation.`)
     );
     this.answers = await this.prompt(questions);
   }
 
   writing() {
+    if (!this.isLatest) return
+
     const { projectName, addSubscriptions, addMessaging, addHelm, withMultiTenancy, addTracing, addGqlLogging, withRights, packageManager } = this.answers
 
     const templatePath = this.templatePath(this.templatePath("infrastructure/**/*"))
@@ -50,6 +49,8 @@ module.exports = class extends Generator {
   }
 
   install() {
+    if (!this.isLatest) return
+
     const { packageManager, projectName } = this.answers
 
     packageManager === 'npm'
@@ -60,6 +61,8 @@ module.exports = class extends Generator {
   }
 
   end() {
+    if (!this.isLatest) return
+
     this.log(
       yosay(`Congratulations, you just entered the exciting world of GraphQL! Enjoy! 
       Bye now! 
