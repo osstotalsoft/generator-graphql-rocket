@@ -20,7 +20,7 @@ yo @totalsoft/graphql-rocket
 ```
 
 You will be prompted to introduce the following information:
- 1. The project name. This will also be the name of the folder in which the new server will live.
+ 1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
  2. GraphQL port. By default it would be set to `4000`
  3. Include multi-tenancy. By default is set to false.
  4. Use subscriptions. By default is set to false.
@@ -185,6 +185,22 @@ By default all the logs are saved in the application database ( this can be chan
 
 In addition, the errors thrown inside Apollo Server, are wrapped in a 'user friendly message'. This helps you not to leak sensitive data from unauthorized users.
 
+## OpenTracing
+
+Microservice Architecture has now become the obvious choice for application developers, but how can you debug and monitor a set of interdependent distributed services? Here comes OpenTracing to help us. This generator, includes an OpenTracing integration using Jaeger, helping you monitor all the components of your GraphQL server ( SQL, Knex statements, GraphQL request lifecycle both Http and WebSocket and of course traces requests and events handled in your messaging handlers.
+
+This feature includes a tracing middleware you can find in `src/middleware/tracing`, a plugin that traces GraphQL requests located at `src/plugins/tracing` and the `src/tracing` folder includes utils files and also the knex/sql tracing implementation. 
+
+In addition, to activate this option, you will need to make a few configuration in server's `.env` file:
+
+```
+JAEGER_SERVICE_NAME=<%= projectName %>
+JAEGER_AGENT_HOST=
+JAEGER_AGENT_PORT=
+JAEGER_SAMPLER_TYPE=const
+JAEGER_SAMPLER_PARAM=1
+JAEGER_DISABLED=true
+```
 ## Code examples
 
 To help you out starting developing a feature in your new server, we included some code samples ( see `src/features/user`). This code's purpose is not only to help you wrap you head around SDL and GraphQL development in general, but it also comes with the queries and data needed to implement authorization in your web application, the missing part from [Webapp Rocket Generator -> Authorization ](https://github.com/osstotalsoft/generator-webapp-rocket#authorization).
