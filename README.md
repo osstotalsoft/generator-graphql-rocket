@@ -20,7 +20,7 @@ yo @totalsoft/graphql-rocket
 ```
 > ⚠ Make sure you have the latest version of **GraphQL Rocket Generator** installed, else you will be prompted the following message:
 
-![version](assets/img/version.png)
+![version](assets/img/versionWarning.png)
 
 You will be prompted to introduce the following information:
  1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
