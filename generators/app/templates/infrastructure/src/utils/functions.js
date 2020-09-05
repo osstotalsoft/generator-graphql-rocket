@@ -1,5 +1,7 @@
 const humps = require("humps");
 
+const randomCharacters = length => Math.random().toString(36).substr(2, length)
+
 const formatArrayUrlParams = obj => {
   const searchParams = new URLSearchParams();
   Object.keys(obj).forEach(a =>
@@ -57,4 +59,4 @@ const customConsole = function (oldCons) {
   };
 }(global.console)
 
-module.exports = { formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, customConsole };
+module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, customConsole };
