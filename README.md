@@ -186,6 +186,21 @@ This features includes a logging plugin, that helps you monitor the execution of
 
 By default all the logs are saved in the application database ( this can be changed by modifying the `saveLogs()` method found in `src/plugins/logging/loggingUtils.js` file. 
 
+You nned the following table in your database to store your logs:
+```
+CREATE TABLE [dbo].[EventLog](
+	[EventLogId] [int] IDENTITY(1,1) NOT NULL,
+	[Uid] [uniqueidentifier] NOT NULL,
+	[RequestId] [uniqueidentifier] NOT NULL,
+	[Code] [nvarchar](50) NOT NULL,
+	[Message] [nvarchar](max) NOT NULL,
+	[Details] [nvarchar](max) NOT NULL,
+	[TimeStamp] [datetime] NOT NULL,
+	[LoggingLevel] [nvarchar](50) NOT NULL,
+	[TenantId] [uniqueidentifier] NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+```
+
 In addition, the errors thrown inside Apollo Server, are wrapped in a 'user friendly message'. This helps you not to leak sensitive data from unauthorized users.
 
 ## OpenTracing
