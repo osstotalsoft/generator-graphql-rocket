@@ -1,14 +1,10 @@
 
 const jsonwebtoken = require('jsonwebtoken');
-const R = require('ramda');
 const { tenantService } = require("../../multiTenancy")
 
 const tenantIdentification = () => async (ctx, next) => {
     if (!ctx.tenant) {
-        const tenantId = R.ifElse(
-            getTenantIdFromQueryString,
-            getTenantIdFromJwt
-        )(ctx)
+        const tenantId = getTenantIdFromJwt(ctx)
 
         ctx.tenant = await tenantService.getTenantFromId(tenantId);
     }
@@ -25,6 +21,8 @@ const getTenantIdFromJwt = ({ token }) => {
     }
     return tenantId;
 }
+
+// eslint-disable-next-line no-unused-vars
 const getTenantIdFromQueryString = ({ request }) => request.query.tenantId
 
 // eslint-disable-next-line no-unused-vars
