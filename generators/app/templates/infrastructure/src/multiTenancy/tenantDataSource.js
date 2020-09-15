@@ -18,8 +18,12 @@ class TenantDataSource extends SQLDataSource {
     }
 
     async getDataSourceInfo(tenantId) {
-        const tenant = await this.knex.select("ConnectionString", "IsSharedDb").from("Tenant").where("ExternalId", tenantId).first();
-        return tenant;
+        try {
+            const tenant = await this.knex.select("ConnectionString", "IsSharedDb").from("Tenant").where("ExternalId", tenantId).first();
+            return tenant;
+        } catch (_error) {
+            return null
+        }
     }
 }
 

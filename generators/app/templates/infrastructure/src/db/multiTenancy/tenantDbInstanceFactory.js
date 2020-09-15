@@ -20,7 +20,7 @@ const logger = (_format, duration, query) => {
 const tenantDbInstanceFactory = async tenantId => {
 
     return await dbInstanceGetOrAdd(tenantId, async () => {
-        const [dbConfig, isSharedDb] = dbConfigService.getDbConfig(tenantId)
+        const [dbConfig, isSharedDb] = await dbConfigService.getDbConfig(tenantId)
 
         const dbInstance = Knex(dbConfig)
 
