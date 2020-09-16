@@ -1,14 +1,10 @@
-<%_ if(withMultiTenancy){ _%>
-const { tenantDbInstanceFactory } = require("../../db");
-<%_} else { _%>
 const { dbInstanceFactory } = require("../../db");
-<%_}_%>
 
 const contextDbInstance = () => async (ctx, next) => {
   <%_ if(withMultiTenancy){ _%>
   const { tenant } = ctx
   if (tenant) {
-    const dbInstance = await tenantDbInstanceFactory(tenant.id)
+    const dbInstance = await dbInstanceFactory(tenant.id)
     ctx.dbInstance = dbInstance
   }
   <%_} else { _%>
