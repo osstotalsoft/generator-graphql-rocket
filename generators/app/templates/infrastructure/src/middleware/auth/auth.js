@@ -10,17 +10,16 @@ const client = {
   jwksUri: `${IDENTITY_AUTHORITY}${IDENTITY_OPENID_CONFIGURATION}`
 }
 
-const validateJwtToken = jwt({
-  secret: jwksRsa.koaJwtSecret(client),
-  issuer: IDENTITY_AUTHORITY,
-  algorithms: ["RS256"]
-});
-
 const jwtTokenValidation = (ctx, next) => {
   //skip token validation for playground and introspection query
   if (ctx.method === "GET" || ctx.request.body.operationName === "IntrospectionQuery") {
     return next();
   } else {
+    const validateJwtToken = jwt({
+      secret: jwksRsa.koaJwtSecret(client),
+      issuer: IDENTITY_AUTHORITY,
+      algorithms: ["RS256"]
+    });
     return validateJwtToken(ctx, next);
   }
 }
