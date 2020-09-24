@@ -2,21 +2,20 @@ const { gql } = require("apollo-server-koa");
 
 const paginationTypes = gql`
   input PagerInput {
-    afterId: Int!
+    afterId: ID
     sortBy: String
     direction: Int
     pageSize: Int
   }
 
   type Page {
-    afterId: Int
+    afterId: ID
     sortBy: String
     direction: Int
     pageSize: Int
   }
 
   type Pagination {
-    currentIndex: Int
     totalCount: Int
     prevPage: Page
     nextPage: Page
