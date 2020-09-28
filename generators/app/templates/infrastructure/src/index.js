@@ -65,18 +65,22 @@ app.use(jwtTokenUserIdentification);
 app.use(tenantIdentification());
 <%_}_%>
 app.use(contextDbInstance());
-
+       
+<%_ if(addGqlLogging || addTracing) {_%>
+const plugins = [
+    <%_ if(addGqlLogging) {_%>
+        loggingPlugin
+    <%_}_%>
+]
+<%_}_%>
+<%_ if(addTracing){ _%>
+tracingEnabled && plugins.concat(tracingPlugin(getApolloTracerPluginConfig(defaultTracer)))
+<%_}_%>
+       
 const server = new ApolloServer({
     schema,
     <%_ if(addGqlLogging || addTracing) {_%>
-    plugins: [
-        <%_ if(addGqlLogging) {_%>
-        loggingPlugin,
-        <%_}_%>
-        <%_ if(addTracing){ _%>
-        tracingEnabled && tracingPlugin(getApolloTracerPluginConfig(defaultTracer))
-        <%_}_%>
-    ],
+    plugins,
     <%_}_%>
     <%_ if(addTracing){ _%>
     tracing: true,
