@@ -11,10 +11,10 @@ const tracing = () => async (ctx, next) => {
     span.log({ event: 'message', message: ctx.received.msg });
     
     const correlationId = ctx && ctx.correlationId;
-    span.setTag(envelope.headers.tenantId, tenantId);
+    span.setTag(envelope.headers.correlationId, correlationId);
     <%_ if(withMultiTenancy){ _%>
     const tenantId = ctx && ctx.tenant && ctx.tenant.externalId; 
-    span.setTag(envelope.headers.correlationId, correlationId);
+    span.setTag(envelope.headers.tenantId, tenantId);
     <%_}_%>
     
     await useSpanManager(span, async () => {
