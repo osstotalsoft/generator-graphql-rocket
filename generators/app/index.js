@@ -20,7 +20,7 @@ module.exports = class extends Generator {
     if (!this.isLatest) return
 
     this.log(
-      yosay(`Welcome to the fantabulous ${chalk.redBright('TotalSoft GraphQL Server')} generator! (⌐■_■)
+      yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
      Out of the box I include Apollo Server, Koa and token validation.`)
     )
     this.answers = await this.prompt(questions)
@@ -85,8 +85,8 @@ module.exports = class extends Generator {
     packageManager === 'npm'
       ? this.npmInstall(null, {}, { cwd: projectName })
       : packageManager === 'yarn'
-      ? this.yarnInstall(null, {}, { cwd: projectName })
-      : this.npmInstall(null, {}, { cwd: projectName })
+        ? this.yarnInstall(null, {}, { cwd: projectName })
+        : this.npmInstall(null, {}, { cwd: projectName })
   }
 
   end() {
