@@ -30,7 +30,7 @@ const initializeDbLogging = (context, operationName) => ({
 
 const saveLogs = async (context) => {
     const { dbInstance, logs, requestId } = context
-    if (logs) {
+    if (logs && dbInstance) {
         const insertLogs = map(({ uid, code, message, timeStamp, loggingLevel, error = {} }) => ({
             Uid: uid,
             RequestId: requestId || v4(),
@@ -42,8 +42,8 @@ const saveLogs = async (context) => {
         }), logs)
         await dbInstance("EventLog")
             .insert(insertLogs)
-        context.logs = null
     }
+    context.logs = null
 }
 
 const logEvent = async (context, message, code, level, error, autoSave) => {

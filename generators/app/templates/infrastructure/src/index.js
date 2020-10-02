@@ -89,7 +89,7 @@ const server = new ApolloServer({
     <%_ if(addSubscriptions){ _%>
     subscriptions: {
         onConnect: async (connectionParams, _webSocket, context) => {
-            const token = connectionParams.authToken;
+            const token = connectionParams.authorization.replace("Bearer ", "");
 
             if (!token) {
                 throw new ForbiddenError("401 Unauthorized");
