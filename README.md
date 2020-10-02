@@ -47,6 +47,13 @@ Using a generator accelerates application development. You don't have to worry a
 
 Included latest versions of the following libraries and technologies: <b>GraphQL,  [Apollo Server](https://github.com/apollographql/apollo-server), [Koa](https://koajs.com/), [@totalsoft/nodebb](https://github.com/osstotalsoft/nodebb), [graphql/dataloader](https://github.com/graphql/dataloader), [knex.js](https://knexjs.org/), [Redis](https://github.com/luin/ioredis) </b> and many more, see generators/app/templates/infrastructure/package.json file.
 
+## Code formatting
+The generated code is formatted using the "Prettier" formatter. A file named ".prettierrc" containing the formatting settings is placed in the root of the project. 
+
+For maintainig unitary style, the ".prettierrc" configuration file is read by other tools that run "Prettier" such as scripts or IDE extensions. For example if using Visual Studio Code we recommend installing the following extension [Prettier formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+
+In case the ".prettierrc" file is customized, the new settings will be used when re-running the generator. The only condition is to answer "no" when asked to overwrite this file.
+
 ## Token validation
 This GraphQL server is expecting that all the applications and services that consumes him, uses an Identity server that generates secure jwk authentication tokens. 
 
