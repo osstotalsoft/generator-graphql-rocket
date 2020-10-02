@@ -1,19 +1,41 @@
+
 # graphql-rocket [![NPM version][npm-image]][npm-url]
 >GraphQL server sample with Apollo Server, Koa middleware, database reads using Knex JS, and/or REST API consumer, token validation, messaging integration with Redis and Nats and many other cool features.
 
 ![Building blocks](assets/img/appicon.png)
 
 > If you are creating a new web application we recommend you to use our [Webapp Rocket Generator](https://github.com/osstotalsoft/generator-webapp-rocket).
-## Installation
 
+## Installation  
+  
 First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
-
-```bash
+  
+```bash  
 npm install -g yo
 npm install -g @totalsoft/generator-graphql-rocket
-```
+```  
+  
+If you wand to use this generator to scaffold a new project navigate to section: [Generate new project](#generate-new-project)  
+To upgrade an existing project that was scaffold using this **GraphQL Rocket Generator**, see section: [Upgrade existing project](#upgrade-existing-project)  
 
-Then generate your new GraphQL server:
+## Content
+1. [Generate new project](#generate-new-project)  
+2. [Upgrade existing project](#upgrade-existing-project)  
+3. [What is a Generator?](#what-is-a-generator)  
+4. [Code formatting](#code-formatting)  
+5. [Token validation](#token-validation)  
+6. [Authorization](#authorization)  
+7. [Multi-tenancy](#multi-tenancy)
+8. [Subscriptions](#subscriptions)  
+9. [Messaging](#messaging)  
+10. [Error logging](#error-logging) 
+11. [OpenTracing](#opentracing)
+12. [Code examples](#code-examples)
+13. [Deployment](#deployment)
+14. [Getting To Know Yeoman](#getting-to-know-yeoman)
+
+## Generate new project  
+To scaffold your new GraphQL server using our generator run:  
 
 ```bash
 yo @totalsoft/graphql-rocket
@@ -40,19 +62,43 @@ You will be prompted to introduce the following information:
  
 If you would like to start the application, simply run ``npm start`` in the newly created folder, otherwise you can begin editing and writing your application!
 
+## Upgrade existing project  
+ > ⚠ First, make sure you have committed everything or have a backup of your existing project.
+
+To upgrade an existing project that was scaffold using this generator open a console outside of your project folder ( see image below )  and run:
+```bash  
+yo @totalsoft/graphql-rocket
+```  
+![OtsideProjectFolder](assets/img/upgrade_project_name.png)  
+
+Now you will be asked to answer the same questions explained in  [Generate new project](#generate-new-project)  section.
+> ⚠ **ATTENTION!** ⚠
+
+> When prompted to enter the name of your project **make sure you enter the name of the project you want to upgrade** ( like shown in the above image ). If you enter a new name, it will generate a new project. 
+
+Mainly you have to choose all the options already included in your existing project, or you can add new ones. 
+
+> ⚠ If you decide not to include an option that was previously installed on your existing project (e.g. Authorization), **Yeoman** will not remove files or folders by its own, he just merges existing files or created new ones, and you would have to manually delete the unnecessary files or folders.
+
+After answering all the questions, **Yeoman** will ask you for each file if you want to overwrite it with the latest version. For those files you haven't edited, just say yes. For the other ones, type `d` to see the differences, then manually do the changes. 
+You can also type `a`, and this will automatically override all the files, and it's up to you to check all the changed files before you commit everything. 
+Or hit **space** to see all your options (see below image).
+
+![FileConflicts](assets/img/upgrade_file_conflicts.png)  
+
 ## What is a Generator?
-A Yeoman generator is a scaffolding tool. You can use Yeoman to install applications based on templates. This repository is an example of a template - an application with a build, code structure, and dependencies installed and organized for you!
+A Yeoman generator is a scaffolding tool. You can use Yeoman to install applications based on templates. This repository is an example of a template - an application with a build, code structure, and dependencies installed and organised for you!
 
 Using a generator accelerates application development. You don't have to worry about best practices for foundational elements, because we've incorporated them. Our template generates a fully functional GraphQL server that becomes the infrastructure of your new project. Before this miracle generator existed, this code would probably took you a few days to write, oh well... now this will be done in only 30 seconds!
 
 Included latest versions of the following libraries and technologies: <b>GraphQL,  [Apollo Server](https://github.com/apollographql/apollo-server), [Koa](https://koajs.com/), [@totalsoft/nodebb](https://github.com/osstotalsoft/nodebb), [graphql/dataloader](https://github.com/graphql/dataloader), [knex.js](https://knexjs.org/), [Redis](https://github.com/luin/ioredis) </b> and many more, see generators/app/templates/infrastructure/package.json file.
 
-## Code formatting
-The generated code is formatted using the "Prettier" formatter. A file named ".prettierrc" containing the formatting settings is placed in the root of the project. 
-
-For maintainig unitary style, the ".prettierrc" configuration file is read by other tools that run "Prettier" such as scripts or IDE extensions. For example if using Visual Studio Code we recommend installing the following extension [Prettier formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-In case the ".prettierrc" file is customized, the new settings will be used when re-running the generator. The only condition is to answer "no" when asked to overwrite this file.
+## Code formatting  
+The generated code is formatted using the **Prettier** formatter. A file named **.prettierrc** containing the formatting settings is placed in the root of the project.  
+  
+For maintaining unitary style, the **.prettierrc** configuration file is read by other tools that run **Prettier** such as scripts or IDE extensions. For example if using **Visual Studio Code** we recommend installing the following extension [Prettier formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)  
+  
+In case the **.prettierrc** file is customized, the new settings will be used when re-running the generator. The only condition is to answer **no** when asked to overwrite this file.  
 
 ## Token validation
 This GraphQL server is expecting that all the applications and services that consumes him, uses an Identity server that generates secure jwk authentication tokens. 
