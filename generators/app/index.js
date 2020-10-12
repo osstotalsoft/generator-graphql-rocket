@@ -39,13 +39,14 @@ module.exports = class extends Generator {
       addGqlLogging,
       withRights,
       packageManager,
+      helmChartName
     } = this.answers
 
     const templatePath = this.templatePath('infrastructure/**/*')
     const destinationPath = this.destinationPath(projectName)
 
-    let ignoreFiles = ['**/.npmignore', '**/.gitignore-template']
-    if (!addHelm) ignoreFiles = append('**/helm/**', ignoreFiles)
+    let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
+
     if (!addSubscriptions) ignoreFiles = concat(['**/messaging/**', '**/pubSub/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/*', ignoreFiles)
     if (!withMultiTenancy)
@@ -74,6 +75,18 @@ module.exports = class extends Generator {
     const gitignorePath = this.templatePath('infrastructure/.gitignore-template')
     const gitignoreDestinationPath = this.destinationPath(`${projectName}/.gitignore`)
     this.fs.copy(gitignorePath, gitignoreDestinationPath)
+
+    if (addHelm) {
+      const helmTemplatePath = this.templatePath('infrastructure/helm/gql/**')
+      const helmDestinationPath = this.destinationPath(`${projectName}/helm/${helmChartName}`)
+      this.fs.copyTpl(
+        helmTemplatePath,
+        helmDestinationPath,
+        { ...this.answers, packageManagerVersion },
+        {},
+        { globOptions: { dot: true } }
+      )
+    }
   }
 
   install() {

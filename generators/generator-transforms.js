@@ -6,6 +6,8 @@ const defaultPrettierOptions = {
   tabWidth: 2,
   singleQuote: true,
   semi: false,
+  trailingComma: "none",
+  arrowParens: "avoid"
 }
 
 const prettierTransform = function (defaultOptions) {

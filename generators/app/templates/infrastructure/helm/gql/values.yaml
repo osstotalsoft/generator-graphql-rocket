@@ -36,7 +36,7 @@ global:
 gql:
   enabled: true
   replicaCount: 1
-  name: "gql"
+  name: "<%= helmChartName %>"
   image:
     repository: "[ORGANIZATION].azurecr.io/"
     pullPolicy: IfNotPresent
