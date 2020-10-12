@@ -1,5 +1,5 @@
-const tracing = require("../index");
-const opentracing = require('opentracing');
+const tracing = require("../../tracing");
+const { globalTracer } = require("opentracing");
 const { envelope } = require("@totalsoft/message-bus");
 const { messagingHost } = require("@totalsoft/messaging-host");
 
