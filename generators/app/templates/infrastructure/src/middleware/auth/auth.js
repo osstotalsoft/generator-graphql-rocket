@@ -12,7 +12,7 @@ const client = {
 
 const jwtTokenValidation = (ctx, next) => {
   //skip token validation for playground and introspection query
-  if (ctx.method === "GET" || ctx.request.body.operationName === "IntrospectionQuery") {
+  if (ctx.method === "GET" || ctx.request.body.operationName === "IntrospectionQuery" || ctx.request.body.query.includes("IntrospectionQuery")) {
     return next();
   } else {
     const validateJwtToken = jwt({
