@@ -22,7 +22,7 @@ global:
 <%_ if(addSubscriptions && addMessaging) { _%>
   messaging:
     topicPrefix: <%= projectName %>.
-    natsUrl: nats://[SERVICE].[NAMESPACE]:[PORT]
+    natsUrl: "nats://[SERVICE].[NAMESPACE]:[PORT]"
     natsCluster: "[CLUSTER_NAME]"
     natsDurableName: durable
 <%_}_%>
