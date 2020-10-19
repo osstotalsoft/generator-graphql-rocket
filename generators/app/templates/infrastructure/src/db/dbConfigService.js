@@ -7,7 +7,7 @@ const generateKnexConfig = ({ server, port, userId, password, database }) => ({
     client: "mssql",
     connection: {
         host: server,
-        port: parseInt(port),
+        port: parseInt(port) || null,
         user: userId,
         password: password,
         database: database,
