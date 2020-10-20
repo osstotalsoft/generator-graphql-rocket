@@ -13,7 +13,7 @@ var tenantDbConfig = {
     client: "mssql",
     connection: {
         host: TENANT_DB_HOST,
-        port: parseInt(TENANT_DB_PORT),
+        port: parseInt(TENANT_DB_PORT) || null,
         user: TENANT_DB_USER,
         password: TENANT_DB_PASSWORD,
         database: TENANT_DB_DATABASE,
