@@ -1,4 +1,4 @@
-const { addTenantFilters } = require("./tenantFilters")
+const { registerTenancyFilter } = require("./tenancyFilter")
 const dbConfigService = require("../dbConfigService")
 const Knex = require("knex")
 const knexTinyLogger = require("knex-tiny-logger").default;
@@ -41,7 +41,7 @@ const tenantDbInstanceFactory = async tenantId => {
         }
         <%_}_%>
         if (isSharedDb) {
-            await addTenantFilters(dbInstance, dbConfig, tenantId)
+            await registerTenancyFilter("TenantId", tenantId, dbInstance)
         }
 
         return dbInstance
