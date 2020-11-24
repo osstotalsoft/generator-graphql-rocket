@@ -11,7 +11,7 @@ describe('generator-graphql-rocket:app', () => {
   const defaultAnswers = {
     projectName,
     gqlPort: "",
-    withMultiTenancy: false,
+    withMultiTenancy: true,
     addSubscriptions: false,
     addMessaging: false,
     withRights: false,
