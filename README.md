@@ -8,7 +8,7 @@
 
 ## Installation  
   
-First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js V14.7](https://nodejs.org/)).
   
 ```bash  
 npm install -g yo
