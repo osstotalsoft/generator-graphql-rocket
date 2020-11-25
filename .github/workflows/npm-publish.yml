@@ -28,7 +28,7 @@ jobs:
           node-version: 14.7.0
       - name: Bump version
         run: |
-          npm version (git describe --abbrev=0 --tags) --no-git-tag-version
+          npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
           npm ci
           git config --global user.name 'alexandra-c'
           git config --global user.email 'alexandra-c@users.noreply.github.com'
