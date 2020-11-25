@@ -32,7 +32,7 @@ jobs:
           npm ci
           git config --global user.name 'alexandra-c'
           git config --global user.email 'alexandra-c@users.noreply.github.com'
-          git push
+          git push origin master
 
   publish-npm:
     needs: [ build, bump-version ]
