@@ -23,18 +23,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: master
       - uses: actions/setup-node@v1
         with:
           node-version: 14.7.0
       - name: Bump version
         run: |
           npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
-          npm ci
           git config --global user.name 'alexandra-c'
           git config --global user.email 'alexandra-c@users.noreply.github.com'
-          git add .
           git commit -am "Automated version bump"
-          git push -u origin main 
+          git push 
 
   publish-npm:
     needs: [ build, bump-version ]
