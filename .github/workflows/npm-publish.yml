@@ -34,7 +34,7 @@ jobs:
           git config --global user.email 'alexandra-c@users.noreply.github.com'
           git add .
           git commit -am "Automated version bump"
-          git push origin master
+          git push -u origin main 
 
   publish-npm:
     needs: [ build, bump-version ]
