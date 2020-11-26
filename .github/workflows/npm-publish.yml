@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
           node-version: 14.7.0
@@ -30,6 +30,7 @@ jobs:
           node-version: 14.7.0
       - name: Bump version
         run: |
+          git show-ref
           git checkout master
           npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
           git config --global user.name 'alexandra-c'
