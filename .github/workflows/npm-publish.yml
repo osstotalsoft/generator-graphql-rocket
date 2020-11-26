@@ -30,12 +30,13 @@ jobs:
           node-version: 14.7.0
       - name: Bump version
         run: |
+          git checkout master
           npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
           git config --global user.name 'alexandra-c'
           git config --global user.email '46926675+alexandra-c@users.noreply.github.com'
           git add .
           git commit -m "Automated version bump"
-          git push 
+          git push origin master
 
   publish-npm:
     needs: [ build, bump-version ]
