@@ -4,21 +4,25 @@
 name: npm-publish
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Bump type: major, minor or patch. Default is patch'
+        default: 'patch'
+        required: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 14.7.0
+          node-version: 14.11.0
       - run: npm ci
       - run: npm test
-  
-  bump-version:
+
+  version-and-release:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -27,28 +31,16 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
-          node-version: 14.7.0
-      - name: Bump version
-        run: |
-          git checkout master
-          npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
-          git config --global user.name 'alexandra-c'
-          git config --global user.email '46926675+alexandra-c@users.noreply.github.com'
-          git add .
-          git commit -m "Automated version bump"
-          git push origin master
-
-  publish-npm:
-    needs: [ build, bump-version ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14.7.0
+          node-version: 14.11.0
           registry-url: https://registry.npmjs.org/
           scope: '@totalsoft'
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN }}
+      - run: echo ${{ github.event.inputs }}
+      - name: npm bump
+        uses: bcomnes/npm-bump@v2.0.2
+        with:
+          git_email: 46926675+alexandra-c@users.noreply.github.com
+          git_username: alexandra-c
+          newversion: ${{ github.event.inputs.bump }}
+          push_version_commit: true
+          github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
+          npm_token: ${{ secrets.NPM_TOKEN }}
