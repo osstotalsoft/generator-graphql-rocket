@@ -23,8 +23,8 @@ const shouldSkipLogging = (operationName, logLevel) => {
 }
 
 const initializeDbLogging = (context, operationName) => ({
-    logInfo: (message, code, autoSave = false) => shouldSkipLogging(operationName, loggingLevels.INFO) && logEvent(context, message, code, loggingLevels.INFO, autoSave),
-    logDebug: (message, code, autoSave = false) => shouldSkipLogging(operationName, loggingLevels.DEBUG) && logEvent(context, message, code, loggingLevels.DEBUG, autoSave),
+    logInfo: (message, code, autoSave = false) => shouldSkipLogging(operationName, loggingLevels.INFO) && logEvent(context, message, code, loggingLevels.INFO, null, autoSave),
+    logDebug: (message, code, autoSave = false) => shouldSkipLogging(operationName, loggingLevels.DEBUG) && logEvent(context, message, code, loggingLevels.DEBUG, null, autoSave),
     logError: (message, code, error) => shouldSkipLogging(operationName, loggingLevels.ERROR) && logDbError(context, message, code, loggingLevels.ERROR, error)
 })
 
