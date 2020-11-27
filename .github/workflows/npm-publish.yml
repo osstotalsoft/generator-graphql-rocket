@@ -34,7 +34,7 @@ jobs:
           node-version: 14.11.0
           registry-url: https://registry.npmjs.org/
           scope: '@totalsoft'
-      - run: echo ${{ github.event.inputs }}
+      - run: npm i
       - name: npm bump
         uses: bcomnes/npm-bump@v2.0.2
         with:
