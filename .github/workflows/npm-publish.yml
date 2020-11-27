@@ -4,25 +4,21 @@
 name: npm-publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: 'Bump type: major, minor or patch. Default is patch'
-        default: 'patch'
-        required: false
+  release:
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
           node-version: 14.11.0
       - run: npm ci
       - run: npm test
 
-  version-and-release:
+  bump-version:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -34,14 +30,8 @@ jobs:
           node-version: 14.11.0
           registry-url: https://registry.npmjs.org/
           scope: '@totalsoft'
-      - run: npm i
-      - name: npm bump
-        uses: bcomnes/npm-bump@v2.0.2
-        with:
-          git_email: 46926675+alexandra-c@users.noreply.github.com
-          git_username: alexandra-c
-          newversion: ${{ github.event.inputs.bump }}
-          # push_version_commit: true
-          publish_cmd: npm run release
-          github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
-          npm_token: ${{ secrets.NPM_TOKEN }}
+      - name: Bump version
+        run: npm version $(git describe --abbrev=0 --tags) --no-git-tag-version
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN }}
