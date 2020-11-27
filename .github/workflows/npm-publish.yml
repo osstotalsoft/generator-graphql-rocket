@@ -42,6 +42,6 @@ jobs:
           git_username: alexandra-c
           newversion: ${{ github.event.inputs.bump }}
           push_version_commit: true
-          publish_cmd: npm publish && gh-release
+          publish_cmd: npm run release
           github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
           npm_token: ${{ secrets.NPM_TOKEN }}
