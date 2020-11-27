@@ -41,7 +41,7 @@ jobs:
           git_email: 46926675+alexandra-c@users.noreply.github.com
           git_username: alexandra-c
           newversion: ${{ github.event.inputs.bump }}
-          push_version_commit: true
+          # push_version_commit: true
           publish_cmd: npm run release
           github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
           npm_token: ${{ secrets.NPM_TOKEN }}
