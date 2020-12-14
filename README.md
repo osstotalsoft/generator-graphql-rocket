@@ -8,14 +8,14 @@
 
 ## Installation  
   
-First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js V14.7](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js >= V14.15](https://nodejs.org/)).
   
 ```bash  
 npm install -g yo
 npm install -g @totalsoft/generator-graphql-rocket
 ```  
   
-If you wand to use this generator to scaffold a new project navigate to section: [Generate new project](#generate-new-project)  
+If you want to use this generator to scaffold a new project navigate to section: [Generate new project](#generate-new-project)  
 To upgrade an existing project that was scaffold using this **GraphQL Rocket Generator**, see section: [Upgrade existing project](#upgrade-existing-project)  
 
 ## Content

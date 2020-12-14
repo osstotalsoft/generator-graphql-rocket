@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "commonjs",
   "engines": {
-    "node": ">=10.0.0",
+    "node": ">=14.15.0",
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "@koa/router": "^9.4.0",
     <%_ if(withMultiTenancy) {_%>
-    "@totalsoft/knex-filters": "^0.3.2",
+    "@totalsoft/knex-filters": "^0.3.3",
     <%_}_%>
     <%_ if(addSubscriptions) {_%>
     "@totalsoft/message-bus": "^0.3.0",
