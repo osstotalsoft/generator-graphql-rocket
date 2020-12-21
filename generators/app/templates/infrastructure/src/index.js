@@ -185,16 +185,13 @@ server.applyMiddleware({ app });
 server.installSubscriptionHandlers(httpServer);
 <%_}_%>
 
-process.on('uncaughtException', function (error) {
-    throw new TypeError(`Error occurred while processing the request: ${error.stack}`)
-})
-
 <%_ if(addSubscriptions) {_%>
 <%_ if(addMessaging && addTracing){ _%>
 const skipMiddleware = (_ctx, next) => next()
 <%_}_%>
 <%_ if(addMessaging) {_%>
-messagingHost()
+const msgHost = messagingHost();
+msgHost
     .subscribe([/*topics*/])
     .use(exceptionHandling())
     .use(correlation())
@@ -207,5 +204,19 @@ messagingHost()
     .use(middleware.dbInstance())
     .use(dispatcher(msgHandlers))
     .start()
+
+process.on("SIGINT", () => {
+    msgHost.stopImmediate();
+});
+process.on("SIGTERM", () => {
+    msgHost.stopImmediate();
+});
 <%_}_%>
 <%_}_%>
+
+process.on('uncaughtException', function (error) {
+    <%_ if(addSubscriptions && addMessaging) {_%>
+    msgHost.stopImmediate();
+    <%_}_%>
+    throw new Error(`Error occurred while processing the request: ${error.stack}`)
+})

@@ -22,13 +22,13 @@
   "dependencies": {
     "@koa/router": "^9.4.0",
     <%_ if(withMultiTenancy) {_%>
-    "@totalsoft/knex-filters": "^0.3.3",
+    "@totalsoft/knex-filters": "^0.3.5",
     <%_}_%>
     <%_ if(addSubscriptions) {_%>
     "@totalsoft/message-bus": "^0.3.0",
     <%_}_%>
     <%_ if(addSubscriptions && addMessaging) {_%>
-    "@totalsoft/messaging-host": "^0.3.0",
+    "@totalsoft/messaging-host": "^0.3.4",
     <%_}_%>
     "apollo-datasource": "^0.7.2",
     "apollo-datasource-rest": "^0.9.4",
