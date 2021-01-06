@@ -10,6 +10,7 @@ module.exports = [
             if (pass) {
                 return true;
             }
+
             return `${chalk.red(
                 "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
             )}`;
@@ -64,7 +65,7 @@ module.exports = [
         name: "helmChartName",
         message: 'What is the name of your helm chart?',
         when: prompts => prompts.addHelm,
-        default: prompts => prompts.projectName.toLowerCase().replace("_","-"),
+        default: prompts => prompts.projectName.toLowerCase().replace("_", "-"),
         validate: name => {
             const pass = name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)
             if (pass) {

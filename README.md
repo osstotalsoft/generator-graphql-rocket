@@ -53,7 +53,7 @@ You will be prompted to introduce the following information:
  6. Implement authorization. By default is set to false. This includes rights and permissions.
  7. Include GraphQL logging plugin. By default is set to false. This also catches all error and throws an error friendly message. Read more bellow.
  8. Whether to generate default helm files or not.
- 9. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
+ 9. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
  9. Add Opentracing using Jaeger. By default is set to false.
  10. Identity API url, your Identity server API url.
  11. Identity openId configuration.
