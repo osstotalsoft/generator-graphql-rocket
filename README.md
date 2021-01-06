@@ -290,6 +290,7 @@ To help you out starting developing a feature in your new server, we included so
  
 ## Deployment
 When you are ready you can deploy you application on any platform. This template also includes a pre-configured Dockerfile and optional Helm files.
+For security reasons, the application isn't going to run as root in container. Once the project is generated, a user is created for your project. Default name is "appuser". You can change the name in Dockerfile.
 
 ## Getting To Know Yeoman
  * Yeoman has a heart of gold.
