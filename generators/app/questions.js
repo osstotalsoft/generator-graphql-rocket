@@ -46,7 +46,7 @@ module.exports = [
         message: 'Would you like to use messaging? This will allow you to receive and handle all events published in a Nats service. Read more here: https://github.com/osstotalsoft/nodebb',
         default: false,
         when: ({ addSubscriptions }) => addSubscriptions
-    },    
+    },
     {
         type: "confirm",
         name: "addGqlLogging",
@@ -60,20 +60,21 @@ module.exports = [
         default: false
     },
     {
-      type: "input",
-      name: "helmChartName",
-      message: 'What is the name of your helm chart?',
-      when: prompts => prompts.addHelm,
-      default: prompts => prompts.projectName.toLowerCase(),
-      validate: name => {
-          const pass = name.match(/^[a-z0-9]+(?:[_-]{1,2}[a-z0-9]+)*$/)
-          if (pass) {
-              return true;
-          }
-          return `${chalk.red(
-              "Provide a valid helm chart name, only use lower case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!"
-          )}`;
-      }
+        type: "input",
+        name: "helmChartName",
+        message: 'What is the name of your helm chart?',
+        when: prompts => prompts.addHelm,
+        default: prompts => prompts.projectName.toLowerCase().replace("_","-"),
+        validate: name => {
+            const pass = name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)
+            if (pass) {
+                return true;
+            }
+
+            return `${chalk.red(
+                "Provide a valid chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!"
+            )}`;
+        }
     },
     {
         type: "confirm",
