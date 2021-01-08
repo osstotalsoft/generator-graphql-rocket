@@ -1,5 +1,7 @@
-<%_ if(addSubscriptions && withMultiTenancy){ _%>
+<%_ if(addSubscriptions){ _%>
 const { topics, redisPubSub } = require('../../pubSub')
+<%_}_%>
+<%_ if(addSubscriptions && withMultiTenancy){ _%>
 const { envelope } = require("@totalsoft/message-bus")
 const { withFilter } = require('apollo-server');
 <%_}_%>
