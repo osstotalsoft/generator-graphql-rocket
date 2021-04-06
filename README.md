@@ -49,7 +49,7 @@ You will be prompted to introduce the following information:
  2. GraphQL port. By default it would be set to `4000`
  3. Include multi-tenancy. By default is set to false.
  4. Use subscriptions. By default is set to false.
- 5. Add messaging integration. Option is available only if you choose to add subscriptions. By default is set to false.
+ 5. Add messaging integration. By default is set to false.
  6. Implement authorization. By default is set to false. This includes rights and permissions.
  7. Include GraphQL logging plugin. By default is set to false. This also catches all error and throws an error friendly message. Read more bellow.
  8. Whether to generate default helm files or not.

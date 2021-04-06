@@ -59,7 +59,6 @@ describe('test package installers', () => {
             .create(path.join(__dirname, '../generators/app'))
             .withPrompts({
                 ...defaultAnswers,
-                addSubscriptions: true,
                 addMessaging: false
             })
             .run()

@@ -16,7 +16,7 @@ const Koa = require("koa");
 const cors = require("@koa/cors");
 const bodyParser = require("koa-bodyparser");
 
-<%_ if(addSubscriptions && addMessaging) {_%>
+<%_ if(addMessaging) {_%>
 // Messaging
 const { msgHandlers, middleware } = require("./messaging")
 const { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
@@ -185,7 +185,6 @@ server.applyMiddleware({ app });
 server.installSubscriptionHandlers(httpServer);
 <%_}_%>
 
-<%_ if(addSubscriptions) {_%>
 <%_ if(addMessaging && addTracing){ _%>
 const skipMiddleware = (_ctx, next) => next()
 <%_}_%>
@@ -212,10 +211,9 @@ process.on("SIGTERM", () => {
     msgHost.stopImmediate();
 });
 <%_}_%>
-<%_}_%>
 
 process.on('uncaughtException', function (error) {
-    <%_ if(addSubscriptions && addMessaging) {_%>
+    <%_ if(addMessaging) {_%>
     msgHost.stopImmediate();
     <%_}_%>
     throw new Error(`Error occurred while processing the request: ${error.stack}`)

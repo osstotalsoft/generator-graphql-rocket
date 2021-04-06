@@ -58,7 +58,7 @@ spec:
             value: {{ $global.db.password | quote }}
           - name: DB_DATABASE
             value: {{ $global.db.database | quote }}
-<%_ if(addSubscriptions && addMessaging) { _%>
+<%_ if(addMessaging) { _%>
           - name: Messaging__TopicPrefix
             value: {{ $global.messaging.topicPrefix | quote }}
           - name: Messaging__Source

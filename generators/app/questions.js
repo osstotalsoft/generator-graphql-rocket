@@ -38,7 +38,7 @@ module.exports = [
     {
         type: "confirm",
         name: "addSubscriptions",
-        message: 'Would you like to support subscriptions? This will also allow you to add some other cool features like messaging integration.',
+        message: 'Would you like to support subscriptions?',
         default: false
     },
     {
@@ -46,7 +46,6 @@ module.exports = [
         name: "addMessaging",
         message: 'Would you like to use messaging? This will allow you to receive and handle all events published in a Nats service. Read more here: https://github.com/osstotalsoft/nodebb',
         default: false,
-        when: ({ addSubscriptions }) => addSubscriptions
     },
     {
         type: "confirm",
