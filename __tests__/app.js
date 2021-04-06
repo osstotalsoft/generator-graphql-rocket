@@ -3,7 +3,6 @@ const path = require('path')
 const assert = require('yeoman-assert')
 const helpers = require('yeoman-test')
 const rimraf = require('rimraf')
-const { fail } = require('yeoman-assert')
 
 describe('generator-graphql-rocket:app', () => {
   const tempRoot = `../.tmp`
