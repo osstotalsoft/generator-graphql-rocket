@@ -115,6 +115,6 @@ module.exports = class extends Generator {
   registerClientTransforms() {
     const fileFilter = filter(['**/*.{js, json}'], { restore: true })
 
-    this.queueTransformStream([fileFilter, prettierTransform(defaultPrettierOptions), fileFilter.restore])
+    this.registerTransformStream([fileFilter, prettierTransform(defaultPrettierOptions), fileFilter.restore])
   }
 }
