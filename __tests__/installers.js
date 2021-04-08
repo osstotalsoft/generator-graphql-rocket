@@ -6,7 +6,6 @@ const helpers = require('yeoman-test')
 describe('test package installers', () => {
     const projectName = 'test-graphql'
     const gqlPort = '4000'
-    const tempRoot = `../.tmp`
 
     const npm = '>= 10.0.0';
     const yarn = '>= 1.22.4';
@@ -30,7 +29,7 @@ describe('test package installers', () => {
                 packageManager: 'npm'
             })
             .run()
-            .then((gen) => {
+            .then((_gen) => {
                 assert.jsonFileContent(`${projectName}/package.json`, {
                     name: projectName,
                     engines: { npm }
@@ -57,7 +56,7 @@ describe('test package installers', () => {
                 packageManager: 'yarn'
             })
             .run()
-            .then((gen) => {
+            .then((_gen) => {
                 assert.jsonFileContent(`${projectName}/package.json`, {
                     name: projectName,
                     engines: { yarn }

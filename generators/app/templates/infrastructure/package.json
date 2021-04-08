@@ -27,7 +27,7 @@
     <%_ if(addSubscriptions) {_%>
     "@totalsoft/message-bus": "^0.3.0",
     <%_}_%>
-    <%_ if(addSubscriptions && addMessaging) {_%>
+    <%_ if(addMessaging) {_%>
     "@totalsoft/messaging-host": "^0.3.4",
     <%_}_%>
     "apollo-datasource": "^0.7.2",

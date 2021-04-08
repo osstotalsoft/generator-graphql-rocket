@@ -2,7 +2,6 @@
 const path = require('path')
 const assert = require('yeoman-assert')
 const helpers = require('yeoman-test')
-const rimraf = require('rimraf')
 
 describe('test package installers', () => {
     const projectName = 'test-graphql'
@@ -59,7 +58,6 @@ describe('test package installers', () => {
             .create(path.join(__dirname, '../generators/app'))
             .withPrompts({
                 ...defaultAnswers,
-                addSubscriptions: true,
                 addMessaging: false
             })
             .run()

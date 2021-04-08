@@ -19,7 +19,7 @@ global:
     samplerType: const
     samplerParam: 1
 <%_}_%>
-<%_ if(addSubscriptions && addMessaging) { _%>
+<%_ if(addMessaging) { _%>
   messaging:
     topicPrefix: <%= projectName %>.
     natsUrl: "nats://[SERVICE].[NAMESPACE]:[PORT]"
@@ -51,7 +51,7 @@ gql:
   resources:
     limits:
       memory: 512Mi
-<%_ if(addSubscriptions && addMessaging) { _%>
+<%_ if(addMessaging) { _%>
   messaging:
     source: <%= projectName %>
     clientId: <%= projectName %>
