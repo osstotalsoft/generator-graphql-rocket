@@ -25,62 +25,63 @@
     "@totalsoft/knex-filters": "^0.3.5",
     <%_}_%>
     <%_ if(addSubscriptions) {_%>
-    "@totalsoft/message-bus": "^0.3.0",
+    "@totalsoft/message-bus": "^0.3.6",
     <%_}_%>
     <%_ if(addMessaging) {_%>
-    "@totalsoft/messaging-host": "^0.3.4",
+    "@totalsoft/messaging-host": "^0.3.6",
     <%_}_%>
-    "apollo-datasource": "^0.7.2",
-    "apollo-datasource-rest": "^0.9.6",
+    "apollo-datasource": "^0.8.0",
+    "apollo-datasource-rest": "^0.11.0",
     <%_ if(addTracing){ _%>
-    "apollo-opentracing": "^2.0.0",
+    "apollo-opentracing": "^2.1.0",
     <%_}_%>
-    "apollo-server": "2.19.1",
-    "apollo-server-koa": "^2.19.1",
-    "async-mutex": "^0.2.6",
+    "apollo-server": "2.22.2",
+    "apollo-server-koa": "^2.22.2",
+    "async-mutex": "^0.3.1",
     "bluebird": "3.7.2",
     "bufferutil": "^4.0.3",
     "colors": "^1.4.0",
     "dataloader": "^2.0.0",
-    "datasource-sql": "^1.3.1",
+    "datasource-sql": "^1.4.1",
     "dotenv": "8.2.0",
     "get-stream": "^6.0.0",
-    "graphql": "^15.4.0",
-    "graphql-middleware": "^6.0.0",
+    "graphql": "^15.5.0",
+    "graphql-middleware": "^6.0.7",
     <%_ if(addSubscriptions){ _%>
     "graphql-redis-subscriptions": "^2.3.1",
     <%_}_%>
-    "graphql-shield": "^7.4.4",
+    "graphql-shield": "^7.5.0",
     <%_ if(addSubscriptions){ _%>
-    "graphql-subscriptions": "^1.1.0",
+    "graphql-subscriptions": "^1.2.1",
     <%_}_%>
-    "graphql-tools": "^7.0.2",
+    "graphql-tools": "^7.0.4",
     "humps": "^2.0.1",
     <%_ if(addSubscriptions){ _%>
-    "ioredis": "^4.19.4",
+    "ioredis": "^4.26.0",
     <%_}_%>
     <%_ if(addTracing){ _%>
     "jaeger-client": "^3.18.1",
     <%_}_%>
     "jsonwebtoken": "8.5.1",
-    "jwks-rsa": "^1.12.1",
-    "knex": "^0.21.15",
-    "knex-tiny-logger": "^2.0.0",
+    "jwks-rsa": "^2.0.2",
+    "knex": "^0.95.4",
+    "knex-tiny-logger": "^2.1.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
-    "koa-jwt": "^4.0.0",
+    "koa-jwt": "^4.0.1",
     "lodash.merge": "^4.6.2",
-    "mime-types": "^2.1.28",
+    "mime-types": "^2.1.30",
     "mssql": "^6.3.1",
     "node-nats-streaming": "0.3.2",
     <%_ if(addTracing){ _%>
     "opentracing": "^0.14.5",
     <%_}_%>
-    "pino": "^6.9.0",
+    "pino": "^6.11.2",
     "ramda": "^0.27.1",
     <%_ if(addSubscriptions){ _%>
     "subscriptions-transport-ws": "^0.9.18",
     <%_}_%>
+    "tedious": "^11.0.7",
     "utf-8-validate": "^5.0.4",
     "utf8-bytes": "0.0.1",
     "uuid": "^8.3.2"
@@ -88,8 +89,8 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "easygraphql-tester": "^5.1.6",
-    "eslint": "^7.17.0",
-    "eslint-plugin-jest": "^24.1.3",
+    "eslint": "^7.24.0",
+    "eslint-plugin-jest": "^24.3.5",
     "eslint-plugin-node": "^11.1.0",
     "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
