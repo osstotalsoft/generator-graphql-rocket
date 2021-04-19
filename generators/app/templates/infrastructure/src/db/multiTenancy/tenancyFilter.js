@@ -6,19 +6,36 @@ async function registerTenancyFilter(columnTenantId, tenantId, knex) {
     knex,
   )
 
-  const addWhereTenantIdClause = (table, queryBuilder) => {
+  const addWhereTenantIdClause = (table, alias, queryBuilder) => {
     queryBuilder.andWhere(
-      `[${table}].[${columnTenantId}]`,
+      `[${alias ?? table}].[${columnTenantId}]`,
+      '=',
+      tenantId,
+    )
+  }
+
+  const addOnTenantIdClause = (
+    table,
+    alias,
+    _queryBuilder,
+    joinClause,
+  ) => {
+    joinClause.andOnVal(
+      `[${alias ?? table}].[${columnTenantId}]`,
       '=',
       tenantId,
     )
   }
 
   const filter = createFilter(tableHasColumnTenantId, {
-    onSelect: addWhereTenantIdClause,
+    onSelect: {
+      from: addWhereTenantIdClause,
+      innerJoin: addWhereTenantIdClause,
+      leftJoin: addOnTenantIdClause,
+    },
     onUpdate: addWhereTenantIdClause,
     onDelete: addWhereTenantIdClause,
-    onInsert: (inserted) => {
+    onInsert: (_table, _alias, _queryBuilder, inserted) => {
       inserted[columnTenantId] = tenantId
     },
   })
