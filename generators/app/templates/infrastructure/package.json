@@ -22,7 +22,7 @@
   "dependencies": {
     "@koa/router": "^10.0.0",
     <%_ if(withMultiTenancy) {_%>
-    "@totalsoft/knex-filters": "^1.0.0",
+    "@totalsoft/knex-filters": "^1.0.1",
     <%_}_%>
     <%_ if(addSubscriptions) {_%>
     "@totalsoft/message-bus": "^1.0.0",
@@ -64,7 +64,7 @@
     <%_}_%>
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "^2.0.2",
-    "knex": "^0.95.4",
+    "knex": "^0.21.19",
     "knex-tiny-logger": "^2.1.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
