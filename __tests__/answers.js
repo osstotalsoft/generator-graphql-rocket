@@ -66,6 +66,19 @@ describe('test package installers', () => {
             })
     })
 
+    it('does not contain middleware in messaging', () => {
+        return helpers
+            .create(path.join(__dirname, '../generators/app'))
+            .withPrompts({
+                ...defaultAnswers,
+                addMessaging: false
+            })
+            .run()
+            .then(() => {
+                assert.noFile(path.join(__dirname, `${projectName}/src/messaging/middleware`))
+            })
+    })
+
     it('does not contain helm files', () => {
         return helpers
             .create(path.join(__dirname, '../generators/app'))
