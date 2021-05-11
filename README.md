@@ -289,8 +289,14 @@ JAEGER_DISABLED=true
 To help you out starting developing a feature in your new server, we included some code samples ( see `src/features/user`). This code's purpose is not only to help you wrap you head around SDL and GraphQL development in general, but it also comes with the queries and data needed to implement authorization in your web application, the missing part from [Webapp Rocket Generator -> Authorization ](https://github.com/osstotalsoft/generator-webapp-rocket#authorization).
  
 ## Deployment
-When you are ready you can deploy you application on any platform. This template also includes a pre-configured Dockerfile and optional Helm files.
+When you are ready you can deploy your application on any platform. This template also includes a pre-configured Dockerfile and optional Helm files.
 Application (or non-system) containers security can be enhanced by running as a non-root user. This can reduce the damage done by a malicious actor that gains access to the application and the underlying system, because it will have only the rights assigned to that user (for example it will not be able to install arbitrary software). Once the project is generated, a user is created for your project. Default name is "appuser". You can change the name in Dockerfile.
+
+## HashiCorp Vault
+HashiCorp Vault is a secrets management tool specifically designed to control access to sensitive credentials in a low-trust environment. It can be used to store sensitive values and at the same time dynamically generate access for specific services/applications on lease. Plus, Vault can be used to authenticate users (machines or humans) to make sure they are authorized to access a particular file.
+The generated project comes with default configurations for Vault. At release time, the configurations must be changed with the Vault secrets defined for your project. 
+By default, the project doesn't use secrets defined in Vault. In order to use it, the 'vaultEnvironment' property must be set to true in values.yaml at release.
+
 
 More info: https://opensource.com/article/18/3/just-say-no-root-containers
 ## Getting To Know Yeoman
