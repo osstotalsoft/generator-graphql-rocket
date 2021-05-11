@@ -30,9 +30,19 @@ spec:
       {{- include "Gql.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations: 
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: {{ $global.vaultConfigs.role }}
+        vault.hashicorp.com/agent-inject-secret-credentials.vault: {{$global.vaultConfigs.secret }}/{{ $global.vaultConfigs.key }}
+        vault.hashicorp.com/agent-inject-template-credentials.vault: |
+          {{ printf "{{- with secret \"%s/%s\" -}}"  .Values.global.vaultConfigs.secret .Values.global.vaultConfigs.key }}
+          export DB_USER={{`{{ .Data.data.db_user }}`}}
+          export DB_PASSWORD={{`{{ .Data.data.db_password }}`}} 
+          {{ print "{{- end }}" }}
       labels:
         {{- include "Gql.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ $global.vaultConfigs.sa }}
     {{- with $current.image.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -52,12 +62,14 @@ spec:
             value: {{ $global.db.host | quote }}
           - name: DB_PORT
             value: {{ $global.db.port | quote }}
+          - name: DB_DATABASE
+            value: {{ $global.db.database | quote }}
+          {{- if eq $global.vaultEnvironment "false" }}
           - name: DB_USER
             value: {{ $global.db.user | quote }}
           - name: DB_PASSWORD
             value: {{ $global.db.password | quote }}
-          - name: DB_DATABASE
-            value: {{ $global.db.database | quote }}
+          {{- end }}
 <%_ if(addMessaging) { _%>
           - name: Messaging__TopicPrefix
             value: {{ $global.messaging.topicPrefix | quote }}

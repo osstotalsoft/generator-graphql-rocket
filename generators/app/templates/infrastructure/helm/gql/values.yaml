@@ -6,6 +6,15 @@ global:
   imagePullSecrets:
   - name: "registrykey"
 
+  vaultEnvironment: "false"
+
+#default values
+  vaultConfigs:
+    sa: "sa"
+    role: "role"
+    secret: "secret"
+    key: key
+
 <%_ if(addTracing){ _%>
   jaeger:
     enabled: true

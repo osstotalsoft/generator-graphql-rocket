@@ -27,4 +27,6 @@ USER $imageUser
 
 EXPOSE 4000
 
-CMD [ "npm", "start", "--config-env", "production"]
+
+CMD ["/bin/bash", "-c", "test -f /vault/secrets/credentials.vault && echo 'INFO: Vault credentials loaded.' && \
+    source /vault/secrets/credentials.vault || echo 'INFO: Vault file not loaded.' && npm start --config-env production"]
