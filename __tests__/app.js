@@ -9,7 +9,7 @@ describe('generator-graphql-rocket:app', () => {
   const projectName = 'test-graphql'
   const defaultAnswers = {
     projectName,
-    gqlPort: "",
+    gqlPort: '',
     withMultiTenancy: true,
     addSubscriptions: false,
     addMessaging: false,
@@ -17,11 +17,15 @@ describe('generator-graphql-rocket:app', () => {
     addGqlLogging: false,
     addHelm: false,
     addTracing: false,
-    identityApiUrl: "",
-    identityOpenIdConfig: "",
+    identityApiUrl: '',
+    identityOpenIdConfig: '',
     identityAuthority: 'localhost:5000',
     packageManager: 'npm'
   }
+
+  beforeAll(() => {
+    rimraf.sync(path.join(__dirname, tempRoot))
+  })
 
   afterEach(() => {
     rimraf.sync(path.join(__dirname, tempRoot))
@@ -45,10 +49,7 @@ describe('generator-graphql-rocket:app', () => {
       .withPrompts(defaultAnswers)
       .run()
       .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/package.json`),
-          `"name": "${projectName}"`
-        )
+        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"name": "${projectName}"`)
       })
   })
 
@@ -63,10 +64,7 @@ describe('generator-graphql-rocket:app', () => {
       })
       .run()
       .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/.env`),
-          `PORT="${gqlPort}"`
-        )
+        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/.env`), `PORT="${gqlPort}"`)
       })
   })
 
@@ -93,9 +91,9 @@ describe('generator-graphql-rocket:app', () => {
         addHelm: true
       })
       .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`));
+        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
       })
-  });
+  })
 
   it('GraphQL logging plugin is added', () => {
     return helpers
@@ -108,9 +106,9 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/plugins/logging`
-        assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`]);
+        assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
       })
-  });
+  })
 
   it('Permissions and rights are ready to be used', () => {
     return helpers
@@ -123,7 +121,7 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/middleware/permissions`
-        assert.file([`${root}/index.js`, `${root}/rules.js`]);
+        assert.file([`${root}/index.js`, `${root}/rules.js`])
       })
-  });
+  })
 })
