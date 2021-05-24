@@ -48,7 +48,7 @@ module.exports = class extends Generator {
     let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
 
     if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
-    if (!addMessaging) ignoreFiles = append('**/messaging/*', ignoreFiles)
+    if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
     if (!withMultiTenancy)
       ignoreFiles = concat(
         ['**/features/tenant/**', '**/multiTenancy/**', '**/middleware/tenantIdentification/**'],

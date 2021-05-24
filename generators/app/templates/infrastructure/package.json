@@ -24,7 +24,7 @@
     <%_ if(withMultiTenancy) {_%>
     "@totalsoft/knex-filters": "^1.0.1",
     <%_}_%>
-    <%_ if(addSubscriptions) {_%>
+    <%_ if((addSubscriptions && withMultiTenancy) || addMessaging) {_%>
     "@totalsoft/message-bus": "^1.0.0",
     <%_}_%>
     <%_ if(addMessaging) {_%>
