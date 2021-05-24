@@ -24,12 +24,11 @@
     <%_ if(withMultiTenancy) {_%>
     "@totalsoft/knex-filters": "^1.0.1",
     <%_}_%>
-    <%_ if(addSubscriptions && withMultiTenancy && !addMessaging) {_%>
+    <%_ if((addSubscriptions && withMultiTenancy) || addMessaging) {_%>
     "@totalsoft/message-bus": "^1.0.0",
     <%_}_%>
     <%_ if(addMessaging) {_%>
     "@totalsoft/messaging-host": "^1.0.0",
-    "@totalsoft/message-bus": "^1.0.0",
     <%_}_%>
     "apollo-datasource": "^0.8.0",
     "apollo-datasource-rest": "^0.11.0",

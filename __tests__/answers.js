@@ -8,6 +8,7 @@ describe('test package installers', () => {
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
+  var messageBus = /^@totalsoft[/]message-bus/
   const defaultAnswers = {
     projectName,
     gqlPort,
@@ -73,6 +74,21 @@ describe('test package installers', () => {
       .run()
       .then(() => {
         assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/messaging`))
+      })
+  })
+
+  it('does not contain message-bus package', () => {
+    return helpers
+      .create(path.join(__dirname, '../generators/app'))
+      .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({
+        ...defaultAnswers
+      })
+      .run()
+      .then(_gen => {
+        assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
+          dependencies: messageBus
+        })
       })
   })
 
