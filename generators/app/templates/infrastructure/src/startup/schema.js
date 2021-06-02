@@ -15,17 +15,17 @@ const userResolvers = require('../features/user/resolvers');
 const tenantResolvers = require('../features/tenant/resolvers');
 <%_}_%>
 
-const typeDefs = []
+const oldTypeDefs = []
 const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
   loaders: [new GraphQLFileLoader()]
 })
 const resolvers = merge(userResolvers<% if(withMultiTenancy){ %>, tenantResolvers<%}%>)
 
-const mergedTypeDefs = [...sources.map(source => source.document), ...typeDefs]
+const typeDefs = [...sources.map(source => source.document), ...oldTypeDefs]
 
 <%_ if(withRights){ _%>
-module.exports = applyMiddleware(makeExecutableSchema({ typeDefs: mergedTypeDefs, resolvers }), permissionsMiddleware);
+module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissionsMiddleware);
 <%_} else { _%>
-module.exports = makeExecutableSchema({ typeDefs: mergedTypeDefs, resolvers });
+module.exports = makeExecutableSchema({ typeDefs, resolvers });
 <%_}_%>
-module.exports.tests = { typeDefs: mergedTypeDefs, resolvers }
+module.exports.tests = { typeDefs, resolvers }
