@@ -1,6 +1,3 @@
-const { gql } = require('apollo-server');
-
-const userTypeDefs = gql`
 input UserInputType {
     id: Int!
     firstName: String
@@ -39,6 +36,3 @@ extend type Mutation {
 extend type Subscription {
     userChanged: String
 }
-`;
-
-module.exports = userTypeDefs;
