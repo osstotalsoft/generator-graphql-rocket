@@ -32,7 +32,8 @@ To upgrade an existing project that was scaffold using this **GraphQL Rocket Gen
 11. [OpenTracing](#opentracing)
 12. [Code examples](#code-examples)
 13. [Deployment](#deployment)
-14. [Getting To Know Yeoman](#getting-to-know-yeoman)
+14. [HashiCorp Vault](#hashicorp-vault)
+15. [Getting To Know Yeoman](#getting-to-know-yeoman)
 
 ## Generate new project  
 To scaffold your new GraphQL server using our generator run:  
