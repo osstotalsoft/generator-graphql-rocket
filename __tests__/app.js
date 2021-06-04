@@ -7,6 +7,7 @@ const rimraf = require('rimraf')
 describe('generator-graphql-rocket:app', () => {
   const tempRoot = `../.tmp`
   const projectName = 'test-graphql'
+  const helmChartName = 'test-helm'
   const defaultAnswers = {
     projectName,
     gqlPort: '',
@@ -16,6 +17,7 @@ describe('generator-graphql-rocket:app', () => {
     withRights: false,
     addGqlLogging: false,
     addHelm: false,
+    addVaultConfigs: false,
     addTracing: false,
     identityApiUrl: '',
     identityOpenIdConfig: '',
@@ -122,6 +124,26 @@ describe('generator-graphql-rocket:app', () => {
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/middleware/permissions`
         assert.file([`${root}/index.js`, `${root}/rules.js`])
+      })
+  })
+
+  it('Contains vaultEnvironment variable set to false', () => {
+    return helpers
+      .create(path.join(__dirname, '../generators/app'))
+      .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({
+        ...defaultAnswers,
+        addHelm: true,
+        helmChartName: 'test-helm',
+        addVaultConfigs: true
+      })
+      .run()
+      .then(() => {
+        console.log(`${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
+        assert.fileContent(
+          path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
+          `vaultEnvironment: "false"`
+        )
       })
   })
 })
