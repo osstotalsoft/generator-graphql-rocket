@@ -30,6 +30,7 @@ spec:
       {{- include "Gql.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+    <%_ if(addVaultConfigs){ _%>
       annotations: 
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: {{ $global.vaultConfigs.role }}
@@ -39,10 +40,15 @@ spec:
           export DB_USER={{`{{ .Data.data.db_user }}`}}
           export DB_PASSWORD={{`{{ .Data.data.db_password }}`}} 
           {{ print "{{- end }}" }}
+    <%_}_%>
       labels:
         {{- include "Gql.selectorLabels" . | nindent 8 }}
     spec:
+    <%_ if(addVaultConfigs){ _%>
+      {{- if eq $global.vaultEnvironment "true" }}
       serviceAccountName: {{ $global.vaultConfigs.sa }}
+      {{- end }}
+    <%_}_%>
     {{- with $current.image.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
