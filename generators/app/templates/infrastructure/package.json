@@ -24,11 +24,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@graphql-tools/graphql-file-loader": "^6.2.7",
+    "@graphql-tools/load": "^6.2.8",
     "@koa/router": "^10.0.0",
     <%_ if(withMultiTenancy) {_%>
     "@totalsoft/knex-filters": "^1.0.1",
     <%_}_%>
-    <%_ if(addSubscriptions) {_%>
+    <%_ if((addSubscriptions && withMultiTenancy) || addMessaging) {_%>
     "@totalsoft/message-bus": "^1.0.0",
     <%_}_%>
     <%_ if(addMessaging) {_%>
@@ -80,6 +82,7 @@
     <%_ if(addTracing){ _%>
     "opentracing": "^0.14.5",
     <%_}_%>
+    "path": "^0.12.7",
     "pino": "^6.11.2",
     "ramda": "^0.27.1",
     <%_ if(addSubscriptions){ _%>

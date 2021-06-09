@@ -1,6 +1,3 @@
-const { gql } = require("apollo-server-koa");
-
-const tenantTypeDefs = gql`
 type Tenant {
     id: ID!
     name: String!
@@ -18,6 +15,3 @@ type ExternalTenant {
 extend type Query {
     myTenants: [ExternalTenant!]!
 }
-`;
-
-module.exports = tenantTypeDefs;

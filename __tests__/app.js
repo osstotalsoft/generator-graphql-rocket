@@ -7,21 +7,27 @@ const rimraf = require('rimraf')
 describe('generator-graphql-rocket:app', () => {
   const tempRoot = `../.tmp`
   const projectName = 'test-graphql'
+  const helmChartName = 'test-helm'
   const defaultAnswers = {
     projectName,
-    gqlPort: "",
+    gqlPort: '',
     withMultiTenancy: true,
     addSubscriptions: false,
     addMessaging: false,
     withRights: false,
     addGqlLogging: false,
     addHelm: false,
+    addVaultConfigs: false,
     addTracing: false,
-    identityApiUrl: "",
-    identityOpenIdConfig: "",
+    identityApiUrl: '',
+    identityOpenIdConfig: '',
     identityAuthority: 'localhost:5000',
     packageManager: 'npm'
   }
+
+  beforeAll(() => {
+    rimraf.sync(path.join(__dirname, tempRoot))
+  })
 
   afterEach(() => {
     rimraf.sync(path.join(__dirname, tempRoot))
@@ -45,10 +51,7 @@ describe('generator-graphql-rocket:app', () => {
       .withPrompts(defaultAnswers)
       .run()
       .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/package.json`),
-          `"name": "${projectName}"`
-        )
+        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"name": "${projectName}"`)
       })
   })
 
@@ -63,10 +66,7 @@ describe('generator-graphql-rocket:app', () => {
       })
       .run()
       .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/.env`),
-          `PORT="${gqlPort}"`
-        )
+        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/.env`), `PORT="${gqlPort}"`)
       })
   })
 
@@ -93,9 +93,9 @@ describe('generator-graphql-rocket:app', () => {
         addHelm: true
       })
       .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`));
+        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
       })
-  });
+  })
 
   it('GraphQL logging plugin is added', () => {
     return helpers
@@ -108,9 +108,9 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/plugins/logging`
-        assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`]);
+        assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
       })
-  });
+  })
 
   it('Permissions and rights are ready to be used', () => {
     return helpers
@@ -123,7 +123,27 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/middleware/permissions`
-        assert.file([`${root}/index.js`, `${root}/rules.js`]);
+        assert.file([`${root}/index.js`, `${root}/rules.js`])
       })
-  });
+  })
+
+  it('Contains vaultEnvironment variable set to false', () => {
+    return helpers
+      .create(path.join(__dirname, '../generators/app'))
+      .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({
+        ...defaultAnswers,
+        addHelm: true,
+        helmChartName: 'test-helm',
+        addVaultConfigs: true
+      })
+      .run()
+      .then(() => {
+        console.log(`${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
+        assert.fileContent(
+          path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
+          `vaultEnvironment: "false"`
+        )
+      })
+  })
 })
