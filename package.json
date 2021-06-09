@@ -59,6 +59,9 @@
     "eslint:report": "eslint --fix --ext .js .",
     "release": "git push --follow-tags && gh-release -y"
   },
+  "lint-staged": {
+    "**/*": "prettier --write"
+  },
   "jest": {
     "testEnvironment": "node",
     "modulePathIgnorePatterns": [
