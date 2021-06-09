@@ -19,7 +19,7 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "**/*": "prettier --write"
+    "**/*.+(js|md|css|graphql|json)": "prettier --write"
   },
   "author": "",
   "license": "ISC",
