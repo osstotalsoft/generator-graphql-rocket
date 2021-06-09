@@ -17,6 +17,9 @@
     "lint": "eslint --fix --ext .js .",
     "prettier": "prettier --write **/*.js"
   },
+  "lint-staged": {
+    "**/*": "prettier --write"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
