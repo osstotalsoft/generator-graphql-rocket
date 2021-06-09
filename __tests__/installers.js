@@ -9,7 +9,7 @@ describe('test package installers', () => {
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
 
-  const npm = '>= 10.0.0'
+  const npm = '>= 7.16.0'
   const yarn = '>= 1.22.4'
 
   beforeAll(() => {

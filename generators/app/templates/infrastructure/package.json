@@ -15,7 +15,11 @@
     "test:watch": "<%=packageManager%> run test -- --watch",
     "test:ci": "cross-env CI=true <%=packageManager%> test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
     "lint": "eslint --fix --ext .js .",
-    "prettier": "prettier --write **/*.js"
+    "prettier": "prettier --write **/*.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*.+(js|md|css|graphql|json)": "prettier --write"
   },
   "author": "",
   "license": "ISC",
@@ -98,7 +102,9 @@
     "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
     "jest-junit": "^12.0.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^10.5.4"
   },
   "jest": {
     "setupFilesAfterEnv": [
