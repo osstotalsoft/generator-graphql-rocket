@@ -57,8 +57,7 @@
     "test": "jest --runInBand --detectOpenHandles --collectCoverage",
     "test:coverage": "jest --collectCoverage",
     "eslint:report": "eslint --fix --ext .js .",
-    "release": "git push --follow-tags && gh-release -y",
-    "prepare": "husky install"
+    "release": "git push --follow-tags && gh-release -y"
   },
   "jest": {
     "testEnvironment": "node",
