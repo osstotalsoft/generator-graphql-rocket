@@ -20,8 +20,7 @@ describe('test package installers', () => {
     rimraf.sync(path.join(__dirname, tempRoot))
   })
 
-  it('installs packages with npm', () => {
-    return helpers
+  it('installs packages with npm', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -45,11 +44,9 @@ describe('test package installers', () => {
           name: projectName,
           engines: { npm }
         })
-      })
-  })
+      }))
 
-  it('installs packages with yarn', () => {
-    return helpers
+  it('installs packages with yarn', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -73,8 +70,7 @@ describe('test package installers', () => {
           name: projectName,
           engines: { yarn }
         })
-      })
-  })
+      }))
 
   afterAll(() => {
     rimraf.sync(path.join(__dirname, tempRoot))

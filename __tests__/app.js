@@ -33,27 +33,23 @@ describe('generator-graphql-rocket:app', () => {
     rimraf.sync(path.join(__dirname, tempRoot))
   })
 
-  it('create new project folder with template data', () => {
-    return helpers
+  it('create new project folder with template data', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts(defaultAnswers)
       .run()
       .then(() => {
         assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/index.js`))
-      })
-  })
+      }))
 
-  it('project has given name', () => {
-    return helpers
+  it('project has given name', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts(defaultAnswers)
       .run()
       .then(() => {
         assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"name": "${projectName}"`)
-      })
-  })
+      }))
 
   it('gql port is configured', () => {
     const gqlPort = '4000'
@@ -70,8 +66,7 @@ describe('generator-graphql-rocket:app', () => {
       })
   })
 
-  it('Redis PubSub is added for Subscriptions', () => {
-    return helpers
+  it('Redis PubSub is added for Subscriptions', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -81,11 +76,9 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
-      })
-  })
+      }))
 
-  it('helm files are added when addHelm option is true', () => {
-    return helpers
+  it('helm files are added when addHelm option is true', () => helpers
       .run(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -94,11 +87,9 @@ describe('generator-graphql-rocket:app', () => {
       })
       .then(() => {
         assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
-      })
-  })
+      }))
 
-  it('GraphQL logging plugin is added', () => {
-    return helpers
+  it('GraphQL logging plugin is added', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -109,11 +100,9 @@ describe('generator-graphql-rocket:app', () => {
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/plugins/logging`
         assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
-      })
-  })
+      }))
 
-  it('Permissions and rights are ready to be used', () => {
-    return helpers
+  it('Permissions and rights are ready to be used', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -124,11 +113,9 @@ describe('generator-graphql-rocket:app', () => {
       .then(() => {
         const root = `${tempRoot}/${projectName}/src/middleware/permissions`
         assert.file([`${root}/index.js`, `${root}/rules.js`])
-      })
-  })
+      }))
 
-  it('Contains vaultEnvironment variable set to false', () => {
-    return helpers
+  it('Contains vaultEnvironment variable set to false', () => helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -139,11 +126,9 @@ describe('generator-graphql-rocket:app', () => {
       })
       .run()
       .then(() => {
-        console.log(`${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
         assert.fileContent(
           path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
           `vaultEnvironment: "false"`
         )
-      })
-  })
+      }))
 })

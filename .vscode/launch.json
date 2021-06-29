@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "yeoman",
       "program": "${workspaceRoot}/node_modules/yo/lib/cli.js",
-      "args": ["@totalsoft/graphql-rocket"],
+      "args": ["./generators/app/index.js"],
       "stopOnEntry": false,
       "cwd": "${workspaceRoot}",
       "console": "integratedTerminal",
