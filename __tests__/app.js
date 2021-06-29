@@ -5,6 +5,7 @@ const helpers = require('yeoman-test')
 const rimraf = require('rimraf')
 
 describe('generator-graphql-rocket:app', () => {
+  jest.setTimeout(10 * 1000)
   const tempRoot = `../.tmp`
   const projectName = 'test-graphql'
   const helmChartName = 'test-helm'
@@ -34,22 +35,22 @@ describe('generator-graphql-rocket:app', () => {
   })
 
   it('create new project folder with template data', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts(defaultAnswers)
-      .run()
-      .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/index.js`))
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts(defaultAnswers)
+    .run()
+    .then(() => {
+      assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/index.js`))
+    }))
 
   it('project has given name', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts(defaultAnswers)
-      .run()
-      .then(() => {
-        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"name": "${projectName}"`)
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts(defaultAnswers)
+    .run()
+    .then(() => {
+      assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"name": "${projectName}"`)
+    }))
 
   it('gql port is configured', () => {
     const gqlPort = '4000'
@@ -67,68 +68,68 @@ describe('generator-graphql-rocket:app', () => {
   })
 
   it('Redis PubSub is added for Subscriptions', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addSubscriptions: true
-      })
-      .run()
-      .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addSubscriptions: true
+    })
+    .run()
+    .then(() => {
+      assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
+    }))
 
   it('helm files are added when addHelm option is true', () => helpers
-      .run(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addHelm: true
-      })
-      .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
-      }))
+    .run(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addHelm: true
+    })
+    .then(() => {
+      assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
+    }))
 
   it('GraphQL logging plugin is added', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addGqlLogging: true
-      })
-      .run()
-      .then(() => {
-        const root = `${tempRoot}/${projectName}/src/plugins/logging`
-        assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addGqlLogging: true
+    })
+    .run()
+    .then(() => {
+      const root = `${tempRoot}/${projectName}/src/plugins/logging`
+      assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
+    }))
 
   it('Permissions and rights are ready to be used', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        withRights: true
-      })
-      .run()
-      .then(() => {
-        const root = `${tempRoot}/${projectName}/src/middleware/permissions`
-        assert.file([`${root}/index.js`, `${root}/rules.js`])
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      withRights: true
+    })
+    .run()
+    .then(() => {
+      const root = `${tempRoot}/${projectName}/src/middleware/permissions`
+      assert.file([`${root}/index.js`, `${root}/rules.js`])
+    }))
 
   it('Contains vaultEnvironment variable set to false', () => helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addHelm: true,
-        helmChartName: 'test-helm',
-        addVaultConfigs: true
-      })
-      .run()
-      .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
-          `vaultEnvironment: "false"`
-        )
-      }))
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addHelm: true,
+      helmChartName: 'test-helm',
+      addVaultConfigs: true
+    })
+    .run()
+    .then(() => {
+      assert.fileContent(
+        path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
+        `vaultEnvironment: "false"`
+      )
+    }))
 })

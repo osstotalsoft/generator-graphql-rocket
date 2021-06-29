@@ -5,6 +5,7 @@ const assert = require('yeoman-assert')
 const helpers = require('yeoman-test')
 
 describe('test package installers', () => {
+  jest.setTimeout(10 * 1000)
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
