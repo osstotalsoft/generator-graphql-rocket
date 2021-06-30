@@ -5,10 +5,11 @@ const assert = require('yeoman-assert')
 const helpers = require('yeoman-test')
 
 describe('test package installers', () => {
+  jest.setTimeout(10 * 1000)
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
-  var messageBus = /^@totalsoft[/]message-bus/
+  const messageBus = /^@totalsoft[/]message-bus/
   const defaultAnswers = {
     projectName,
     gqlPort,
@@ -49,74 +50,69 @@ describe('test package installers', () => {
       })
   })
 
-  it('does not contain subscriptions', () => {
-    return helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addSubscriptions: false
-      })
-      .run()
-      .then(() => {
-        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
-      })
-  })
+  it('does not contain subscriptions', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addSubscriptions: false
+    })
+    .run()
+    .then(() => {
+      assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
+    })
+  )
 
-  it('does not contain messaging', () => {
-    return helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addMessaging: false
-      })
-      .run()
-      .then(() => {
-        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/messaging`))
-      })
-  })
+  it('does not contain messaging', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addMessaging: false
+    })
+    .run()
+    .then(() => {
+      assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/messaging`))
+    })
+  )
 
-  it('does not contain message-bus package', () => {
-    return helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers
+  it('does not contain message-bus package', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers
+    })
+    .run()
+    .then(_gen => {
+      assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
+        dependencies: messageBus
       })
-      .run()
-      .then(_gen => {
-        assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
-          dependencies: messageBus
-        })
-      })
-  })
+    })
+  )
 
-  it('does not contain middleware in messaging', () => {
-    return helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addMessaging: false
-      })
-      .run()
-      .then(() => {
-        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/messaging/middleware`))
-      })
-  })
+  it('does not contain middleware in messaging', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addMessaging: false
+    })
+    .run()
+    .then(() => {
+      assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/messaging/middleware`))
+    })
+  )
 
-  it('does not contain helm files', () => {
-    return helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addHelm: false
-      })
-      .run()
-      .then(() => {
-        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
-      })
-  })
+  it('does not contain helm files', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addHelm: false
+    })
+    .run()
+    .then(() => {
+      assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
+    })
+  )
 })
