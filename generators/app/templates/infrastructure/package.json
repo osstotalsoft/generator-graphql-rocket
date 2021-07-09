@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "test": "jest --collectCoverage",
+    "test": "jest --collectCoverage --passWithNoTests",
     "test:watchAll": "<%=packageManager%> run test -- --watchAll",
     "test:watch": "<%=packageManager%> run test -- --watch",
     "test:ci": "cross-env CI=true <%=packageManager%> test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
