@@ -42,7 +42,7 @@
     "apollo-opentracing": "^2.1.0",
     <%_}_%>
     "apollo-server": "2.25.2",
-    "apollo-server-koa": "^2.25.2",
+    "apollo-server-koa": "2.25.2",
     "async-mutex": "^0.3.1",
     "bluebird": "3.7.2",
     "bufferutil": "^4.0.3",
