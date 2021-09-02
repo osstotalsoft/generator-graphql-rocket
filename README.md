@@ -22,16 +22,16 @@ To upgrade an existing project that was scaffold using this **GraphQL Rocket Gen
 1. [Generate new project](#generate-new-project)  
 2. [Upgrade existing project](#upgrade-existing-project)  
 3. [What is a Generator?](#what-is-a-generator)  
-4. [Code formatting](#code-formatting)  
-5. [Token validation](#token-validation)  
-6. [Authorization](#authorization)  
-7. [Multi-tenancy](#multi-tenancy)
-8. [Subscriptions](#subscriptions)  
-9. [Messaging](#messaging)  
-10. [Error logging](#error-logging) 
-11. [OpenTracing](#opentracing)
-12. [Code examples](#code-examples)
-13. [Enforcing Coding Conventions](#enforcing-coding-conventions)
+4. [Code formatting](#code-formatting)
+5. [Enforcing Coding Conventions](#enforcing-coding-conventions)
+6. [Token validation](#token-validation)  
+7. [Authorization](#authorization)  
+8. [Multi-tenancy](#multi-tenancy)
+9. [Subscriptions](#subscriptions)  
+10. [Messaging](#messaging)  
+11. [Error logging](#error-logging) 
+12. [OpenTracing](#opentracing)
+13. [Code examples](#code-examples)
 14. [Deployment](#deployment)
 15. [HashiCorp Vault](#hashicorp-vault)
 16. [Getting To Know Yeoman](#getting-to-know-yeoman)
@@ -113,6 +113,50 @@ For maintaining unitary style, the **.prettierrc** configuration file is read by
 In case the **.prettierrc** file is customized, the new settings will be used when re-running the generator. The only condition is to answer **no** when asked to overwrite this file.  
 
 The default prettier config file can be found here: [.prettierrc](generators/app/templates/infrastructure/.prettierrc)
+
+## Enforcing Coding Conventions
+
+Ensuring code quality is very important for a maintainable and scalable application. As a default, this generator automatically will install and configure ESLint and Prettier in your project, for a consistent code formatting. ( Read more about this in [Code formatting](#code-formatting) section. ).
+
+To help you enforce this standards, the generator also comes with this great library called **Husky** ( 🐶 woof! ).
+
+**[Husky](https://typicode.github.io/husky/#/)** is a JavaScript package that allows you to run some code during various parts of your git workflow. Husky leverages git hooks to allow you to hook into various git events such as pre-commit and pre-push.
+
+This application uses husky to trigger lint-staged during the pre-commit hook to automate the tedious part of your workflows, such as formatting with Prettier and/or linting with ESLint. Your code gets fixed before it ever leaves your machine, so you don’t have to wait for your CI to inform you that you forgot to run the formatter or linter.
+
+  ### ⚠ Configuring a monorepo with multiple packages
+By design, `husky install` must be run in the same directory as `.git`. If your project is a monorepo containing multiple packages, for example a Server and Client sub-folders, husky will expects your `package.json` to be at the root of your project.
+
+If you don't want to add a separate `package.json` in your root just for this, you need to change the husky configurations in your Server and Client projects as follows:
+
+* Change directory during prepare script and pass a subdirectory
+```
+// clientProject/package.json
+"scripts": {
+    "prepare": "cd .. && husky install clientProject/.husky"
+}
+```
+```
+// serverProject/package.json
+"scripts": {
+    "prepare": "cd .. && husky install serverProject/.husky"
+}
+```
+
+* You'll also need to change directory in one of Client or Server hooks and write for both projects  
+```
+// clientProject/.husky/pre-commit
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+cd serverProject
+npx lint-staged
+npm run test:ci
+cd ../clientProject
+npx lint-staged
+npm run test:ci
+```
+
+* Run `npm install` in both projects and that’s it! Now if you try to make a commit, you will see that eslint and prettier will run and fix themselves as you would expect.
 
 ## Token validation
 This GraphQL server is expecting that all the applications and services that consumes him, uses an Identity server that generates secure jwk authentication tokens. 
@@ -290,46 +334,6 @@ JAEGER_DISABLED=true
 
 To help you out starting developing a feature in your new server, we included some code samples ( see `src/features/user`). This code's purpose is not only to help you wrap you head around SDL and GraphQL development in general, but it also comes with the queries and data needed to implement authorization in your web application, the missing part from [Webapp Rocket Generator -> Authorization ](https://github.com/osstotalsoft/generator-webapp-rocket#authorization).
 
-## Enforcing Coding Conventions
-
-**[Husky](https://typicode.github.io/husky/#/)** is a JavaScript package that allows you to run some code during various parts of your git workflow. Husky leverages git hooks to allow you to hook into various git events such as pre-commit and pre-push.
-
-This application uses husky to trigger lint-staged during the pre-commit hook to automate the tedious part of your workflows, such as formatting with Prettier and/or linting with ESLint. Your code gets fixed before it ever leaves your machine, so you don’t have to wait for your CI to inform you that you forgot to run the formatter or linter.
-
-By design, `husky install` must be run in the same directory as `.git`. If your project is a monorepo, or a single repo contains both the Server and Client in separate folders, husky will expects your `package.json` to be at the root of your project. 
-If you don't want to have anothor package.json in the root, you have to make some changes in both your Server and Client folders:
-
-* Change directory during prepare script and pass a subdirectory
-```
-// clientProject/package.json
-"scripts": {
-    "prepare": "cd .. && husky install clientProject/.husky"
-}
-```
-```
-// serverProject/package.json
-"scripts": {
-    "prepare": "cd .. && husky install serverProject/.husky"
-}
-```
-
-* You'll also need to change directory in one of Client or Server hooks and write for both projects  
-```
-// clientProject/.husky/pre-commit
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-cd serverProject
-npx lint-staged
-npm run test:ci
-
-cd ../clientProject
-npx lint-staged
-npm run test:ci
-```
-
-* Run `npm install` in both projects and that’s it! Now if you try to make a commit, you will see that eslint and prettier will run and fix themselves as you would expect.
- 
 ## Deployment
 When you are ready you can deploy your application on any platform. This template also includes a pre-configured Dockerfile and optional Helm files.
 Application (or non-system) containers security can be enhanced by running as a non-root user. This can reduce the damage done by a malicious actor that gains access to the application and the underlying system, because it will have only the rights assigned to that user (for example it will not be able to install arbitrary software). Once the project is generated, a user is created for your project. Default name is "appuser". You can change the name in Dockerfile.
