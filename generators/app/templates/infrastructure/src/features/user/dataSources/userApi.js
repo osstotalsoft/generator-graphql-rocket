@@ -1,6 +1,6 @@
-const { RESTDataSource } = require('apollo-datasource-rest');
+const { NoCacheRESTDataSource } = require('../../../utils/noCacheRESTDataSource');
 
-class UserApi extends RESTDataSource {
+class UserApi extends NoCacheRESTDataSource {
 
     constructor() {
         super();

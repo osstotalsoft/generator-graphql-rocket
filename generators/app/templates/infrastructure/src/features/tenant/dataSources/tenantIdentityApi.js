@@ -1,6 +1,6 @@
-const { RESTDataSource } = require('apollo-datasource-rest');
+const { NoCacheRESTDataSource } = require('../../../utils/noCacheRESTDataSource');
 
-class TenantIdentityApi extends RESTDataSource {
+class TenantIdentityApi extends NoCacheRESTDataSource {
     constructor() {
         super();
         this.baseURL = `${process.env.IDENTITY_API_URL}`;
