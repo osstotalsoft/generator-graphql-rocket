@@ -71,6 +71,8 @@ describe('test package installers', () => {
         name: projectName,
         engines: { yarn }
       })
+      assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"yarn")
+      assert.noFileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"npm")
     }))
 
   afterAll(() => {

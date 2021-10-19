@@ -29,9 +29,9 @@ spec:
     matchLabels:
       {{- include "Gql.selectorLabels" . | nindent 6 }}
   template:
-    metadata:
+    metadata:   
+      annotations:
     <%_ if(addVaultConfigs){ _%>
-      annotations: 
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: {{ $global.vaultConfigs.role }}
         vault.hashicorp.com/agent-inject-secret-credentials.vault: {{$global.vaultConfigs.secret }}/{{ $global.vaultConfigs.key }}
@@ -40,6 +40,11 @@ spec:
           export DB_USER={{`{{ .Data.data.db_user }}`}}
           export DB_PASSWORD={{`{{ .Data.data.db_password }}`}} 
           {{ print "{{- end }}" }}
+    <%_}_%>
+    <%_ if(addMessaging && messagingTransport == 'rusi') { _%>
+        rusi.io/app-id: {{ $current.messaging.source | quote }}
+        rusi.io/config: {{ $global.messaging.rusiConfigName | quote }}
+        rusi.io/enabled: "true"
     <%_}_%>
       labels:
         {{- include "Gql.selectorLabels" . | nindent 8 }}
@@ -70,17 +75,24 @@ spec:
             value: {{ $global.db.port | quote }}
           - name: DB_DATABASE
             value: {{ $global.db.database | quote }}
+<%_ if(addVaultConfigs){ _%>
           {{- if eq $global.vaultEnvironment "false" }}
+<%_}_%>
           - name: DB_USER
             value: {{ $global.db.user | quote }}
           - name: DB_PASSWORD
             value: {{ $global.db.password | quote }}
+<%_ if(addVaultConfigs){ _%>
           {{- end }}
+<%_}_%>
 <%_ if(addMessaging) { _%>
           - name: Messaging__TopicPrefix
             value: {{ $global.messaging.topicPrefix | quote }}
           - name: Messaging__Source
             value: {{ $current.messaging.source | quote }}
+          - name: Messaging__Transport
+            value: <%= messagingTransport %>
+<%_ if(messagingTransport == 'nats') { _%>
           - name: NATS_URL
             value: {{ $global.messaging.natsUrl | quote }}
           - name: NATS_CLUSTER
@@ -91,6 +103,11 @@ spec:
             value: {{ $current.messaging.clientId | quote }}
           - name: NATS_Q_GROUP
             value: {{ $current.messaging.natsQGroup | quote }}
+<%_}_%>
+<%_ if(messagingTransport == 'rusi') { _%>
+          - name: RUSI_PUB_SUB_NAME
+            value: {{ $global.messaging.rusiPubSubName | quote }}
+<%_}_%>
 <%_}_%>
 <%_ if(addTracing){ _%>
           - name: JAEGER_SERVICE_NAME
