@@ -12,13 +12,11 @@ RUN addgroup --system --gid $imageUserGroupId $imageUserGroup && \
     adduser --system --uid $imageUserId --ingroup $imageUserGroup $imageUser
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY --chown=$imageUser:$imageUserGroup package*.json ./
+COPY --chown=$imageUser:$imageUserGroup package.json <%=packageManagerLockFile%>* ./
 
-RUN npm install
+RUN <%=packageManager%> install
 # If you are building your code for production
-# RUN npm install --only=production
+# RUN <%=packageManager%> install --only=production
 
 # Bundle app source
 COPY --chown=$imageUser:$imageUserGroup . .
@@ -29,7 +27,7 @@ EXPOSE 4000
 
 <%_ if(addVaultConfigs){ _%>
 CMD ["/bin/bash", "-c", "test -f /vault/secrets/credentials.vault && echo 'INFO: Vault credentials loaded.' && \
-    source /vault/secrets/credentials.vault || echo 'INFO: Vault file not loaded.' && npm start --config-env production"]
+    source /vault/secrets/credentials.vault || echo 'INFO: Vault file not loaded.' && <%=packageManager%> start --config-env production"]
 <%_} else {_%>
-CMD [ "npm", "start", "--config-env", "production"]
+CMD [ "<%=packageManager%>", "start", "--config-env", "production"]
 <%_}_%>

@@ -289,7 +289,13 @@ messagingHost()
     .use(dispatcher(msgHandlers))
     .start()
 ```
-This code basically executes the same middleware functions in the same order as they are executed on a GraphQL request. 
+This code basically executes the same middleware functions in the same order as they are executed on a GraphQL request.
+
+When using messaging, you need to opt-in between two existing messaging transports:
+- `nats`: uses [Nats streaming](https://github.com/nats-io/nats-streaming-server)
+- `rusi`: uses a sidecar container, powered by [rusi](https://github.com/osstotalsoft/rusi), to offload messaging concerns
+
+You can find more details [here](https://github.com/osstotalsoft/nodebb/blob/master/packages/message-bus/README.md#transport)
 
 ## Error logging
 

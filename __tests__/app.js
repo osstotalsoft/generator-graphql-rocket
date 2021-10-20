@@ -132,4 +132,31 @@ describe('generator-graphql-rocket:app', () => {
         `vaultEnvironment: "false"`
       )
     }))
+
+  it('Rusi messaging transport', () => helpers
+    .create(path.join(__dirname, '../generators/app'))
+    .inDir(path.join(__dirname, tempRoot))
+    .withPrompts({
+      ...defaultAnswers,
+      addMessaging: true,
+      messagingTransport: 'rusi',
+      addHelm: true,
+      helmChartName
+    })
+    .run()
+    .then(() => {
+      const valuesYaml = path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
+      assert.fileContent([
+        [valuesYaml, `rusiPubSubName: "[RUSI_PUBSUB_COMPONENT_NAME]"`],
+        [valuesYaml, `rusiConfigName: "[RUSI_CONFIG_NAME]"`]
+      ])
+
+      const deploymentYaml = path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/templates/deployment.yaml`)
+      assert.fileContent([
+        [deploymentYaml, `rusi.io/app-id: {{ $current.messaging.source | quote }}`],
+        [deploymentYaml, `rusi.io/config: {{ $global.messaging.rusiConfigName | quote }}`],
+        [deploymentYaml, `rusi.io/enabled: "true"`]
+      ])
+    })
+  )
 })

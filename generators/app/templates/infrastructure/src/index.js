@@ -203,6 +203,12 @@ msgHost
     .use(middleware.dbInstance())
     .use(dispatcher(msgHandlers))
     .start()
+    .catch((err) => {
+        console.error(err)
+        setImmediate(() => {
+          throw err
+        })
+      })
 
 process.on("SIGINT", () => {
     msgHost.stopImmediate();

@@ -44,8 +44,16 @@ module.exports = [
     {
         type: "confirm",
         name: "addMessaging",
-        message: 'Would you like to use messaging? This will allow you to receive and handle all events published in a Nats service. Read more here: https://github.com/osstotalsoft/nodebb',
+        message: 'Would you like to use messaging? This will allow you to react to messages in the event-driven fashion. Read more here: https://github.com/osstotalsoft/nodebb/tree/master/packages/messaging-host#readme.',
         default: false,
+    },
+    {
+        type: "list",
+        name: "messagingTransport",
+        message: 'What messaging transport would you like to use? Read more here: https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#transport.',
+        choices: ['nats', 'rusi'],
+        when: prompts => prompts.addMessaging,
+        default: 'nats'
     },
     {
         type: "confirm",

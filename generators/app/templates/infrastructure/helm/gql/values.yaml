@@ -34,9 +34,15 @@ global:
   messaging:
     env: <%= projectName %>
     topicPrefix: <%= projectName %>.
+<%_ if(messagingTransport == 'nats') { _%>
     natsUrl: "nats://[SERVICE].[NAMESPACE]:[PORT]"
     natsCluster: "[CLUSTER_NAME]"
     natsDurableName: durable
+<%_}_%>
+<%_ if(messagingTransport == 'rusi') { _%>
+    rusiPubSubName: "[RUSI_PUBSUB_COMPONENT_NAME]"
+    rusiConfigName: "[RUSI_CONFIG_NAME]"
+<%_}_%>
 <%_}_%>
   db:
     host: "[DB_HOST]"
@@ -66,8 +72,10 @@ gql:
 <%_ if(addMessaging) { _%>
   messaging:
     source: <%= projectName %>
+<%_ if(messagingTransport == 'nats') { _%>
     clientId: <%= projectName %>
     natsQGroup: <%= projectName %>
+<%_}_%>
 <%_}_%>
 
   # Additional environment variables

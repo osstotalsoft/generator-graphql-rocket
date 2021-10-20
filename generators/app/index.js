@@ -64,11 +64,12 @@ module.exports = class extends Generator {
       )
 
     const packageManagerVersion = packageManager === 'npm' ? '7.16.0' : packageManager === 'yarn' ? '1.22.4' : '7.16.0'
+    const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
 
     this.fs.copyTpl(
       templatePath,
       destinationPath,
-      { ...this.answers, packageManagerVersion },
+      { ...this.answers, packageManagerVersion, packageManagerLockFile },
       {},
       { globOptions: { ignore: ignoreFiles, dot: true } }
     )
@@ -83,7 +84,7 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         helmTemplatePath,
         helmDestinationPath,
-        { ...this.answers, packageManagerVersion },
+        { ...this.answers, packageManagerVersion, packageManagerLockFile },
         {},
         { globOptions: { dot: true } }
       )
