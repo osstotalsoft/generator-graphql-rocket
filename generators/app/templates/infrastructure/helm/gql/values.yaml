@@ -32,6 +32,7 @@ global:
 <%_}_%>
 <%_ if(addMessaging) { _%>
   messaging:
+    env: <%= projectName %>
     topicPrefix: <%= projectName %>.
     natsUrl: "nats://[SERVICE].[NAMESPACE]:[PORT]"
     natsCluster: "[CLUSTER_NAME]"
