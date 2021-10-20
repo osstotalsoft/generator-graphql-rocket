@@ -79,6 +79,8 @@ spec:
 <%_ if(addMessaging) { _%>
           - name: Messaging__TopicPrefix
             value: {{ $global.messaging.topicPrefix | quote }}
+          - name: Messaging__Env
+            value: {{ $global.messaging.env | quote }}
           - name: Messaging__Source
             value: {{ $current.messaging.source | quote }}
           - name: NATS_URL
