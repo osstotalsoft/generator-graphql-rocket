@@ -108,13 +108,14 @@ const server = new ApolloServer({
             if (!dbInstance) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
             }
+            const dataSources = getDataSources()
             return {
                 token,
                 <%_ if(addSubscriptions && withMultiTenancy){ _%>
                 tenant,
                 <%_}_%>
                 dbInstance,
-                dataSources: initializedDataSources(context, dbInstance),
+                dataSources: initializedDataSources(context, dbInstance, dataSources),
                 dataLoaders: getDataLoaders(dbInstance),
                 externalUser: {
                     id: decoded.sub,
