@@ -50,14 +50,14 @@ const tenantDbInstanceFactory = async tenantId => {
 
 
 async function dbInstanceGetOrAdd(tenantId, factory) {
-    let cachedDbInstance = dbInstanceCache.get(tenantId)
+    const cachedDbInstance = dbInstanceCache.get(tenantId)
     if (cachedDbInstance) {
         return cachedDbInstance
     }
 
     const release = await mutex.acquire();
     try {
-        let cachedDbInstance = dbInstanceCache.get(tenantId)
+        const cachedDbInstance = dbInstanceCache.get(tenantId)
         if (cachedDbInstance) {
             return cachedDbInstance
         }
