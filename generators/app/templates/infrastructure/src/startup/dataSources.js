@@ -13,10 +13,10 @@ module.exports.getDataSources = () => ({
 
 // This is a temporary fix to pass dataSources to ws requests. This will be fixed in Apollo server v3.0
 module.exports.initializedDataSources = (context, dbInstance, dataSources) => {
-    ds.userApi.initialize({ context })
-    ds.userDb.initialize({ context: { dbInstance } })
+    dataSources.userApi.initialize({ context })
+    dataSources.userDb.initialize({ context: { dbInstance } })
     <%_ if(withMultiTenancy){ _%>
-    ds.tenantIdentityApi.initialize({ context })
+    dataSources.tenantIdentityApi.initialize({ context })
     <%_}_%>
-    return ds
+    return dataSources
 }
