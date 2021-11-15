@@ -45,6 +45,7 @@
     "bluebird": "3.7.2",
     "bufferutil": "^4.0.3",
     "colors": "^1.4.0",
+    "console-stamp": "^3.0.3",
     "dataloader": "^2.0.0",
     "datasource-sql": "^1.4.1",
     "dotenv": "10.0.0",

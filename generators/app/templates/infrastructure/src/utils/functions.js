@@ -40,23 +40,4 @@ const parseConnectionString = connectionString => {
   return humps.camelizeKeys(parsed);
 };
 
-const getCurrentDate = () => new Date().toLocaleString()
-
-const customConsole = function (oldCons) {
-  return {
-    log: function (text) {
-      oldCons.log(`[${getCurrentDate()}] ${text}`);
-    },
-    info: function (text) {
-      oldCons.info(`[${getCurrentDate()}] ${text}`);
-    },
-    warn: function (text) {
-      oldCons.warn(`[${getCurrentDate()}] ${text}`);
-    },
-    error: function (text) {
-      oldCons.error(`[${getCurrentDate()}] ${text}`);
-    }
-  };
-}(global.console)
-
-module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, customConsole };
+module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString };

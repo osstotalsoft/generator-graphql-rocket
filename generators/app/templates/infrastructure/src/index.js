@@ -5,8 +5,9 @@ if (result.error) {
     const path = `.env`;
     dotenv.config({ path });
 }
-const { customConsole } = require('./utils/functions')
-global.console = customConsole;
+require('console-stamp')(global.console, {
+    format: ':date(yyyy/mm/dd HH:MM:ss.l)'
+  })
 
 const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('apollo-server-koa');
 const Koa = require("koa");
