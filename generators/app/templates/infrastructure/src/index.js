@@ -46,11 +46,12 @@ const tenantService = require('./multiTenancy/tenantService');
 
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken');
+
+const { execute, subscribe } = require('graphql')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
 <%_}_%>
 
 const { createServer } = require('http')
-const { execute, subscribe } = require('graphql')
-const { SubscriptionServer } = require('subscriptions-transport-ws')
 
 const { dbInstanceFactory } = require("./db");
 const { contextDbInstance, <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,

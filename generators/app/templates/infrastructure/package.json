@@ -54,11 +54,9 @@
     "graphql-middleware": "^6.0.10",
     <%_ if(addSubscriptions){ _%>
     "graphql-redis-subscriptions": "^2.4.0",
-    <%_}_%>
-    "graphql-shield": "^7.5.0",
-    <%_ if(addSubscriptions){ _%>
     "graphql-subscriptions": "^1.2.1",
     <%_}_%>
+    "graphql-shield": "^7.5.0",
     "graphql-tools": "^7.0.5",
     "graphql-upload": "^11.0.0",
     "humps": "^2.0.1",
