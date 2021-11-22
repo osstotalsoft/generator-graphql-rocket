@@ -3,7 +3,7 @@ const { topics, redisPubSub } = require('../../pubSub')
 <%_}_%>
 <%_ if(addSubscriptions && withMultiTenancy){ _%>
 const { envelope } = require("@totalsoft/message-bus")
-const { withFilter } = require('apollo-server');
+const { withFilter } = require('graphql-subscriptions');
 <%_}_%>
 
 const userResolvers = {

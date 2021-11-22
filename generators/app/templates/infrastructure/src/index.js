@@ -5,6 +5,7 @@ if (result.error) {
     const path = `.env`;
     dotenv.config({ path });
 }
+const { graphqlUploadKoa } = require('graphql-upload')
 require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l)'
   })
@@ -46,15 +47,23 @@ const tenantService = require('./multiTenancy/tenantService');
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken');
 <%_}_%>
+
+const { createServer } = require('http')
+const { execute, subscribe } = require('graphql')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
+
 const { dbInstanceFactory } = require("./db");
 const { contextDbInstance, <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
     <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
 const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources, getDataLoaders } = require('./startup/index');
 
+async function startServer(httpServer) {
+
 const app = new Koa();
 
 app.use(errorHandlingMiddleware())
 app.use(bodyParser());
+app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
 app.use(correlationMiddleware());
 <%_ if(addTracing){ _%>
 tracingEnabled && app.use(tracingMiddleware());
@@ -67,30 +76,38 @@ app.use(tenantIdentification());
 <%_}_%>
 app.use(contextDbInstance());
        
-<%_ if(addGqlLogging || addTracing) {_%>
+<%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
 const plugins = [
+    <%_ if(addSubscriptions) {_%>
+    {
+        async serverWillStart() {
+            return {
+            async drainServer() {
+                subscriptionServer.close()
+            }
+            }
+        }
+    },
+    <%_}_%>
     <%_ if(addGqlLogging) {_%>
-        loggingPlugin
+        loggingPlugin,
+    <%_}_%>
+    <%_ if(addTracing){ _%>
+        tracingEnabled && tracingPlugin(getApolloTracerPluginConfig(defaultTracer))
     <%_}_%>
 ]
 <%_}_%>
-<%_ if(addTracing){ _%>
-tracingEnabled && plugins.concat(tracingPlugin(getApolloTracerPluginConfig(defaultTracer)))
-<%_}_%>
-       
-const server = new ApolloServer({
-    schema,
-    <%_ if(addGqlLogging || addTracing) {_%>
-    plugins,
-    <%_}_%>
-    <%_ if(addTracing){ _%>
-    tracing: true,
-    <%_}_%>
-    dataSources: getDataSources,
-    <%_ if(addSubscriptions){ _%>
-    subscriptions: {
-        onConnect: async (connectionParams, _webSocket, context) => {
-            const token = connectionParams.authorization.replace("Bearer ", "");
+
+
+<%_ if(addSubscriptions){ _%>
+console.info('Creating Subscription Server...')
+  const subscriptionServer = SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe,
+      async onConnect(connectionParams, _webSocket, context) {
+        const token = connectionParams.authorization.replace("Bearer ", "");
 
             if (!token) {
                 throw new ForbiddenError("401 Unauthorized");
@@ -125,7 +142,21 @@ const server = new ApolloServer({
             }
         }
     },
+    {
+      server: httpServer,
+      path: '/graphql'
+    }
+  )
+<%_}_%>
+
+console.info('Creating Apollo Server...')
+const server = new ApolloServer({
+    schema,
+    uploads: false,
+    <%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
+    plugins,
     <%_}_%>
+    dataSources: getDataSources,
     context: async context => {
         const { ctx, connection } = context;
 
@@ -161,31 +192,30 @@ const server = new ApolloServer({
                 <%_}_%>
             };
         }
-    },
-    uploads: {
-        // Limits here should be stricter than config for surrounding
-        // infrastructure such as Nginx so errors can be handled elegantly by
-        // graphql-upload:
-        // https://github.com/jaydenseric/graphql-upload#type-processrequestoptions
-        maxFileSize: 1000000, // 1 MB
-        maxFiles: 20,
     }
-});
-
-// This `listen` method launches a web-server.  Existing apps
-// can utilize middleware options, which we'll discuss later.
-const port = process.env.PORT || 4000;
-<% if(addSubscriptions){ %>const httpServer = <%}%>app.listen(port, () => {
-    console.log(`🚀  Server ready at http://localhost:${port}/graphql`);
-    <%_ if(addSubscriptions){ _%>
-    console.log(`🚀  Subscriptions ready at ws://localhost:${port}/graphql`);
-    <%_}_%>
 })
 
-server.applyMiddleware({ app });
-<%_ if(addSubscriptions){ _%>
-server.installSubscriptionHandlers(httpServer);
-<%_}_%>
+await server.start()
+server.getMiddleware({ cors: {} })
+server.applyMiddleware({ app })
+httpServer.on('request', app.callback())
+
+process.on('uncaughtException', function (error) {
+    throw new Error(`Error occurred while processing the request: ${error.stack}`)
+  })
+}
+
+const httpServer = createServer()
+startServer(httpServer)
+const port = process.env.PORT || 4000;
+// This `listen` method launches a web-server.  Existing apps
+// can utilize middleware options, which we'll discuss later.
+httpServer.listen(port, () => {
+    console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
+    <%_ if(addSubscriptions){ _%>
+    console.log(`🚀 Subscriptions ready at ws://localhost:${port}/graphql`)
+    <%_}_%>
+  })
 
 <%_ if(addMessaging && addTracing){ _%>
 const skipMiddleware = (_ctx, next) => next()

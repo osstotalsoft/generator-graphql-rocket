@@ -1,4 +1,4 @@
-const { makeExecutableSchema } = require('apollo-server-koa')
+const { makeExecutableSchema } = require('graphql-tools')
 const merge = require('lodash.merge');
 
 const { loadTypedefsSync } = require('@graphql-tools/load')

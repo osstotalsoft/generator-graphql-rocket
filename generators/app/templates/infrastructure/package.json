@@ -39,8 +39,8 @@
     <%_ if(addTracing){ _%>
     "apollo-opentracing": "^2.1.0",
     <%_}_%>
-    "apollo-server": "2.25.2",
-    "apollo-server-koa": "2.25.2",
+    "apollo-server": "3.1.2",
+    "apollo-server-koa": "3.1.2",
     "async-mutex": "^0.3.1",
     "bluebird": "3.7.2",
     "bufferutil": "^4.0.3",
@@ -60,6 +60,7 @@
     "graphql-subscriptions": "^1.2.1",
     <%_}_%>
     "graphql-tools": "^7.0.5",
+    "graphql-upload": "^11.0.0",
     "humps": "^2.0.1",
     <%_ if(addSubscriptions){ _%>
     "ioredis": "^4.27.6",
