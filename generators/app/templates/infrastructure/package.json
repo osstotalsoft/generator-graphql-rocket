@@ -36,9 +36,6 @@
     <%_}_%>
     "apollo-datasource": "^0.9.0",
     "apollo-datasource-rest": "^0.14.0",
-    <%_ if(addTracing){ _%>
-    "apollo-opentracing": "^2.1.0",
-    <%_}_%>
     "apollo-server": "3.1.2",
     "apollo-server-koa": "3.1.2",
     "async-mutex": "^0.3.1",
@@ -55,16 +52,17 @@
     <%_ if(addSubscriptions){ _%>
     "graphql-redis-subscriptions": "^2.4.0",
     "graphql-subscriptions": "^1.2.1",
+    "ioredis": "^4.27.6",
+    "subscriptions-transport-ws": "^0.9.19",
     <%_}_%>
     "graphql-shield": "^7.5.0",
     "graphql-tools": "^7.0.5",
     "graphql-upload": "^11.0.0",
     "humps": "^2.0.1",
-    <%_ if(addSubscriptions){ _%>
-    "ioredis": "^4.27.6",
-    <%_}_%>
     <%_ if(addTracing){ _%>
     "jaeger-client": "^3.18.1",
+    "opentracing": "^0.14.5",
+    "apollo-opentracing": "^2.1.0",
     <%_}_%>
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "^2.0.3",
@@ -77,15 +75,9 @@
     "mime-types": "^2.1.31",
     "mssql": "^6.2.0",
     "node-nats-streaming": "0.3.2",
-    <%_ if(addTracing){ _%>
-    "opentracing": "^0.14.5",
-    <%_}_%>
     "path": "^0.12.7",
     "pino": "^6.11.3",
     "ramda": "^0.27.1",
-    <%_ if(addSubscriptions){ _%>
-    "subscriptions-transport-ws": "^0.9.19",
-    <%_}_%>
     "tedious": "^11.0.7",
     "utf-8-validate": "^5.0.5",
     "utf8-bytes": "0.0.1",
