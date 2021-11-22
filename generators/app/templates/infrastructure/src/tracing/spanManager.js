@@ -18,12 +18,12 @@ async function useSpanManager(rootSpan, scopeAction) {
 
 function beginScope(span) {
     const context = asyncLocalStorage.getStore()
-    context.push(span)
+    context && context.push(span)
 }
 
 function endScope() {
     const context = asyncLocalStorage.getStore()
-    context.pop()
+    context && context.pop()
 }
 
 async function withScope(span, action) {
@@ -36,4 +36,4 @@ async function withScope(span, action) {
     }
 }
 
-module.exports = {useSpanManager, getActiveSpan, beginScope, endScope, withScope}
+module.exports = { useSpanManager, getActiveSpan, beginScope, endScope, withScope }

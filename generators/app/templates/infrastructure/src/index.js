@@ -93,7 +93,7 @@ const plugins = [
         loggingPlugin,
     <%_}_%>
     <%_ if(addTracing){ _%>
-        tracingEnabled && tracingPlugin(getApolloTracerPluginConfig(defaultTracer))
+        tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {}
     <%_}_%>
 ]
 <%_}_%>
