@@ -1,6 +1,6 @@
 const { RedisPubSub } = require('graphql-redis-subscriptions')
 const RedisClient = require('ioredis');
-const { PubSub } = require('apollo-server');
+const { PubSub } = require('graphql-subscriptions');
 const { REDIS_DOMAIN_NAME, REDIS_PORT_NUMBER } = process.env;
 
 const options = {
