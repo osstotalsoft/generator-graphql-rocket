@@ -12,7 +12,7 @@ const tracing = () => async (ctx, next) => {
     
     const correlationId = ctx && ctx.correlationId;
     span.setTag(envelope.headers.correlationId, correlationId);
-    <%_ if(withMultiTenancy){ _%>
+    <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
     const tenantId = ctx && ctx.tenant && ctx.tenant.externalId; 
     span.setTag(envelope.headers.tenantId, tenantId);
     <%_}_%>

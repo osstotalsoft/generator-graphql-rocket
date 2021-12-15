@@ -12,7 +12,7 @@ class MessagingDataSource extends DataSource {
     initialize(config) {
         const ctx = config.context
         this.context = {
-            <%_ if(withMultiTenancy){ _%>
+            <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
             tenantId: ctx.tenant && ctx.tenant.externalId,
             <%_}_%>
             correlationId: ctx.correlationId

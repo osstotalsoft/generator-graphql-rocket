@@ -3,6 +3,9 @@ const { ApolloError } = require('apollo-server-koa')
 const { v4 } = require('uuid');
 const { append, map } = require('ramda')
 require('colors')
+<%_ if(dataLayer == "prisma") {_%>
+const prisma = require('../../utils/prisma')
+<%_}_%>
 
 const loggingLevels = {
     INFO: 'INFO',
@@ -29,6 +32,7 @@ const initializeDbLogging = (context, operationName) => ({
 })
 
 const saveLogs = async (context) => {
+<%_ if(dataLayer == "knex") {_%>
     const { dbInstance, logs, requestId } = context
     if (logs && dbInstance) {
         const insertLogs = map(({ uid, code, message, timeStamp, loggingLevel, error = {} }) => ({
@@ -43,6 +47,24 @@ const saveLogs = async (context) => {
         await dbInstance("EventLog")
             .insert(insertLogs)
     }
+<%_ } else if(dataLayer == "prisma") {_%>
+    const { logs, requestId } = context
+    if (logs) {
+      const insertLogs = map(
+        ({ uid, code, message, timeStamp, loggingLevel, error = {} }) => ({
+          Uid: uid,
+          RequestId: requestId || uuid(),
+          Code: code,
+          Message: message,
+          Details: error ? `${error.message} ${error.stack} ${JSON.stringify(error.extensions)}` : '',
+          TimeStamp: timeStamp,
+          LoggingLevel: loggingLevel
+        }),
+        logs
+      )
+      await prisma.eventLog.createMany({ data: insertLogs })
+    }
+<%_}_%>
     context.logs = null
 }
 

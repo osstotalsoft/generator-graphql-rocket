@@ -39,7 +39,7 @@ opentracing.initGlobalTracer(defaultTracer);
 const { JAEGER_DISABLED } = process.env;
 const tracingEnabled = !JSON.parse(JAEGER_DISABLED)
 <%_}_%>
-<%_ if(withMultiTenancy){ _%>
+<%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
 // MultiTenancy
 const tenantService = require('./multiTenancy/tenantService');
 <%_}_%>
@@ -53,10 +53,12 @@ const { SubscriptionServer } = require('subscriptions-transport-ws')
 
 const { createServer } = require('http')
 
+<%_ if(dataLayer == "knex") {_%>
 const { dbInstanceFactory } = require("./db");
-const { contextDbInstance, <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
-    <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
-const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources, getDataLoaders } = require('./startup/index');
+<%_}_%>
+const { <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
+    <% if(dataLayer == "knex" && withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
+const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index');
 
 async function startServer(httpServer) {
 
@@ -72,10 +74,12 @@ tracingEnabled && app.use(tracingMiddleware());
 app.use(cors());
 app.use(jwtTokenValidation);
 app.use(jwtTokenUserIdentification);
-<%_ if(withMultiTenancy){ _%>
+<%_ if(dataLayer == "knex") {_%>
+    <%_ if(withMultiTenancy){ _%>
 app.use(tenantIdentification());
-<%_}_%>
+    <%_}_%>
 app.use(contextDbInstance());
+<%_}_%>
        
 <%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
 const plugins = [
@@ -117,25 +121,30 @@ console.info('Creating Subscription Server...')
             await validateToken(token);
 
             const decoded = jsonwebtoken.decode(token);
-            <%_ if(addSubscriptions && withMultiTenancy){ _%>
+            <%_ if(dataLayer == "knex") {_%>
+                <%_ if(addSubscriptions && withMultiTenancy){ _%>
             const tenantId = decoded.tid
             const tenant = await tenantService.getTenantFromId(tenantId);
-            <%_}_%>
-
-            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenant.id <%}%>)
+                <%_}_%>
+            
+            const dbInstance = await dbInstanceFactory(<% if(dataLayer == "knex" && withMultiTenancy){ %>tenant.id <%}%>)
 
             if (!dbInstance) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
             }
+            <%_}_%>
             const dataSources = getDataSources()
             return {
                 token,
-                <%_ if(addSubscriptions && withMultiTenancy){ _%>
+                <%_ if(addSubscriptions && dataLayer == "knex" && withMultiTenancy){ _%>
                 tenant,
                 <%_}_%>
+                <%_ if(dataLayer == "knex") {_%>
                 dbInstance,
                 dataSources: initializedDataSources(context, dbInstance, dataSources),
                 dataLoaders: getDataLoaders(dbInstance),
+                <%_}_%>
+                dataSources: initializedDataSources(context, dataSources),
                 externalUser: {
                     id: decoded.sub,
                     role: decoded.role
@@ -163,8 +172,7 @@ const server = new ApolloServer({
 
         if (connection) {
             <%_ if(addSubscriptions && addGqlLogging){ _%>
-                const { dbInstance } = connection.context
-                const { logInfo, logDebug, logError } = initializeDbLogging({ dbInstance, requestId: v4() }, connection.operationName)
+                const { logInfo, logDebug, logError } = initializeDbLogging({  ...connection.context, requestId: v4() }, connection.operationName)
             <%_}_%>
             return {
                 ...connection.context<% if(addSubscriptions && addGqlLogging){ %>,
@@ -172,18 +180,20 @@ const server = new ApolloServer({
                 <%_}_%>
             };
         } else {
-            const { token, <% if(withMultiTenancy){ %>tenant, <%}%>dbInstance, externalUser, correlationId, request, requestSpan } = ctx;
+            const { token, <% if(dataLayer == "knex" && withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
             <%_ if(addGqlLogging) {_%>
-            const { logInfo, logDebug, logError } = initializeDbLogging({ dbInstance, requestId: v4() }, request.operationName)
+                const { logInfo, logDebug, logError } = initializeDbLogging({ ...ctx, requestId: v4() }, request.operationName)
             <%_}_%>
             return {
                 token,
+                <%_ if(dataLayer == "knex") {_%>
                 dbInstance,
+                dbInstanceFactory,
                 dataLoaders: getDataLoaders(dbInstance),
-                <%_ if(withMultiTenancy){ _%>
+                <%_}_%>
+                <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
                 tenant, 
                 <%_}_%>
-                dbInstanceFactory,
                 externalUser,
                 correlationId,
                 request,               
@@ -230,10 +240,12 @@ msgHost
     <%_ if(addMessaging && addTracing){ _%>
     .use(tracingEnabled ? middleware.tracing() : skipMiddleware)
     <%_}_%>
-    <%_ if(addMessaging && withMultiTenancy) {_%>
+    <%_ if(addMessaging && dataLayer == "knex" && withMultiTenancy) {_%>
     .use(middleware.tenantIdentification())
     <%_}_%>
+    <%_ if(dataLayer == "knex") {_%>
     .use(middleware.dbInstance())
+    <%_}_%>
     .use(dispatcher(msgHandlers))
     .start()
     .catch((err) => {

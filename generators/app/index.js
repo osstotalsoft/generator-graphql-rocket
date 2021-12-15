@@ -40,13 +40,34 @@ module.exports = class extends Generator {
       addGqlLogging,
       withRights,
       packageManager,
-      helmChartName
+      helmChartName,
+      dataLayer
     } = this.answers
 
     const templatePath = this.templatePath('infrastructure/**/*')
     const destinationPath = this.destinationPath(projectName)
 
     let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
+
+    if (dataLayer === 'knex') ignoreFiles = concat(['**/prisma/**', '**/utils/prisma.js'], ignoreFiles)
+    if (dataLayer === 'prisma')
+      ignoreFiles = concat(
+        [
+          '**/src/db/**',
+          '**/middleware/db/**',
+          '**/middleware/tenantIdentification/**',
+          '**/middleware/messaging/multiTenancy/**',
+          '**/messaging/middleware/dbInstance.js',
+          '**/startup/dataLoaders.js',
+          '**/features/common/dbGenerators.js',
+          '**/features/tenant/**',
+          '**/features/user/dataLoaders.js',
+          '**/features/user/dataSources/userDb.js',
+          '**/tracing/knexTracer.js',
+          '**/utils/sqlDataSource.js'
+        ],
+        ignoreFiles
+      )
 
     if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
@@ -96,13 +117,15 @@ module.exports = class extends Generator {
 
     const { packageManager, projectName } = this.answers
 
-    this.log(chalk.greenBright(`All the dependencies will be installed shortly using "${packageManager}" package manager...`))
+    this.log(
+      chalk.greenBright(`All the dependencies will be installed shortly using "${packageManager}" package manager...`)
+    )
     // eslint-disable-next-line no-unused-expressions
     packageManager === 'npm'
       ? this.npmInstall(null, {}, { cwd: projectName })
       : packageManager === 'yarn'
-        ? this.yarnInstall(null, {}, { cwd: projectName })
-        : this.npmInstall(null, {}, { cwd: projectName })
+      ? this.yarnInstall(null, {}, { cwd: projectName })
+      : this.npmInstall(null, {}, { cwd: projectName })
   }
 
   end() {

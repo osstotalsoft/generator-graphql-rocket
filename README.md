@@ -310,7 +310,7 @@ By default all the logs are saved in the application database ( this can be chan
 You need the following table in your database to store your logs:
 ```
 CREATE TABLE [dbo].[EventLog](
-	[EventLogId] [int] IDENTITY(1,1) NOT NULL,
+	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[Uid] [uniqueidentifier] NOT NULL,
 	[RequestId] [uniqueidentifier] NOT NULL,
 	[Code] [nvarchar](50) NOT NULL,
