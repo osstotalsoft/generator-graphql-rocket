@@ -1,78 +1,94 @@
-
 # graphql-rocket [![NPM version][npm-image]][npm-url]
->GraphQL server sample with Apollo Server, Koa middleware, database reads using Knex JS, and/or REST API consumer, token validation, messaging integration with Redis and Nats and many other cool features.
+
+> GraphQL server sample with Apollo Server, Koa middleware, database reads using Knex JS or Prisma, and/or REST API consumer, token validation, messaging integration with Redis and Nats and many other cool features.
 
 ![Building blocks](assets/img/appicon.png)
 
 > If you are creating a new web application we recommend you to use our [Webapp Rocket Generator](https://github.com/osstotalsoft/generator-webapp-rocket).
 
-## Installation  
-  
+## Installation
+
 First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [NodeJS Latest LTS Version](https://nodejs.org/). Old versions of NodeJS are also supported.)
 
->⚠ Use the npm version supported by your installed NodeJS version. 
+> ⚠ Use the npm version supported by your installed NodeJS version. 
 
->e.g. NodeJS Latest LTS Version: 14.17.1 (includes npm 6.14.13)
-  
-```bash  
+> e.g. NodeJS Latest LTS Version: 14.17.1 (includes npm 6.14.13)
+
+```bash
 npm install -g yo
 npm install -g @totalsoft/generator-graphql-rocket
-```  
-  
+```
+
 If you want to use this generator to scaffold a new project navigate to section: [Generate new project](#generate-new-project)  
 To upgrade an existing project that was scaffold using this **GraphQL Rocket Generator**, see section: [Upgrade existing project](#upgrade-existing-project)  
 
 ## Content
+
 1. [Generate new project](#generate-new-project)  
 2. [Upgrade existing project](#upgrade-existing-project)  
 3. [What is a Generator?](#what-is-a-generator)  
-4. [Code formatting](#code-formatting)
-5. [Enforcing Coding Conventions](#enforcing-coding-conventions)
-6. [Token validation](#token-validation)  
-7. [Authorization](#authorization)  
-8. [Multi-tenancy](#multi-tenancy)
-9. [Subscriptions](#subscriptions)  
-10. [Messaging](#messaging)  
-11. [Error logging](#error-logging) 
-12. [OpenTracing](#opentracing)
-13. [Code examples](#code-examples)
-14. [Deployment](#deployment)
-15. [HashiCorp Vault](#hashicorp-vault)
-16. [Getting To Know Yeoman](#getting-to-know-yeoman)
+4. [Data layer technology stack](#data-layer-technology-stack)
+5. [Code formatting](#code-formatting)
+6. [Enforcing Coding Conventions](#enforcing-coding-conventions)
+7. [Token validation](#token-validation)  
+8. [Authorization](#authorization)  
+9. [Multi-tenancy](#multi-tenancy)
+10. [Subscriptions](#subscriptions)  
+11. [Messaging](#messaging)  
+12. [Error logging](#error-logging) 
+13. [OpenTracing](#opentracing)
+14. [Code examples](#code-examples)
+15. [Deployment](#deployment)
+16. [HashiCorp Vault](#hashicorp-vault)
+17. [Getting To Know Yeoman](#getting-to-know-yeoman)
 
-## Generate new project  
+## Generate new project
+
 To scaffold your new GraphQL server using our generator run:  
 
 ```bash
 yo @totalsoft/graphql-rocket
 ```
+
 > ⚠ Make sure you have the latest version of **GraphQL Rocket Generator** installed, else you will be prompted the following message:
 
 ![version](assets/img/versionWarning.png)
 
 You will be prompted to introduce the following information:
- 1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
- 2. GraphQL port. By default it would be set to `4000`
- 3. Include multi-tenancy. By default is set to false.
- 4. Use subscriptions. By default is set to false.
- 5. Add messaging integration. By default is set to false.
- 6. Implement authorization. By default is set to false. This includes rights and permissions.
- 7. Include GraphQL logging plugin. By default is set to false. This also catches all error and throws an error friendly message. Read more bellow.
- 8. Whether to generate default helm files or not.
- 9. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
- 9. Add Opentracing using Jaeger. By default is set to false.
- 10. Identity API url, your Identity server API url.
- 11. Identity openId configuration.
- 12. Identity authority.
- 13. What package manager you wish to use to install the application dependencies. (npm or yarn).
- 
+
+1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
+2. GraphQL port. By default it would be set to `4000`
+3. What data integration layer technology you would like to use? You can choose between `Prisma` and `Knex JS`
+4. Include multi-tenancy. By default is set to false.
+5. Use subscriptions. By default is set to false.
+6. Add messaging integration. By default is set to false.
+7. Implement authorization. By default is set to false. This includes rights and permissions.
+8. Include GraphQL logging plugin. By default is set to false. This also catches all error and throws an error friendly message. Read more bellow.
+9. Whether to generate default helm files or not.
+10. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
+11. Add Opentracing using Jaeger. By default is set to false.
+12. Identity API url, your Identity server API url.
+13. Identity openId configuration.
+14. Identity authority.
+15. What package manager you wish to use to install the application dependencies. (npm or yarn).
+
+> ⚠If you decided to use **Prisma** as you data layer technology, make sure you introspected your database and generated **Prisma Client **instance. 
+> 
+> You can find more information here -> [Setting up Prisma to an existing project](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases-typescript-postgres/)
+> 
+> Or you can just run the following command:`npm run prisma` 
+
+
 If you would like to start the application, simply run ``npm start`` in the newly created folder, otherwise you can begin editing and writing your application!
 
-## Upgrade existing project  
+## Upgrade existing project
+
 ⚠ **First, make sure you have committed everything or have a backup of your existing project.**
 
 ⚠ **RECOMANDATION!** ⚠
+
 ________
+
 To avoind having lots of differences, make sure you have **Prettier** formatter installed in your project. 
 ``npm install prettier --dev``
 
@@ -80,15 +96,19 @@ Also a file named **.prettierrc** containing the desired formatting settings is 
 
 Then apply your formatting rules to the existing files by executing:
 ``prettier --write **/*.js``
+
 ________
 
 To upgrade an existing project that was scaffold using this generator open a console outside of your project folder ( see image below )  and run:
-```bash  
+
+```bash
 yo @totalsoft/graphql-rocket
-```  
+```
+
 ![OtsideProjectFolder](assets/img/upgrade_project_name.png)  
 
 Now you will be asked to answer the same questions explained in  [Generate new project](#generate-new-project)  section.
+
 > ⚠ **ATTENTION!** ⚠
 
 > When prompted to enter the name of your project **make sure you enter the name of the project you want to upgrade** ( like shown in the above image ). If you enter a new name, it will generate a new project. 
@@ -103,17 +123,41 @@ Or hit **space** to see all your options (see below image).
 ![FileConflicts](assets/img/upgrade_file_conflicts.png)  
 
 ## What is a Generator?
+
 A Yeoman generator is a scaffolding tool. You can use Yeoman to install applications based on templates. This repository is an example of a template - an application with a build, code structure, and dependencies installed and organised for you!
 
 Using a generator accelerates application development. You don't have to worry about best practices for foundational elements, because we've incorporated them. Our template generates a fully functional GraphQL server that becomes the infrastructure of your new project. Before this miracle generator existed, this code would probably took you a few days to write, oh well... now this will be done in only 30 seconds!
 
-Included latest versions of the following libraries and technologies: <b>GraphQL,  [Apollo Server](https://github.com/apollographql/apollo-server), [Koa](https://koajs.com/), [@totalsoft/nodebb](https://github.com/osstotalsoft/nodebb), [graphql/dataloader](https://github.com/graphql/dataloader), [knex.js](https://knexjs.org/), [Redis](https://github.com/luin/ioredis) </b> and many more, see generators/app/templates/infrastructure/package.json file.
+Included latest versions of the following libraries and technologies: <b>GraphQL,  [Apollo Server](https://github.com/apollographql/apollo-server), [Koa](https://koajs.com/), [@totalsoft/nodebb](https://github.com/osstotalsoft/nodebb), [graphql/dataloader](https://github.com/graphql/dataloader), [knex.js](https://knexjs.org/), [Prisma](https://www.prisma.io/docs/), [Redis](https://github.com/luin/ioredis) </b> and many more, see generators/app/templates/infrastructure/package.json file.
 
-## Code formatting  
+## Data layer technology stack
+
+To suit everyone's needs, this great GraphQL generator allows you to use different data layer technology approaches:
+
+- **REST API** calls using [apollo-datasource-rest](https://github.com/apollographql/apollo-server/tree/main/packages/apollo-datasource-rest) library
+
+- **Direct database access**. In this case you can choose one of two options:
+  
+  - [Prisma ORM](https://www.prisma.io/docs/). Prisma is a **server-side** library that helps your app read and write data to the database in an intuitive and safe way. 
+    
+    This is an open source database toolkit for **PostgreSQL, MySQL, SQL Server, and SQLite.** 
+    
+    Despite being the best ORM on the market right now, Prsima also includes: 
+    
+    - **Prisma Migrate** component, automatically generates fully customizable SQL database migrations   
+    
+    - **Prisma Studio** , a free web component, that allows the user to easily explore and manipulate Data in its Prisma projects.
+  
+  - [knex.js](https://knexjs.org/)  is a "batteries included" SQL query builder, designed to be flexible, portable, and fun to use.  
+    
+    By default, this generator implements Knex.js library with **MSSQL**, but with a few tweaks it can also be used with **PostgreSQL**, **CockroachDB**, **MySQL**, **MariaDB**, **SQLite3**, **Oracle**, and **Amazon Redshift**.
+
+## Code formatting
+
 The generated code is formatted using the **Prettier** formatter. A file named **.prettierrc** containing the formatting settings is placed in the root of the project.  
-  
+
 For maintaining unitary style, the **.prettierrc** configuration file is read by other tools that run **Prettier** such as scripts or IDE extensions. For example if using **Visual Studio Code** we recommend installing the following extension [Prettier formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)  
-  
+
 In case the **.prettierrc** file is customized, the new settings will be used when re-running the generator. The only condition is to answer **no** when asked to overwrite this file.  
 
 The default prettier config file can be found here: [.prettierrc](generators/app/templates/infrastructure/.prettierrc)
@@ -128,46 +172,52 @@ To help you enforce this standards, the generator also comes with this great lib
 
 This application uses husky to trigger lint-staged during the pre-commit hook to automate the tedious part of your workflows, such as formatting with Prettier and/or linting with ESLint. Your code gets fixed before it ever leaves your machine, so you don’t have to wait for your CI to inform you that you forgot to run the formatter or linter.
 
-  ### ⚠ Configuring a monorepo with multiple packages
+### ⚠ Configuring a monorepo with multiple packages
+
 By design, `husky install` must be run in the same directory as `.git`. If your project is a monorepo containing multiple packages, for example a Server and Client sub-folders, husky will expects your `package.json` to be at the root of your project.
 
 If you don't want to add a separate `package.json` in your root just for this, you need to change the husky configurations in your Server and Client projects as follows:
 
 * Change directory during prepare script and pass a subdirectory
-```
-// clientProject/package.json
-"scripts": {
+  
+  ```
+  // clientProject/package.json
+  "scripts": {
     "prepare": "cd .. && husky install clientProject/.husky"
-}
-```
-```
-// serverProject/package.json
-"scripts": {
+  }
+  ```
+  
+  ```
+  // serverProject/package.json
+  "scripts": {
     "prepare": "cd .. && husky install serverProject/.husky"
-}
-```
+  }
+  ```
 
 * You'll also need to change directory in one of Client or Server hooks and write for both projects  
-```
-// clientProject/.husky/pre-commit
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-cd serverProject
-npx lint-staged
-npm run test:ci
-cd ../clientProject
-npx lint-staged
-npm run test:ci
-```
+  
+  ```
+  // clientProject/.husky/pre-commit
+  #!/bin/sh
+  . "$(dirname "$0")/_/husky.sh"
+  cd serverProject
+  npx lint-staged
+  npm run test:ci
+  cd ../clientProject
+  npx lint-staged
+  npm run test:ci
+  ```
 
 * Run `npm install` in both projects and that’s it! Now if you try to make a commit, you will see that eslint and prettier will run and fix themselves as you would expect.
 
 ## Token validation
+
 This GraphQL server is expecting that all the applications and services that consumes him, uses an Identity server that generates secure jwk authentication tokens. 
 
 Our server defines a middleware  function that decodes the token and validate it against the Identity server on every request using the following libraries:[jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) and [jwks-rsa](https://github.com/auth0/node-jwks-rsa). 
 
 ## Authorization
+
 When building a service or any other application it is crucial to make it secure, besides token validation, there might be the need to limit access to certain fields, types or even endpoints. We can help you do this too. 
 
 To implement restriction rules we use [graphql-shield](https://github.com/maticzav/graphql-shield). If you answered with `true` to the "Implement authorization" question prompted at the beginning, there will be an example of permission checking included in this sample. (See `src/middleware/permissions`)
@@ -178,7 +228,7 @@ To define a new role, assuming it was already added in the database, you should 
 
 By default the permission check is made by checking the `UserRight` table (This function can me replace and changes as desired):
 
-``` 
+```
 const checkForPermission = async (permissions, { dbInstance, externalUser }) => {
     try {
         const { id } = await dbInstance.select("Id").from("User").where("ExternalId", externalUser.id).first()
@@ -196,6 +246,7 @@ const checkForPermission = async (permissions, { dbInstance, externalUser }) => 
 
 To implement restrictions you first have to define your rules and them apply them in the "shield" defined on top of your GraphQL schema.
 e.g.: 
+
 ```
 const isAuthenticated = rule({ cache: 'contextual' })(
     (_parent, _args, context) => !!context.externalUser.id
@@ -219,9 +270,10 @@ shield({
 ```
 
 ## Multi-tenancy
+
 If you need to handle multi-tenancy in your new application, you can just reply with `yes` when you are being prompted about this topic at the beginning and voilà! Everything will be done for you.
 
-This feature comes with	a middleware function that identitfies the tenant on every request using different strategies. By default it first looks for the tenantId in the query string ( `request.query.tenantId` ), if not there then we'll decode the token and try to extrat it from there. You can use other strategies of tenant identification, we also included some you can choose from or you can define your own.
+This feature comes with    a middleware function that identitfies the tenant on every request using different strategies. By default it first looks for the tenantId in the query string ( `request.query.tenantId` ), if not there then we'll decode the token and try to extrat it from there. You can use other strategies of tenant identification, we also included some you can choose from or you can define your own.
 
 ```
 const tenantIdentification = () => async (ctx, next) => {
@@ -279,6 +331,7 @@ This feature will include the `src/messaging` folder, which contains all the thi
 3. (Optional) `MessagingDataSource` - this allows you to define a custom Apollo data source that helps you explicitly publish or subscribe to events on the message bus.
 
 Being a totally different context, we would have to apply all the middleware functions and strategies that are normally executed on a basic GraphQL request. To to so, in your `src/index.js` file you fill see the following code:
+
 ```
 messagingHost()
     .subscribe([
@@ -293,9 +346,11 @@ messagingHost()
     .use(dispatcher(msgHandlers))
     .start()
 ```
+
 This code basically executes the same middleware functions in the same order as they are executed on a GraphQL request.
 
 When using messaging, you need to opt-in between two existing messaging transports:
+
 - `nats`: uses [Nats streaming](https://github.com/nats-io/nats-streaming-server)
 - `rusi`: uses a sidecar container, powered by [rusi](https://github.com/osstotalsoft/rusi), to offload messaging concerns
 
@@ -308,17 +363,18 @@ This features includes a logging plugin, that helps you monitor the execution of
 By default all the logs are saved in the application database ( this can be changed by modifying the `saveLogs()` method found in `src/plugins/logging/loggingUtils.js` file. 
 
 You need the following table in your database to store your logs:
+
 ```
 CREATE TABLE [dbo].[EventLog](
-	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[Uid] [uniqueidentifier] NOT NULL,
-	[RequestId] [uniqueidentifier] NOT NULL,
-	[Code] [nvarchar](50) NOT NULL,
-	[Message] [nvarchar](max) NOT NULL,
-	[Details] [nvarchar](max) NOT NULL,
-	[TimeStamp] [datetime] NOT NULL,
-	[LoggingLevel] [nvarchar](50) NOT NULL,
-	[TenantId] [uniqueidentifier] NULL
+    [Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [Uid] [uniqueidentifier] NOT NULL,
+    [RequestId] [uniqueidentifier] NOT NULL,
+    [Code] [nvarchar](50) NOT NULL,
+    [Message] [nvarchar](max) NOT NULL,
+    [Details] [nvarchar](max) NOT NULL,
+    [TimeStamp] [datetime] NOT NULL,
+    [LoggingLevel] [nvarchar](50) NOT NULL,
+    [TenantId] [uniqueidentifier] NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 ```
 
@@ -340,26 +396,30 @@ JAEGER_SAMPLER_TYPE=const
 JAEGER_SAMPLER_PARAM=1
 JAEGER_DISABLED=true
 ```
+
 ## Code examples
 
 To help you out starting developing a feature in your new server, we included some code samples ( see `src/features/user`). This code's purpose is not only to help you wrap you head around SDL and GraphQL development in general, but it also comes with the queries and data needed to implement authorization in your web application, the missing part from [Webapp Rocket Generator -> Authorization ](https://github.com/osstotalsoft/generator-webapp-rocket#authorization).
 
 ## Deployment
+
 When you are ready you can deploy your application on any platform. This template also includes a pre-configured Dockerfile and optional Helm files.
 Application (or non-system) containers security can be enhanced by running as a non-root user. This can reduce the damage done by a malicious actor that gains access to the application and the underlying system, because it will have only the rights assigned to that user (for example it will not be able to install arbitrary software). Once the project is generated, a user is created for your project. Default name is "appuser". You can change the name in Dockerfile.
 
 ## HashiCorp Vault
+
 HashiCorp Vault is a secrets management tool specifically designed to control access to sensitive credentials in a low-trust environment. It can be used to store sensitive values and at the same time dynamically generate access for specific services/applications on lease. Plus, Vault can be used to authenticate users (machines or humans) to make sure they are authorized to access a particular file.
 The generated project comes with default configurations for Vault. At release time, the configurations must be changed with the Vault secrets defined for your project. 
 By default, the project doesn't use secrets defined in Vault. In order to use it, the 'vaultEnvironment' property must be set to true in values.yaml at release.
 
-
 More info: https://opensource.com/article/18/3/just-say-no-root-containers
+
 ## Getting To Know Yeoman
- * Yeoman has a heart of gold.
- * Yeoman is a person with feelings and opinions, but is very easy to work with.
- * Yeoman can be too opinionated at times but is easily convinced not to be.
- * Feel free to [learn more about Yeoman](http://yeoman.io/).
+
+* Yeoman has a heart of gold.
+* Yeoman is a person with feelings and opinions, but is very easy to work with.
+* Yeoman can be too opinionated at times but is easily convinced not to be.
+* Feel free to [learn more about Yeoman](http://yeoman.io/).
 
 ## License
 
