@@ -9,7 +9,7 @@
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "nodemon src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",
     "test:watchAll": "<%=packageManager%> run test -- --watchAll",
     "test:watch": "<%=packageManager%> run test -- --watch",
@@ -25,7 +25,7 @@
   "license": "ISC",
   "dependencies": {
     "@graphql-tools/graphql-file-loader": "^7.3.3",
-    "@graphql-tools/load": "^7.4.1",
+    "@graphql-tools/load": "^7.5.0",
     "@graphql-tools/schema": "^8.3.1",
     "@koa/router": "^10.1.1",
     <%_ if(dataLayer === "prisma") {_%>

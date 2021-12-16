@@ -6,3 +6,10 @@ datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
+
+// Example of generated code
+model User {
+  id    Int     @id @default(autoincrement())
+  firstName  String?
+  lastName  String?
+}
