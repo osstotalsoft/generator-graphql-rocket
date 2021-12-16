@@ -1,4 +1,3 @@
-const _arity = require('ramda/src/internal/_arity');
 const UserApi = require('../features/user/dataSources/userApi');
 <%_ if(dataLayer == "knex") {_%>
 const UserDb = require('../features/user/dataSources/userDb');
