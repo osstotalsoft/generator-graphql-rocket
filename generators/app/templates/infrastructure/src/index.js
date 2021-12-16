@@ -39,7 +39,7 @@ opentracing.initGlobalTracer(defaultTracer);
 const { JAEGER_DISABLED } = process.env;
 const tracingEnabled = !JSON.parse(JAEGER_DISABLED)
 <%_}_%>
-<%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
+<%_ if(dataLayer == "knex" && addSubscriptions && withMultiTenancy){ _%>
 // MultiTenancy
 const tenantService = require('./multiTenancy/tenantService');
 <%_}_%>

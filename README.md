@@ -59,7 +59,7 @@ You will be prompted to introduce the following information:
 1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
 2. GraphQL port. By default it would be set to `4000`
 3. What data integration layer technology you would like to use? You can choose between `Prisma` and `Knex JS`
-4. Include multi-tenancy. By default is set to false.
+4. Include multi-tenancy. By default is set to false. <mark>(⚠ For now multi-tenancy option is not available with `Prisma`)</mark>
 5. Use subscriptions. By default is set to false.
 6. Add messaging integration. By default is set to false.
 7. Implement authorization. By default is set to false. This includes rights and permissions.
