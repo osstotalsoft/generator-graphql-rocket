@@ -273,7 +273,7 @@ shield({
 
 If you need to handle multi-tenancy in your new application, you can just reply with `yes` when you are being prompted about this topic at the beginning and voilà! Everything will be done for you.
 
-This feature comes with    a middleware function that identitfies the tenant on every request using different strategies. By default it first looks for the tenantId in the query string ( `request.query.tenantId` ), if not there then we'll decode the token and try to extrat it from there. You can use other strategies of tenant identification, we also included some you can choose from or you can define your own.
+This feature comes with a middleware function that identifies the tenant on every request using different strategies. By default it first looks for the tenantId in the query string ( `request.query.tenantId` ), if not there then we'll decode the token and try to extract it from there. You can use other strategies of tenant identification, we also included some you can choose from or you can define your own.
 
 ```
 const tenantIdentification = () => async (ctx, next) => {
@@ -313,7 +313,7 @@ const getTenantIdFromRefererHost = async ctx => {
 };
 ```
 
-In addition, when choosing this option, you will find a `src/features/tenant` folder. This contains the infrastructure (query, resolvers, dataLoaders and api functions) you can use to manage multi-tenancy in your frontent application. This is the missing piece for the **Tenant Selector** component, a part of the [Webapp Rocket Generator -> Multy-tenancy](https://github.com/osstotalsoft/generator-webapp-rocket#multi-tenancy).
+In addition, when choosing this option, you will find a `src/features/tenant` folder. This contains the infrastructure (query, resolvers, dataLoaders and api functions) you can use to manage multi-tenancy in your frontent application. This is the missing piece for the **Tenant Selector** component, a part of the [Webapp Rocket Generator -> Multi-tenancy](https://github.com/osstotalsoft/generator-webapp-rocket#multi-tenancy).
 
 ## Subscriptions
 
