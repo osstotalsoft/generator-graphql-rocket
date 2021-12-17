@@ -11,7 +11,7 @@ describe("Tracing tests", () => {
     it("should create span from received msg: ", async () => {
         //arrange
         const someCorrelationId = "some-correlation-id"
-        <%_ if(withMultiTenancy){ _%>
+        <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
         const someTenantId = "some-tenant-id";
         const msg = envelope({}, { tenantId: someTenantId, correlationId: someCorrelationId })
         const ctx = messagingHost()._contextFactory("topic1", msg)
@@ -35,7 +35,7 @@ describe("Tracing tests", () => {
         const span = tracer.startSpan.mock.results[0].value
         expect(span.log.mock.calls).toEqual([[{ event: "message", message: ctx.received.msg }]]);
         expect(span.setTag.mock.calls).toEqual([
-            [envelope.headers.correlationId, someCorrelationId]<% if(withMultiTenancy){ %>,
+            [envelope.headers.correlationId, someCorrelationId]<% if(dataLayer == "knex" && withMultiTenancy){ %>,
             [envelope.headers.tenantId, someTenantId]
             <%_}_%>
         ]);

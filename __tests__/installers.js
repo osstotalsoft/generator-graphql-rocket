@@ -74,8 +74,4 @@ describe('test package installers', () => {
       assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"yarn")
       assert.noFileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"npm")
     }))
-
-  afterAll(() => {
-    rimraf.sync(path.join(__dirname, tempRoot))
-  })
 })

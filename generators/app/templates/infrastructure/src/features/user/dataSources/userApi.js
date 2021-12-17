@@ -9,7 +9,7 @@ class UserApi extends NoCacheRESTDataSource {
 
     willSendRequest(request) {
         request.headers.set('Authorization', this.context.token);
-        <%_ if(withMultiTenancy){ _%>
+        <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
         request.headers.set('TenantId', this.context.tenantId);
         <%_}_%>
     }

@@ -1,14 +1,19 @@
 <%_ if(addSubscriptions){ _%>
 const { topics, redisPubSub } = require('../../pubSub')
 <%_}_%>
-<%_ if(addSubscriptions && withMultiTenancy){ _%>
+<%_ if(addSubscriptions && dataLayer == "knex" && withMultiTenancy){ _%>
 const { envelope } = require("@totalsoft/message-bus")
-const { withFilter } = require('graphql-subscriptions');
+const { withFilter } = require('graphql-subscriptions')
+<%_}_%>
+<%_ if(dataLayer == "prisma") {_%>
+const { pascalizeKeys } = require('humps')
+const prisma = require('../../utils/prisma')
 <%_}_%>
 
 const userResolvers = {
+    <%_ if(dataLayer == "knex") {_%>
     Query: {
-        userData: async (_, { id, externalId }, { dataLoaders }) => {
+        userData: async (_, { id, externalId }, { dataLoaders }, _info) => {
             if (externalId) {
                 return await dataLoaders.userByExternalId.load(externalId);
             } else return await dataLoaders.userById.load(id);
@@ -21,7 +26,7 @@ const userResolvers = {
         }
     },
     User: {
-        rights: async ({ id }, _params, { dataLoaders }) => {
+        rights: async ({ id }, _params, { dataLoaders }, _info) => {
             // to avoid n+1 problem, use dataLoader whenever you can
             const userRights = await dataLoaders.userRightsByUserId.load(id);
             const rightsIds = userRights && userRights.map(ur => ur.rightId)
@@ -30,7 +35,7 @@ const userResolvers = {
         }
     },
     UserList: {
-        pagination: async ({ nextAfterId, sortByValue }, { pager, filters }, { dataSources }) => {
+        pagination: async ({ nextAfterId, sortByValue }, { pager, filters }, { dataSources }, _info) => {
             const { totalCount } = await dataSources.userDb.getUserListTotalCount(filters);
             const prevPageId = await dataSources.userDb.getUserListPreviousPageAfterId(pager, filters, sortByValue);
             const prevPage = { ...pager, afterId: prevPageId && prevPageId.id };
@@ -40,10 +45,77 @@ const userResolvers = {
     },
     //Not working! Only for demonstration
     Mutation: {
-        updateUser: async (_, { input }, { dataSources }) => {
+        updateUser: async (_, { input }, { dataSources }, _info) => {
             return dataSources.userApi.updateUser(input);
         }
     },
+    <%_} else if(dataLayer == "prisma"){_%>
+    Query: {
+        userData: async (_, { id, externalId }, _ctx, _info) => {
+            if (externalId) {
+              return await prisma.user.findUnique({ where: { ExternalId: externalId } })
+            } else return await prisma.user.findUnique({ where: { Id: id } })
+        },
+        userList: async (_parent, { pager, filters }, _ctx) => {
+        const { pageSize, afterId, sortBy, direction } = pager
+        const orderBy = pascalizeKeys(sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { Id: 'asc' })
+    
+        const values = await prisma.user.findMany({
+            take: pageSize ? pageSize + 1 : undefined,
+            cursor: afterId
+            ? {
+                Id: afterId
+                }
+            : undefined,
+            where: filters ? pascalizeKeys(filters) : undefined,
+            orderBy
+        })
+    
+        return pageSize ? { values: values?.slice(0, pageSize), orderBy, nextAfterId: values?.[pageSize]?.id } : { values }
+        }
+    },
+    User: {
+        rights: async ({ id }, _params, _ctx, _info) => {
+          const userRights = await prisma.userRight.findUnique({
+            where: { UserId: id },
+            include: { Right: true }
+          })
+          return userRights.map(r => r?.right?.name)
+        }
+    },
+    UserList: {
+        pagination: async ({ orderBy, nextAfterId }, { pager, filters }, _ctx) => {
+            const { pageSize, afterId } = pager
+            if (!pageSize) return
+      
+            let res = { dbContext: prisma.userInformation, nextPage: { ...pager, afterId: nextAfterId ?? null } }
+      
+            if (!afterId) return res
+      
+            const prevPageValues = await prisma.user.findMany({
+              select: { Id: true },
+              skip: 1,
+              take: -pageSize,
+              cursor: {
+                Id: afterId
+              },
+              where: filters ? pascalizeKeys(filters) : undefined,
+              orderBy
+            })
+            const prevPage = { ...pager, afterId: prevPageValues?.[0]?.id }
+            return { ...res, prevPage }
+        }
+    },
+    Pagination: {
+        totalCount: ({ dbContext }) => dbContext.count()
+    },
+    //Not working! Only for demonstration
+    Mutation: {
+        updateUser: async (_, { input }, _ctx, _info) => {
+            return prisma.user.update({ data: pascalizeKeys(input), where: { Id: input?.id } })
+        }
+    },
+    <%_}_%>    
     <%_ if(addSubscriptions){ _%>
     //Not working! Only for demonstration
     Subscription: {
@@ -51,7 +123,7 @@ const userResolvers = {
             resolve: async (msg, _variables, _context, _info) => {
                 return msg.payload
             },
-            <%_ if(withMultiTenancy){ _%>
+            <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
             subscribe: withFilter(
                 (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED),
                 (message, _params, { tenant, logger }, _info) => {
@@ -67,6 +139,6 @@ const userResolvers = {
         }
     }
     <%_}_%>
-};
+}
 
-module.exports = userResolvers;
+module.exports = userResolvers

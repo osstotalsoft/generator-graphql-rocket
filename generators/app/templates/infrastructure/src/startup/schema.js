@@ -1,4 +1,4 @@
-const { makeExecutableSchema } = require('graphql-tools')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
 const merge = require('lodash.merge');
 
 const { loadTypedefsSync } = require('@graphql-tools/load')
@@ -11,7 +11,7 @@ const { permissionsMiddleware } = require('../middleware/permissions/index')
 
 const userResolvers = require('../features/user/resolvers');
 
-<%_ if(withMultiTenancy){ _%>
+<%_ if(dataLayer === "knex" && withMultiTenancy){ _%>
 const tenantResolvers = require('../features/tenant/resolvers');
 <%_}_%>
 
@@ -19,7 +19,7 @@ const oldTypeDefs = []
 const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
   loaders: [new GraphQLFileLoader()]
 })
-const resolvers = merge(userResolvers<% if(withMultiTenancy){ %>, tenantResolvers<%}%>)
+const resolvers = merge(userResolvers<% if(dataLayer === "knex" && withMultiTenancy){ %>, tenantResolvers<%}%>)
 
 const typeDefs = [...sources.map(source => source.document), ...oldTypeDefs]
 
