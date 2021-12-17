@@ -117,7 +117,7 @@ describe('test package installers', () => {
         assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
       }))
 
-  it('does not contain knex config files and adb associated files', async () => {
+  it('does not contain knex config files and db associated files', async () => {
     const files = [
       path.join(__dirname, `${tempRoot}/${projectName}/src/db`),
       path.join(__dirname, `${tempRoot}/${projectName}/src/middleware/db`),

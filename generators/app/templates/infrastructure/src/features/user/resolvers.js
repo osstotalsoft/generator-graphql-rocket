@@ -76,7 +76,6 @@ const userResolvers = {
     },
     User: {
         rights: async ({ id }, _params, _ctx, _info) => {
-          // to avoid n+1 problem, use dataLoader whenever you can
           const userRights = await prisma.userRight.findUnique({
             where: { UserId: id },
             include: { Right: true }
@@ -108,7 +107,7 @@ const userResolvers = {
         }
     },
     Pagination: {
-        totalCount: ({ dbContext }) => dbContext.count() //dataSources.userDb.getUserListTotalCount(filters)
+        totalCount: ({ dbContext }) => dbContext.count()
     },
     //Not working! Only for demonstration
     Mutation: {
