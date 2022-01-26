@@ -17,8 +17,8 @@ const generateKnexConfig = ({
     server,
     port: parseInt(port) || null,
     user: userId,
-    password: password,
-    database: database,
+    password,
+    database,
     options: {
       enableArithAbort: true,
       trustServerCertificate: JSON.parse(trustServerCertificate),
