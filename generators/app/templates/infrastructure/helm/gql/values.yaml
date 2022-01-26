@@ -50,6 +50,8 @@ global:
     port: 0 # [DB_PORT] here
     user: "[DB_USER]"
     password: "[DB_PASSWORD]"
+    instanceName: ""
+    trustServerCertificate: "false"
 
 gql:
   enabled: true
