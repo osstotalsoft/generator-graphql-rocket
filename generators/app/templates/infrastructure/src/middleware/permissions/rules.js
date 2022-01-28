@@ -1,3 +1,5 @@
+// Define your shield rules using graphql-shield (see docs https://github.com/maticzav/graphql-shield)
+<%_if(addQuickStart){ _%>
 const { rule } = require('graphql-shield')
 const { includes, intersection } = require('ramda');
 const { admin, globalAdmin } = require('../../constants/identityUserRoles')
@@ -6,7 +8,6 @@ const { ForbiddenError } = require('apollo-server-koa');
 <%_ if(dataLayer == "prisma") {_%>
 const prisma = require('../../utils/prisma')
 <%_}_%>
-
 // strict - use when rule relies on parent or args parameter as well (field specific modifications)
 // Cannot use STRICT caching for upload types
 
@@ -54,3 +55,4 @@ const checkForPermission = async (permissions, { externalUser }) => {
 module.exports = {
     isAuthenticated, isAdmin, canViewDashboard
 }
+<%_}_%>

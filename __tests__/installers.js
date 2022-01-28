@@ -34,9 +34,6 @@ describe('test package installers', () => {
       addGqlLogging: true,
       addHelm: true,
       addTracing: true,
-      identityApiUrl: '',
-      identityOpenIdConfig: '',
-      identityAuthority: 'localhost:5000',
       packageManager: 'npm'
     })
     .run()
@@ -60,9 +57,6 @@ describe('test package installers', () => {
       addGqlLogging: true,
       addHelm: true,
       addTracing: true,
-      identityApiUrl: '',
-      identityOpenIdConfig: '',
-      identityAuthority: 'localhost:5000',
       packageManager: 'yarn'
     })
     .run()

@@ -68,10 +68,8 @@ You will be prompted to introduce the following information:
 9. Whether to generate default helm files or not.
 10. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
 11. Add Opentracing using Jaeger. By default is set to false.
-12. Identity API url, your Identity server API url.
-13. Identity openId configuration.
-14. Identity authority.
-15. What package manager you wish to use to install the application dependencies. (npm or yarn).
+12. Would you like to include quick start examples? If so, some end to end examples will be included in your new generated project to help you get started.
+13. What package manager you wish to use to install the application dependencies. (npm or yarn).
 
 > ⚠If you decided to use **Prisma** as you data layer technology, make sure you introspected your database and generated **Prisma Client **instance. 
 > 

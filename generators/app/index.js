@@ -41,7 +41,8 @@ module.exports = class extends Generator {
       withRights,
       packageManager,
       helmChartName,
-      dataLayer
+      dataLayer,
+      addQuickStart
     } = this.answers
 
     const templatePath = this.templatePath('infrastructure/**/*')
@@ -81,6 +82,20 @@ module.exports = class extends Generator {
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],
+        ignoreFiles
+      )
+
+    if (!addQuickStart)
+      ignoreFiles = concat(
+        [
+          '**/features/common/dbGenerators.js',
+          '**/features/tenant/**',
+          '**/features/user/**',
+          '**/constants/identityUserRoles.js',
+          '**/multiTenancy/tenantDataSource.js',
+          '**/multiTenancy/tenantModule.js',
+          '**/middleware/permissions/__tests__/**'
+        ],
         ignoreFiles
       )
 

@@ -9,17 +9,24 @@ const { applyMiddleware } = require('graphql-middleware')
 const { permissionsMiddleware } = require('../middleware/permissions/index')
 <%_}_%>
 
+<%_if(addQuickStart){ _%>
 const userResolvers = require('../features/user/resolvers');
 
 <%_ if(dataLayer === "knex" && withMultiTenancy){ _%>
 const tenantResolvers = require('../features/tenant/resolvers');
+<%_}_%>
 <%_}_%>
 
 const oldTypeDefs = []
 const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
   loaders: [new GraphQLFileLoader()]
 })
+
+<%_if(addQuickStart){ _%>
 const resolvers = merge(userResolvers<% if(dataLayer === "knex" && withMultiTenancy){ %>, tenantResolvers<%}%>)
+<%_} else { _%>
+const resolvers = merge(/* Your resolvers here*/)
+<%_}_%>
 
 const typeDefs = [...sources.map(source => source.document), ...oldTypeDefs]
 

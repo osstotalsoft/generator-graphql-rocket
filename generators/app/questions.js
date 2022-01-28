@@ -111,22 +111,10 @@ module.exports = [
     default: false
   },
   {
-    type: 'input',
-    name: 'identityApiUrl',
-    message: 'What is your Identity API url?',
-    default: ''
-  },
-  {
-    type: 'input',
-    name: 'identityOpenIdConfig',
-    message: 'What is your identity openId configuration?',
-    default: ''
-  },
-  {
-    type: 'input',
-    name: 'identityAuthority',
-    message: 'And the identity authority link?',
-    default: ''
+    type: 'confirm',
+    name: 'addQuickStart',
+    message: 'Would you like to include quick start examples?',
+    default: false
   },
   {
     type: 'list',
