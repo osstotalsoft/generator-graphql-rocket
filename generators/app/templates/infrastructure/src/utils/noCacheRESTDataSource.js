@@ -1,6 +1,15 @@
-const { RESTDataSource } = require('apollo-datasource-rest')
+<%_ if(addTracing){ _%>
+  const { OpenTracingRESTDataSource } = require("../tracing/openTracingRestDataSource");
+<%_ } else { _%>
+  const { RESTDataSource } = require('apollo-datasource-rest')
+<%_ } _%>
 
-class NoCacheRESTDataSource extends RESTDataSource {
+<%_ if(addTracing){ _%>
+  class NoCacheRESTDataSource extends OpenTracingRESTDataSource {
+<%_ } else { _%>
+  class NoCacheRESTDataSource extends RESTDataSource {
+<%_ } _%>
+
   deleteCacheForRequest(request) {
     this.memoizedResults.delete(this.cacheKeyFor(request))
   }

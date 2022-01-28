@@ -87,25 +87,36 @@ describe("logging plugin tests:", () => {
         expect(context.logs[1].loggingLevel).toBe(loggingLevels.DEBUG)
     })
 
-    it("logDbError should clears logs from context, call insert logs and return new ApolloError: ", async () => {
+    it("logDbError should clear logs from context, call insert logs and return new ApolloError: ", async () => {
         //arrange
         const message = "Error log message"
         const code = "Error_Message_Code"
         const errorMessage = "ErrorMessage"
 
-        const context = { logs: [], dbInstance: jest.fn(() => ({ insert: jest.fn(() => []) })) }
-
         const loggingUtils = require("../loggingUtils")
         jest.mock("../loggingUtils");
         loggingUtils.saveLogs.mockResolvedValue(null);
-        global.console = { error: jest.fn() }
+        global.console = { log: jest.fn(), error: jest.fn() }
+
+        <%_ if(dataLayer == "knex") {_%>
+        const context = { logs: [], dbInstance: jest.fn(() => ({ insert: jest.fn(() => []) })) }
+        <%_ } else if(dataLayer == "prisma") {_%>
+        const context = { logs: [] }
+        jest.mock('../../../utils/prisma', () => ({
+            eventLog: {
+            createMany: jest.fn().mockReturnValue([])
+            }
+        }))
+        <%_}_%>
 
         //act
         const res = await logDbError(context, message, code, loggingLevels.ERROR, new Error(errorMessage))
 
         //assert
         expect(context.logs).toBe(null)
+        <%_ if(dataLayer == "knex") {_%>
         expect(context.dbInstance.mock.calls.length).toBe(1);
+        <%_}_%>
         expect(console.error).toBeCalled()
         expect(res).toBeInstanceOf(ApolloError)
 

@@ -29,7 +29,7 @@ spec:
     matchLabels:
       {{- include "Gql.selectorLabels" . | nindent 6 }}
   template:
-    metadata:   
+    metadata:
       annotations:
     <%_ if(addVaultConfigs){ _%>
         vault.hashicorp.com/agent-inject: "true"
@@ -38,7 +38,7 @@ spec:
         vault.hashicorp.com/agent-inject-template-credentials.vault: |
           {{ printf "{{- with secret \"%s/%s\" -}}"  .Values.global.vaultConfigs.secret .Values.global.vaultConfigs.key }}
           export DB_USER={{`{{ .Data.data.db_user }}`}}
-          export DB_PASSWORD={{`{{ .Data.data.db_password }}`}} 
+          export DB_PASSWORD={{`{{ .Data.data.db_password }}`}}
           {{ print "{{- end }}" }}
     <%_}_%>
     <%_ if(addMessaging && messagingTransport == 'rusi') { _%>
@@ -82,6 +82,10 @@ spec:
             value: {{ $global.db.user | quote }}
           - name: DB_PASSWORD
             value: {{ $global.db.password | quote }}
+          - name: DB_INSTANCE_NAME
+            value: {{ $global.db.instanceName | quote }}
+          - name: DB_TRUST_SERVER_CERTIFICATE
+            value: {{ $global.db.trustServerCertificate | quote }}
 <%_ if(addVaultConfigs){ _%>
           {{- end }}
 <%_}_%>
