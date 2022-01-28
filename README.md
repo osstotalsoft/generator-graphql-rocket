@@ -215,6 +215,15 @@ This GraphQL server is expecting that all the applications and services that con
 
 Our server defines a middleware  function that decodes the token and validate it against the Identity server on every request using the following libraries:[jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) and [jwks-rsa](https://github.com/auth0/node-jwks-rsa). 
 
+In order to connect your new application to an identity server, the following configuration variables must be filled in `.env` file:
+```
+IDENTITY_API_URL -> Identity API url, your Identity server API url 
+
+IDENTITY_AUTHORITY -> Identity authority
+
+IDENTITY_OPENID_CONFIGURATION -> Identity openId configuration
+```
+
 ## Authorization
 
 When building a service or any other application it is crucial to make it secure, besides token validation, there might be the need to limit access to certain fields, types or even endpoints. We can help you do this too. 
