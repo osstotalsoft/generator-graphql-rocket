@@ -125,7 +125,7 @@ spec:
           - name: JAEGER_SAMPLER_TYPE
             value: {{ $global.jaeger.samplerType | quote }}
           - name: JAEGER_SAMPLER_PARAM
-            value: $global.jaeger.samplerParam
+            value: {{ $global.jaeger.samplerParam | quote }}
           - name: JAEGER_DISABLED
           {{- if $global.jaeger.enabled }}
             value: "false"
