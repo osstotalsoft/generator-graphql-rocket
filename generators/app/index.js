@@ -94,7 +94,8 @@ module.exports = class extends Generator {
           '**/constants/identityUserRoles.js',
           '**/multiTenancy/tenantDataSource.js',
           '**/multiTenancy/tenantModule.js',
-          '**/middleware/permissions/__tests__/**'
+          '**/middleware/permissions/__tests__/**',
+          '**/README.md',
         ],
         ignoreFiles
       )
