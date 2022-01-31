@@ -24,6 +24,7 @@ const permissionsMiddleware = shield({
 
 module.exports = { permissionsMiddleware }
 <%_}else{_%>
+const { shield } = require('graphql-shield')
 // Apply shield rules on your schema (see docs https://github.com/maticzav/graphql-shield)
 const permissionsMiddleware = shield({})
 module.exports = { permissionsMiddleware }

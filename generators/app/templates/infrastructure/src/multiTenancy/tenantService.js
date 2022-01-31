@@ -1,5 +1,6 @@
-
+<%_if(addQuickStart){ _%>
 const tenantModule = require("./tenantModule");
+<%_}_%>
 
 async function getTenantFromId(tenantId) {
     if (!tenantId) {
