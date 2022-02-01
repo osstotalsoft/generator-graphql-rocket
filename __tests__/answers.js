@@ -21,9 +21,6 @@ describe('test package installers', () => {
     addGqlLogging: false,
     addHelm: false,
     addTracing: false,
-    identityApiUrl: '',
-    identityOpenIdConfig: '',
-    identityAuthority: 'localhost:5000',
     packageManager: 'npm'
   }
 

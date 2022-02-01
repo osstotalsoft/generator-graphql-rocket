@@ -1,3 +1,4 @@
+<%_if(addQuickStart){ _%>
 const { shield, and } = require('graphql-shield')
 const { isAuthenticated, isAdmin } = require('./rules')
 const { ForbiddenError } = require('apollo-server-koa');
@@ -22,3 +23,9 @@ const permissionsMiddleware = shield({
     })
 
 module.exports = { permissionsMiddleware }
+<%_}else{_%>
+const { shield } = require('graphql-shield')
+// Apply shield rules on your schema (see docs https://github.com/maticzav/graphql-shield)
+const permissionsMiddleware = shield({})
+module.exports = { permissionsMiddleware }
+<%_}_%>

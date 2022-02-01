@@ -20,9 +20,6 @@ describe('generator-graphql-rocket:app', () => {
     addHelm: false,
     addVaultConfigs: false,
     addTracing: false,
-    identityApiUrl: '',
-    identityOpenIdConfig: '',
-    identityAuthority: 'localhost:5000',
     packageManager: 'npm'
   }
 
