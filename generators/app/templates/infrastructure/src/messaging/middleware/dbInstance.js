@@ -6,9 +6,9 @@
   
   const dbInstance = () => async (ctx, next) => {
     <%_ if(withMultiTenancy){ _%>
-    const { tenant } = ctx
-    if (tenant) {
-      const dbInstance = await tenantDbInstanceFactory(tenant.id)
+    const { tenantId } = ctx
+    if (tenantId) {
+      const dbInstance = await tenantDbInstanceFactory(tenantId)
       ctx.dbInstance = dbInstance
     }
     <%_} else { _%>

@@ -1,13 +1,13 @@
 <%_ if(addSubscriptions){ _%>
 const { topics, redisPubSub } = require('../../pubSub')
 <%_}_%>
-<%_ if(addSubscriptions && dataLayer == "knex" && withMultiTenancy){ _%>
+<%_ if(addSubscriptions && withMultiTenancy){ _%>
 const { envelope } = require("@totalsoft/message-bus")
 const { withFilter } = require('graphql-subscriptions')
 <%_}_%>
 <%_ if(dataLayer == "prisma") {_%>
 const { pascalizeKeys } = require('humps')
-const prisma = require('../../utils/prisma')
+const { prisma } = require('../../prisma')
 <%_}_%>
 
 const userResolvers = {
@@ -53,14 +53,14 @@ const userResolvers = {
     Query: {
         userData: async (_, { id, externalId }, _ctx, _info) => {
             if (externalId) {
-              return await prisma.user.findUnique({ where: { ExternalId: externalId } })
-            } else return await prisma.user.findUnique({ where: { Id: id } })
+              return await prisma().user.findUnique({ where: { ExternalId: externalId } })
+            } else return await prisma().user.findUnique({ where: { Id: id } })
         },
         userList: async (_parent, { pager, filters }, _ctx) => {
         const { pageSize, afterId, sortBy, direction } = pager
         const orderBy = pascalizeKeys(sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { Id: 'asc' })
     
-        const values = await prisma.user.findMany({
+        const values = await prisma().user.findMany({
             take: pageSize ? pageSize + 1 : undefined,
             cursor: afterId
             ? {
@@ -76,7 +76,7 @@ const userResolvers = {
     },
     User: {
         rights: async ({ id }, _params, _ctx, _info) => {
-          const userRights = await prisma.userRight.findUnique({
+          const userRights = await prisma().userRight.findUnique({
             where: { UserId: id },
             include: { Right: true }
           })
@@ -88,11 +88,11 @@ const userResolvers = {
             const { pageSize, afterId } = pager
             if (!pageSize) return
       
-            let res = { dbContext: prisma.userInformation, nextPage: { ...pager, afterId: nextAfterId ?? null } }
+            let res = { dbContext: prisma().userInformation, nextPage: { ...pager, afterId: nextAfterId ?? null } }
       
             if (!afterId) return res
       
-            const prevPageValues = await prisma.user.findMany({
+            const prevPageValues = await prisma().user.findMany({
               select: { Id: true },
               skip: 1,
               take: -pageSize,
@@ -112,7 +112,7 @@ const userResolvers = {
     //Not working! Only for demonstration
     Mutation: {
         updateUser: async (_, { input }, _ctx, _info) => {
-            return prisma.user.update({ data: pascalizeKeys(input), where: { Id: input?.id } })
+            return prisma().user.update({ data: pascalizeKeys(input), where: { Id: input?.id } })
         }
     },
     <%_}_%>    
@@ -123,14 +123,14 @@ const userResolvers = {
             resolve: async (msg, _variables, _context, _info) => {
                 return msg.payload
             },
-            <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
+            <%_ if(withMultiTenancy){ _%>
             subscribe: withFilter(
                 (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED),
-                (message, _params, { tenant, logger }, _info) => {
+                (message, _params, { externalTenantId, logger }, _info) => {
                     logger.logInfo(`📨   Message received from ${topics.USER_CHANGED}: ${JSON.stringify(message)}`, '[Message_Received]', true);
-                    logger.logInfo(`📨   Message tenant id =  ${envelope.getTenantId(message).toUpperCase()}; Context tenant id = ${tenant.externalId.toUpperCase()}`,
+                    logger.logInfo(`📨   Message tenant id =  ${envelope.getTenantId(message).toUpperCase()}; Context tenant id = ${externalTenantId.toUpperCase()}`,
                         '[Message_Tenant_Check]', true);
-                    return envelope.getTenantId(message).toUpperCase() === tenant.externalId.toUpperCase()
+                    return envelope.getTenantId(message).toUpperCase() === externalTenantId.toUpperCase()
                 }                
             )
             <%_} else { _%>

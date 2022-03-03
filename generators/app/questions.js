@@ -44,7 +44,6 @@ module.exports = [
     type: 'confirm',
     name: 'withMultiTenancy',
     message: 'Would you like to use and implement multi-tenancy?',
-    when: prompts => prompts.dataLayer === 'knex',
     default: false
   },
   {

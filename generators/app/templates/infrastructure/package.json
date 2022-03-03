@@ -24,24 +24,35 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@graphql-tools/graphql-file-loader": "^7.3.3",
-    "@graphql-tools/load": "^7.5.1",
-    "@graphql-tools/schema": "^8.3.1",
+    "@graphql-tools/graphql-file-loader": "^7.3.4",
+    "@graphql-tools/load": "^7.5.2",
+    "@graphql-tools/schema": "^8.3.2",
     "@koa/router": "^10.1.1",
     <%_ if(dataLayer === "prisma") {_%>
-    "@prisma/client": "^3.8.1",
-    "prisma": "^3.8.1",
-    <%_} else if(dataLayer === "knex") { _%>
+    "@prisma/client": "^3.10.0",
+    "prisma": "^3.10.0",
       <%_ if(withMultiTenancy) {_%>
-    "@totalsoft/knex-filters": "^2.4.0",
+    "lodash.set": "^4.3.2",
+      <%_} _%>
+    <%_} _%>
+    <%_ if(withMultiTenancy) {_%>
+    "object-path": "^0.11.8",
+    "koa-ignore": "^1.0.1",
+      <%_ if(addQuickStart) {_%>
+      "datasource-sql": "^1.6.0",
+      "knex": "^0.95.0",
       <%_}_%>
+    <%_}_%>
+    <%_ if(dataLayer === "knex") {_%>
     "dataloader": "^2.0.0",
-    "datasource-sql": "^1.6.0",
-    "knex": "^0.95.0",
     "knex-tiny-logger": "^2.1.0",
     "mssql": "^7.3.0",
+      <%_ if(withMultiTenancy) {_%>
+    "@totalsoft/knex-filters": "^2.4.0",
+
+      <%_} _%>
     <%_}_%>
-    <%_ if(addMessaging || (dataLayer === "knex" && withMultiTenancy && addSubscriptions)) {_%>
+    <%_ if(addMessaging || (withMultiTenancy && addSubscriptions)) {_%>
     "@totalsoft/message-bus": "^2.3.0",
     "@totalsoft/messaging-host": "^2.3.0",
     <%_}_%>

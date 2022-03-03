@@ -1,6 +1,5 @@
 
-const { tests } = require("../loggingUtils")
-const { shouldSkipLogging, loggingLevels, logEvent, logDbError } = tests
+const { shouldSkipLogging, loggingLevels, logEvent } = require("../loggingUtils").tests
 const { ApolloError } = require('apollo-server-koa')
 
 describe("logging plugin tests:", () => {
@@ -71,9 +70,6 @@ describe("logging plugin tests:", () => {
         const message = "Log message"
         const code = "Message_Code"
 
-        jest.mock("../loggingUtils");
-        // const { saveLogs } = require("../loggingUtils")
-
         //act
         logEvent(context, message, code, loggingLevels.INFO)
         logEvent(context, message, code, loggingLevels.DEBUG)
@@ -93,21 +89,22 @@ describe("logging plugin tests:", () => {
         const code = "Error_Message_Code"
         const errorMessage = "ErrorMessage"
 
-        const loggingUtils = require("../loggingUtils")
-        jest.mock("../loggingUtils");
-        loggingUtils.saveLogs.mockResolvedValue(null);
         global.console = { log: jest.fn(), error: jest.fn() }
 
         <%_ if(dataLayer == "knex") {_%>
         const context = { logs: [], dbInstance: jest.fn(() => ({ insert: jest.fn(() => []) })) }
         <%_ } else if(dataLayer == "prisma") {_%>
         const context = { logs: [] }
-        jest.mock('../../../utils/prisma', () => ({
-            eventLog: {
+        jest.mock('../../../prisma')
+        const { prisma } = require('../../../prisma')
+        prisma.mockImplementation(() => ({
+          eventLog: {
             createMany: jest.fn().mockReturnValue([])
-            }
+          }
         }))
         <%_}_%>
+        const { ApolloError } = require('apollo-server-koa')
+        const { logDbError } = require('../loggingUtils').tests
 
         //act
         const res = await logDbError(context, message, code, loggingLevels.ERROR, new Error(errorMessage))

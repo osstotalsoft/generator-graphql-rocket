@@ -1,6 +1,6 @@
 const { postProcessDbResponse<% if(withMultiTenancy){ %>, parseConnectionString <%}%>} = require("../utils/functions");
 <%_ if(withMultiTenancy){ _%>
-const { tenantModule } = require("../multiTenancy");
+const { tenantConfiguration } = require("../multiTenancy");
 <%_}_%>
 
 const generateKnexConfig = ({
@@ -41,13 +41,13 @@ const generateKnexConfig = ({
 
 const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()<%}%> => {
   <%_ if(withMultiTenancy){ _%>
-  const tenantDsInfo = await tenantModule.getDataSourceInfo(tenantId);
+  const tenantDsInfo = await tenantConfiguration.getDataSourceInfo(tenantId);
 
   if (tenantDsInfo) {
-    if (!tenantDsInfo.isSharedDb && !tenantDsInfo.connectionString)
+    if (!tenantDsInfo.isSharedDb && !tenantDsInfo.connectionInfo)
         throw new Error(`Could not find database configuration info for tenant id: ${tenantId}`)
 
-    const connection = parseConnectionString(tenantDsInfo.connectionString);
+    const connection = parseConnectionString(tenantDsInfo.connectionInfo);
     const dbConfig = generateKnexConfig(connection)
     return [dbConfig, tenantDsInfo.isSharedDb]
   } else {

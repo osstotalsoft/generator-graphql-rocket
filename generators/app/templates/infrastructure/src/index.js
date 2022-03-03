@@ -39,10 +39,15 @@ opentracing.initGlobalTracer(defaultTracer);
 const { JAEGER_DISABLED } = process.env;
 const tracingEnabled = !JSON.parse(JAEGER_DISABLED)
 <%_}_%>
-<%_ if(dataLayer == "knex" && addSubscriptions && withMultiTenancy){ _%>
+<%_ if(withMultiTenancy){ _%>
 // MultiTenancy
-const tenantService = require('./multiTenancy/tenantService');
+const { introspectionRoute } = require('./utils/functions')
+const ignore = require('koa-ignore')
+<%_ if(addSubscriptions){ _%>
+    const tenantFactory = require('./multiTenancy/tenantFactory');
 <%_}_%>
+<%_}_%>
+
 
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken');
@@ -57,7 +62,7 @@ const { createServer } = require('http')
 const { dbInstanceFactory } = require("./db");
 <%_}_%>
 const { <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
-    <% if(dataLayer == "knex" && withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
+    <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
 const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index');
 
 async function startServer(httpServer) {
@@ -72,12 +77,13 @@ app.use(correlationMiddleware());
 tracingEnabled && app.use(tracingMiddleware());
 <%_}_%>
 app.use(cors());
+<%_ if(withMultiTenancy){ _%>
+app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification, tenantIdentification()).if(ctx => introspectionRoute(ctx)))
+<%_} else {_%>
 app.use(jwtTokenValidation);
 app.use(jwtTokenUserIdentification);
+<%_}_%>
 <%_ if(dataLayer == "knex") {_%>
-    <%_ if(withMultiTenancy){ _%>
-app.use(tenantIdentification());
-    <%_}_%>
 app.use(contextDbInstance());
 <%_}_%>
        
@@ -113,21 +119,19 @@ console.info('Creating Subscription Server...')
       subscribe,
       async onConnect(connectionParams, _webSocket, context) {
         const token = connectionParams.authorization.replace("Bearer ", "");
-
             if (!token) {
                 throw new ForbiddenError("401 Unauthorized");
             }
 
             await validateToken(token);
-
             const decoded = jsonwebtoken.decode(token);
+            <%_ if(withMultiTenancy){ _%>
+                const externalTenantId = decoded.tid
+                const tenant = await tenantFactory.getTenantFromId(externalTenantId);
+            <%_}_%>
+
             <%_ if(dataLayer == "knex") {_%>
-                <%_ if(addSubscriptions && withMultiTenancy){ _%>
-            const tenantId = decoded.tid
-            const tenant = await tenantService.getTenantFromId(tenantId);
-                <%_}_%>
-            
-            const dbInstance = await dbInstanceFactory(<% if(dataLayer == "knex" && withMultiTenancy){ %>tenant.id <%}%>)
+            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenant?.id <%}%>)
 
             if (!dbInstance) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
@@ -136,8 +140,9 @@ console.info('Creating Subscription Server...')
             const dataSources = getDataSources()
             return {
                 token,
-                <%_ if(addSubscriptions && dataLayer == "knex" && withMultiTenancy){ _%>
-                tenant,
+                <%_ if(withMultiTenancy){ _%>
+                externalTenantId,
+                tenantId: tenant?.id,
                 <%_}_%>
                 <%_ if(dataLayer == "knex") {_%>
                 dbInstance,
@@ -180,7 +185,7 @@ const server = new ApolloServer({
                 <%_}_%>
             };
         } else {
-            const { token, <% if(dataLayer == "knex" && withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
+            const { token, <% if(withMultiTenancy){ %>tenantId, externalTenantId, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
             <%_ if(addGqlLogging) {_%>
                 const { logInfo, logDebug, logError } = initializeDbLogging({ ...ctx, requestId: v4() }, request.operationName)
             <%_}_%>
@@ -191,8 +196,9 @@ const server = new ApolloServer({
                 dbInstanceFactory,
                 dataLoaders: getDataLoaders(dbInstance),
                 <%_}_%>
-                <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
-                tenant, 
+                <%_ if(withMultiTenancy){ _%>
+                externalTenantId,
+                tenantId, 
                 <%_}_%>
                 externalUser,
                 correlationId,
@@ -240,7 +246,7 @@ msgHost
     <%_ if(addMessaging && addTracing){ _%>
     .use(tracingEnabled ? middleware.tracing() : skipMiddleware)
     <%_}_%>
-    <%_ if(addMessaging && dataLayer == "knex" && withMultiTenancy) {_%>
+    <%_ if(addMessaging && withMultiTenancy) {_%>
     .use(middleware.tenantIdentification())
     <%_}_%>
     <%_ if(dataLayer == "knex") {_%>

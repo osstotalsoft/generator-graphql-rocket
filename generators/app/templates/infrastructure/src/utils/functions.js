@@ -40,4 +40,44 @@ const parseConnectionString = connectionString => {
   return humps.camelizeKeys(parsed);
 };
 
-module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString };
+
+const sanitizeConnectionInfo = connectionInfo => {
+  connectionInfo = humps.camelizeKeys(connectionInfo)
+
+  const portSplit = connectionInfo.server?.split(',')
+  if (portSplit?.length > 1) {
+    connectionInfo.server = portSplit[0]
+    connectionInfo.port = portSplit[1]
+  }
+
+  const instanceSplit = connectionInfo.server?.split('\\')
+  if (instanceSplit?.length > 1) {
+    connectionInfo.server = instanceSplit[0]
+    connectionInfo.instanceName = instanceSplit[1]
+  }
+
+  const otherParams = connectionInfo.otherParams
+    ?.split(';')
+    .filter(i => i)
+    .map(pair => pair.split('='))
+  if (otherParams) {
+    connectionInfo = { ...connectionInfo, ...humps.camelizeKeys(Object.fromEntries(otherParams)) }
+  }
+  connectionInfo.user = connectionInfo.userId || connectionInfo.userName
+
+  return connectionInfo
+}
+
+const introspectionRoute = ctx => {
+  if (
+    ctx.method === 'GET' ||
+    ctx.request.body.operationName === 'IntrospectionQuery' ||
+    (ctx.request.body.query && ctx.request.body.query.includes('IntrospectionQuery'))
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
+module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, sanitizeConnectionInfo, introspectionRoute };

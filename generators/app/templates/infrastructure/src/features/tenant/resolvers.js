@@ -1,3 +1,8 @@
+<%_ if(dataLayer == "prisma") {_%>
+    const { pascalizeKeys } = require('humps')
+    const { prisma } = require('../../prisma')
+<%_}_%>
+
 const tenantResolvers = {
     Query: {
         myTenants: async (_parent, _params, { dataSources }) => {
@@ -6,10 +11,12 @@ const tenantResolvers = {
         }
     },
     ExternalTenant: {
-        tenant: async ({ externalId }, _params, { dataLoaders }) => {
-            const tenants = await dataLoaders.tenantByExternalId.load(externalId)
-            return tenants
-        }
+        <%_ if(dataLayer == "knex") {_%>
+        tenant: ({ externalId }, _params, { dataLoaders }) => dataLoaders.tenantByExternalId.load(externalId)
+        <%_}_%>
+        <%_ if(dataLayer == "prisma") {_%>
+        tenant: ({ externalId }, _params, _ctx) => prisma().tenant.findUnique({ where: { ExternalId: externalId } })
+        <%_}_%>
     }
 }
 

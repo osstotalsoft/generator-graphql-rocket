@@ -6,7 +6,7 @@ const { admin, globalAdmin } = require('../../constants/identityUserRoles')
 const { viewDashboard } = require('../../constants/permissions')
 const { ForbiddenError } = require('apollo-server-koa');
 <%_ if(dataLayer == "prisma") {_%>
-const prisma = require('../../utils/prisma')
+const { prisma } = require('../../prisma')
 <%_}_%>
 // strict - use when rule relies on parent or args parameter as well (field specific modifications)
 // Cannot use STRICT caching for upload types
@@ -41,7 +41,7 @@ const checkForPermission = async (permissions, { dbInstance, externalUser }) => 
 const checkForPermission = async (permissions, { externalUser }) => {
     try {
       const rights = (
-        await prisma.user.findFirst({ where: { ExternalId: externalUser?.id } }).UserRights({ include: { Right: true } })
+        await prisma().user.findFirst({ where: { ExternalId: externalUser?.id } }).UserRights({ include: { Right: true } })
       )?.map(x => x?.right?.name)
   
       return intersection(permissions, rights).length > 0

@@ -1,3 +1,4 @@
+<%_if(addQuickStart){ _%>
 const { postProcessDbResponse } = require("../utils/functions");
 const TenantDataSource = require('./tenantDataSource');
 
@@ -31,3 +32,11 @@ module.exports = {
     getTenantFromId: tenantDb.getTenantFromId.bind(tenantDb),
     getDataSourceInfo: tenantDb.getDataSourceInfo.bind(tenantDb)
 }
+<%_} else {_%>
+// Implement your tenant configurator data access
+module.exports = {
+    getTenantFromId: ()=>{},
+    getDataSourceInfo: ()=>{}
+}
+<%_}_%>
+

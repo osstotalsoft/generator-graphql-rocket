@@ -12,7 +12,7 @@ class TenantIdentityApi extends NoCacheRESTDataSource {
 
     willSendRequest(request) {
         request.headers.set('Authorization', this.context.token);
-        request.headers.set('TenantId', this.context.tenant.externalId);
+        request.headers.set('TenantId', this.context.externalTenantId);
     }
 
     async getTenants() {
