@@ -10,10 +10,10 @@ const tracing = () => async (ctx, next) => {
     ctx.requestSpan = span;
     span.log({ event: 'message', message: ctx.received.msg });
     
-    const correlationId = ctx && ctx.correlationId;
+    const correlationId = ctx?.correlationId;
     span.setTag(envelope.headers.correlationId, correlationId);
-    <%_ if(dataLayer == "knex" && withMultiTenancy){ _%>
-    const tenantId = ctx && ctx.tenant && ctx.tenant.externalId; 
+    <%_ if(withMultiTenancy){ _%>
+    const tenantId = ctx?.externalTenantId; 
     span.setTag(envelope.headers.tenantId, tenantId);
     <%_}_%>
     

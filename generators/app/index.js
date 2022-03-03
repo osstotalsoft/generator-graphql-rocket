@@ -50,18 +50,15 @@ module.exports = class extends Generator {
 
     let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
 
-    if (dataLayer === 'knex') ignoreFiles = concat(['**/prisma/**', '**/utils/prisma.js'], ignoreFiles)
+    if (dataLayer === 'knex') ignoreFiles = concat(['**/prisma/**'], ignoreFiles)
     if (dataLayer === 'prisma')
       ignoreFiles = concat(
         [
           '**/src/db/**',
           '**/middleware/db/**',
-          '**/middleware/tenantIdentification/**',
-          '**/middleware/messaging/multiTenancy/**',
           '**/messaging/middleware/dbInstance.js',
           '**/startup/dataLoaders.js',
           '**/features/common/dbGenerators.js',
-          '**/features/tenant/**',
           '**/features/user/dataLoaders.js',
           '**/features/user/dataSources/userDb.js',
           '**/tracing/knexTracer.js',
@@ -69,12 +66,20 @@ module.exports = class extends Generator {
         ],
         ignoreFiles
       )
-
+    if (dataLayer === 'knex' && withMultiTenancy)
+      ignoreFiles = concat(['**/multiTenancy/tenantManager.js', '**/startup/middleware'], ignoreFiles)
     if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
+
     if (!withMultiTenancy)
       ignoreFiles = concat(
-        ['**/features/tenant/**', '**/multiTenancy/**', '**/middleware/tenantIdentification/**'],
+        [
+          '**/features/tenant/**',
+          '**/multiTenancy/**',
+          '**/middleware/tenantIdentification/**',
+          '**/startup/middleware',
+          '**/prisma/tenancyFilter.js'
+        ],
         ignoreFiles
       )
     if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/__mocks__/opentracing.js'], ignoreFiles)
@@ -93,9 +98,8 @@ module.exports = class extends Generator {
           '**/features/user/**',
           '**/constants/identityUserRoles.js',
           '**/multiTenancy/tenantDataSource.js',
-          '**/multiTenancy/tenantModule.js',
           '**/middleware/permissions/__tests__/**',
-          '**/README.md',
+          '**/README.md'
         ],
         ignoreFiles
       )

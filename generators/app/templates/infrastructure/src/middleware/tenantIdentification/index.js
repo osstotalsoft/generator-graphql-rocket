@@ -1,12 +1,15 @@
 
 const jsonwebtoken = require('jsonwebtoken');
-const { tenantService } = require("../../multiTenancy")
+const { tenantFactory } = require("../../multiTenancy")
 
 const tenantIdentification = () => async (ctx, next) => {
-    if (!ctx.tenant) {
-        const tenantId = getTenantIdFromJwt(ctx)
-
-        ctx.tenant = await tenantService.getTenantFromId(tenantId);
+    const externalTenantId = getTenantIdFromJwt(ctx)
+    const tenant = await tenantFactory.getTenantFromId(tenantId)
+    if (tenant) {
+      ctx.tenantId = tenant?.id
+      ctx.externalTenantId = externalTenantId
+    } else {
+      throw new Error(`Could not identify tenant!`)
     }
     await next();
 }

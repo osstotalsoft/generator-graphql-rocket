@@ -4,7 +4,7 @@ const { v4 } = require('uuid');
 const { append, map } = require('ramda')
 require('colors')
 <%_ if(dataLayer == "prisma") {_%>
-const prisma = require('../../utils/prisma')
+const { prisma } = require('../../prisma')
 <%_}_%>
 
 const loggingLevels = {
@@ -53,7 +53,7 @@ const saveLogs = async (context) => {
       const insertLogs = map(
         ({ uid, code, message, timeStamp, loggingLevel, error = {} }) => ({
           Uid: uid,
-          RequestId: requestId || uuid(),
+          RequestId: requestId || v4(),
           Code: code,
           Message: message,
           Details: error ? `${error.message} ${error.stack} ${JSON.stringify(error.extensions)}` : '',
@@ -62,7 +62,7 @@ const saveLogs = async (context) => {
         }),
         logs
       )
-      await prisma.eventLog.createMany({ data: insertLogs })
+      await prisma().eventLog.createMany({ data: insertLogs })
     }
 <%_}_%>
     context.logs = null

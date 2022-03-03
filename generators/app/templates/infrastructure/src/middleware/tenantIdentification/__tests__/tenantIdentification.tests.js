@@ -1,6 +1,6 @@
 const tenantIdentification = require('../index')
 const jsonwebtoken = require('jsonwebtoken')
-const { tenantService } = require('../../../multiTenancy')
+const { tenantFactory } = require('../../../multiTenancy')
 
 jest.mock('jsonwebtoken')
 jest.mock('../../../multiTenancy')
@@ -10,7 +10,7 @@ describe('tenant identification tests:', () => {
     //arrange
     const tenantId = 'some-tenant-id'
     jsonwebtoken.decode = () => ({ tid: tenantId })
-    tenantService.getTenantFromId.mockImplementation((tid) => Promise.resolve({ id: tid }))
+    tenantFactory.getTenantFromId.mockImplementation((tid) => Promise.resolve({ id: tid }))
 
     const ctx = {
       request: {
@@ -25,6 +25,6 @@ describe('tenant identification tests:', () => {
     await tenantIdentification()(ctx, next)
 
     //assert
-    expect(ctx.tenant.id).toBe(tenantId)
+    expect(ctx.tenantId).toBe(tenantId)
   })
 })

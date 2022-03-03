@@ -1,5 +1,5 @@
 <%_if(addQuickStart){ _%>
-const tenantModule = require("./tenantModule");
+const tenantConfiguration = require("./tenantConfiguration");
 <%_}_%>
 
 async function getTenantFromId(tenantId) {
@@ -8,7 +8,7 @@ async function getTenantFromId(tenantId) {
     }
     // Get your tenant details here by calling a service, module, data source, or something else
 <%_if(addQuickStart){ _%>
-    const tenant = await tenantModule.getTenantFromId(tenantId)
+    const tenant = await tenantConfiguration.getTenantFromId(tenantId)
     return tenant
 <%_} else { _%>
     return null // your tenant data here

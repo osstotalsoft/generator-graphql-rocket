@@ -1,8 +1,8 @@
 <%_ if(dataLayer == "knex") {_%>
-  <%_ if(withMultiTenancy){ _%>
-const tenantIdentification = require("./tenantIdentification");
-  <%_}_%>
 const contextDbInstance = require("./db/contextDbInstance");
+<%_}_%>
+<%_ if(withMultiTenancy){ _%>
+const tenantIdentification = require("./tenantIdentification");
 <%_}_%>
 const correlationMiddleware = require("./correlation/correlationMiddleware")
 const validateToken = require("./auth/auth");
@@ -15,9 +15,9 @@ module.exports = {
   ...validateToken,
   <%_ if(dataLayer == "knex") {_%>
   contextDbInstance,
-    <%_ if(withMultiTenancy){ _%>
+  <%_}_%>
+  <%_ if(withMultiTenancy){ _%>
   tenantIdentification,
-    <%_}_%>
   <%_}_%>
   correlationMiddleware,
   <%_ if(addTracing){ _%>

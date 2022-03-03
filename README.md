@@ -291,7 +291,7 @@ const tenantIdentification = () => async (ctx, next) => {
             getTenantIdFromJwt
         )(ctx)
 
-        ctx.tenant = await tenantService.getTenantFromId(tenantId);
+        ctx.tenant = await tenantFactory.getTenantFromId(tenantId);
     }
     await next();
 }
