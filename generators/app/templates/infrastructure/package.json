@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "nodemon src/index.js",
+    "start:production": "cross-env NODE_ENV=production node src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",
     "test:watchAll": "<%=packageManager%> run test -- --watchAll",
     "test:watch": "<%=packageManager%> run test -- --watch",
