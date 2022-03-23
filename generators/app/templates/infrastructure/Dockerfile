@@ -29,5 +29,5 @@ EXPOSE 4000
 CMD ["/bin/bash", "-c", "test -f /vault/secrets/credentials.vault && echo 'INFO: Vault credentials loaded.' && \
     source /vault/secrets/credentials.vault || echo 'INFO: Vault file not loaded.' && <%=packageManager%> start --config-env production"]
 <%_} else {_%>
-CMD [ "<%=packageManager%>", "start", "--config-env", "production"]
+CMD [ "<%=packageManager%>", "run", "start:production"]
 <%_}_%>
