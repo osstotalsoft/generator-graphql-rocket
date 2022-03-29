@@ -21,51 +21,53 @@ describe('test package installers', () => {
     rimraf.sync(path.join(__dirname, tempRoot))
   })
 
-  it('installs packages with npm', () => helpers
-    .create(path.join(__dirname, '../generators/app'))
-    .inDir(path.join(__dirname, tempRoot))
-    .withPrompts({
-      projectName,
-      gqlPort,
-      withMultiTenancy: true,
-      addSubscriptions: true,
-      addMessaging: false,
-      withRights: true,
-      addGqlLogging: true,
-      addHelm: true,
-      addTracing: true,
-      packageManager: 'npm'
-    })
-    .run()
-    .then(_gen => {
-      assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
-        name: projectName,
-        engines: { npm }
+  it('installs packages with npm', () =>
+    helpers
+      .create(path.join(__dirname, '../generators/app'))
+      .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({
+        projectName,
+        gqlPort,
+        withMultiTenancy: true,
+        addSubscriptions: true,
+        addMessaging: false,
+        withRights: true,
+        addGqlLogging: true,
+        addHelm: true,
+        addTracing: true,
+        packageManager: 'npm'
       })
-    }))
+      .run()
+      .then(_gen => {
+        assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
+          name: projectName,
+          engines: { npm }
+        })
+      }))
 
-  it('installs packages with yarn', () => helpers
-    .create(path.join(__dirname, '../generators/app'))
-    .inDir(path.join(__dirname, tempRoot))
-    .withPrompts({
-      projectName,
-      gqlPort,
-      withMultiTenancy: true,
-      addSubscriptions: true,
-      addMessaging: false,
-      withRights: true,
-      addGqlLogging: true,
-      addHelm: true,
-      addTracing: true,
-      packageManager: 'yarn'
-    })
-    .run()
-    .then(_gen => {
-      assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
-        name: projectName,
-        engines: { yarn }
+  it('installs packages with yarn', () =>
+    helpers
+      .create(path.join(__dirname, '../generators/app'))
+      .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({
+        projectName,
+        gqlPort,
+        withMultiTenancy: true,
+        addSubscriptions: true,
+        addMessaging: false,
+        withRights: true,
+        addGqlLogging: true,
+        addHelm: true,
+        addTracing: true,
+        packageManager: 'yarn'
       })
-      assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"yarn")
-      assert.noFileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`),"npm")
-    }))
+      .run()
+      .then(_gen => {
+        assert.jsonFileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), {
+          name: projectName,
+          engines: { yarn }
+        })
+        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`), 'yarn')
+        assert.noFileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`), 'npm')
+      }))
 })

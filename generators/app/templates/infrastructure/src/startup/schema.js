@@ -36,7 +36,7 @@ const resolvers = merge(/* Your resolvers here*/)
 const typeDefs = [...sources.map(source => source.document), ...oldTypeDefs]
 
 <%_ if(withRights || (dataLayer === "prisma" && withMultiTenancy)){ _%>
-module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), <% if(withRights){ %>permissionsMiddleware<%}%><% if(dataLayer === "prisma" && withMultiTenancy){ %>, tenantIdentification<%}%>);
+module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers })<% if(withRights){ %>, permissionsMiddleware<%}%><% if(dataLayer === "prisma" && withMultiTenancy){ %>, tenantIdentification<%}%>);
 <%_} else { _%>
 module.exports = makeExecutableSchema({ typeDefs, resolvers });
 <%_}_%>
