@@ -146,7 +146,9 @@ describe('test package installers', () => {
   it('initializes prisma', async () => {
     const files = [
       path.join(__dirname, `${tempRoot}/${projectName}/prisma`),
-      path.join(__dirname, `${tempRoot}/${projectName}/src/utils/prisma.js`)
+      path.join(__dirname, `${tempRoot}/${projectName}/src/prisma/client.js`),
+      path.join(__dirname, `${tempRoot}/${projectName}/src/prisma/index.d.ts`),
+      path.join(__dirname, `${tempRoot}/${projectName}/src/prisma/index.js`)
     ]
     await helpers
       .create(path.join(__dirname, '../generators/app'))
