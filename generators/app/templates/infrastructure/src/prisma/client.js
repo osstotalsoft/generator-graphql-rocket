@@ -67,8 +67,10 @@ function prisma() {
       cacheMap.set(id, prismaClient)
    }
   <%_} else { _%>
+    if (cacheMap.has('default')) return cacheMap.get('default')
     prismaClient = new PrismaClient(prismaOptions)
     applyMiddleware(prismaClient)
+    cacheMap.set('default', prismaClient)
   <%_}_%>
 
   return prismaClient
