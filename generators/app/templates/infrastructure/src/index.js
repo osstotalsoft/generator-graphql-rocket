@@ -49,19 +49,20 @@ const ignore = require('koa-ignore')
 <%_}_%>
 
 
-<%_ if(addSubscriptions){ _%>
-const jsonwebtoken = require('jsonwebtoken');
-
-const { execute, subscribe } = require('graphql')
-const { SubscriptionServer } = require('subscriptions-transport-ws')
-<%_}_%>
-
+const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core")
 const { createServer } = require('http')
+
+<%_ if(addSubscriptions){ _%>
+const jsonwebtoken = require('jsonwebtoken'),
+  { createServer } = require("http"),
+  { WebSocketServer } = require("ws"),
+  { useServer } = require("graphql-ws/lib/use/ws")
+<%_}_%>
 
 <%_ if(dataLayer == "knex") {_%>
 const { dbInstanceFactory } = require("./db");
 <%_}_%>
-const { <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
+const { <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateWsToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
     <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
 const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index');
 
@@ -89,16 +90,17 @@ app.use(contextDbInstance());
        
 <%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
 const plugins = [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
     <%_ if(addSubscriptions) {_%>
     {
         async serverWillStart() {
             return {
             async drainServer() {
-                subscriptionServer.close()
+                await subscriptionServer.dispose();
             }
-            }
+            };
         }
-    },
+        },
     <%_}_%>
     <%_ if(addGqlLogging) {_%>
         loggingPlugin,
@@ -112,56 +114,74 @@ const plugins = [
 
 <%_ if(addSubscriptions){ _%>
 console.info('Creating Subscription Server...')
-  const subscriptionServer = SubscriptionServer.create(
+const subscriptionServer = useServer(
     {
       schema,
-      execute,
-      subscribe,
-      async onConnect(connectionParams, _webSocket, context) {
+      onConnect: async ctx => {
+        const connectionParams = ctx?.connectionParams;
         const token = connectionParams.authorization.replace("Bearer ", "");
-            if (!token) {
-                throw new ForbiddenError("401 Unauthorized");
-            }
+        if (!token) {
+          throw new ForbiddenError("401 Unauthorized");
+        }
+        ctx.token = token;
 
-            await validateToken(token);
-            const decoded = jsonwebtoken.decode(token);
-            <%_ if(withMultiTenancy){ _%>
-                const externalTenantId = decoded.tid
-                const tenant = await tenantFactory.getTenantFromId(externalTenantId);
-            <%_}_%>
+        await validateWsToken(token, ctx?.extra?.socket);
 
-            <%_ if(dataLayer == "knex") {_%>
-            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenant?.id <%}%>)
+        const decoded = jsonwebtoken.decode(token);
+        ctx.externalUser = {
+          id: decoded?.sub,
+          role: decoded?.role
+        };
+
+        <%_ if(withMultiTenancy){ _%>
+            ctx.externalTenantId = decoded?.tid
+            const tenant = await tenantFactory.getTenantFromId(decoded?.tid) ?? {};
+            ctx.tenantId = tenant?.id
+        <%_}_%>
+      },
+      onSubscribe: async ctx => await validateWsToken(ctx?.token, ctx?.extra?.socket),
+      onDisconnect: (_ctx, code, reason) =>
+        code != 1000 && console.info(`Subscription server disconnected! Code: ${code} Reason: ${reason}`),
+      onError: (ctx, msg, errors) => console.error("Subscription error!", { ctx, msg, errors }),
+      context: async (ctx, msg, _args) => {
+        <%_ if(withMultiTenancy){ _%>
+            const { tenantId } = ctx;
+        <%_}_%>
+        <%_ if(dataLayer == "knex") {_%>
+            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenantId <%}%>)
 
             if (!dbInstance) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
             }
+        <%_}_%>
+        const dataSources = getDataSources()
+        <%_ if(addGqlLogging){ _%>
+        const { logInfo, logDebug, logError } = initializeDbLogging(
+          { dbInstance, requestId: v4() },
+          msg?.payload?.operationName
+        );
+        <%_}_%>
+
+        return {
+            ...ctx,
+            <%_ if(dataLayer == "knex") {_%>
+            dbInstance,
+            dataSources: initializedDataSources(context, dbInstance, dataSources),
+            dataLoaders: getDataLoaders(dbInstance),
+            <%_}else{_%>
+            dataSources: initializedDataSources(context, dataSources),
             <%_}_%>
-            const dataSources = getDataSources()
-            return {
-                token,
-                <%_ if(withMultiTenancy){ _%>
-                externalTenantId,
-                tenantId: tenant?.id,
-                <%_}_%>
-                <%_ if(dataLayer == "knex") {_%>
-                dbInstance,
-                dataSources: initializedDataSources(context, dbInstance, dataSources),
-                dataLoaders: getDataLoaders(dbInstance),
-                <%_}_%>
-                dataSources: initializedDataSources(context, dataSources),
-                externalUser: {
-                    id: decoded.sub,
-                    role: decoded.role
-                }
-            }
+            <%_ if(addGqlLogging){ _%>
+            logger: { logInfo, logDebug, logError }
+            <%_}_%>
         }
+      }
     },
-    {
+    new WebSocketServer({
       server: httpServer,
-      path: '/graphql'
-    }
-  )
+      path: "/graphql"
+    })
+  );
 <%_}_%>
 
 console.info('Creating Apollo Server...')
@@ -172,43 +192,30 @@ const server = new ApolloServer({
     plugins,
     <%_}_%>
     dataSources: getDataSources,
-    context: async context => {
-        const { ctx, connection } = context;
-
-        if (connection) {
-            <%_ if(addSubscriptions && addGqlLogging){ _%>
-                const { logInfo, logDebug, logError } = initializeDbLogging({  ...connection.context, requestId: v4() }, connection.operationName)
+    context: async ({ ctx }) => {
+        const { token, <% if(withMultiTenancy){ %>tenantId, externalTenantId, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
+        <%_ if(addGqlLogging) {_%>
+            const { logInfo, logDebug, logError } = initializeDbLogging({ ...ctx, requestId: v4() }, request.operationName)
+        <%_}_%>
+        return {
+            token,
+            <%_ if(dataLayer == "knex") {_%>
+            dbInstance,
+            dbInstanceFactory,
+            dataLoaders: getDataLoaders(dbInstance),
             <%_}_%>
-            return {
-                ...connection.context<% if(addSubscriptions && addGqlLogging){ %>,
-                logger: { logInfo, logDebug, logError }
-                <%_}_%>
-            };
-        } else {
-            const { token, <% if(withMultiTenancy){ %>tenantId, externalTenantId, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
-            <%_ if(addGqlLogging) {_%>
-                const { logInfo, logDebug, logError } = initializeDbLogging({ ...ctx, requestId: v4() }, request.operationName)
+            <%_ if(withMultiTenancy){ _%>
+            externalTenantId,
+            tenantId,
             <%_}_%>
-            return {
-                token,
-                <%_ if(dataLayer == "knex") {_%>
-                dbInstance,
-                dbInstanceFactory,
-                dataLoaders: getDataLoaders(dbInstance),
-                <%_}_%>
-                <%_ if(withMultiTenancy){ _%>
-                externalTenantId,
-                tenantId, 
-                <%_}_%>
-                externalUser,
-                correlationId,
-                request,               
-                requestSpan
-                <%_ if(addGqlLogging) {_%>,
-                logger: { logInfo, logDebug, logError }
-                <%_}_%>
-            };
-        }
+            externalUser,
+            correlationId,
+            request,
+            requestSpan
+            <%_ if(addGqlLogging) {_%>,
+            logger: { logInfo, logDebug, logError }
+            <%_}_%>
+        };
     }
 })
 
