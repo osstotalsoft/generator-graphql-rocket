@@ -49,15 +49,15 @@ const ignore = require('koa-ignore')
 <%_}_%>
 
 
-const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core"),
+const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core")
+const { createServer } = require('http')
+
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken'),
   { createServer } = require("http"),
   { WebSocketServer } = require("ws"),
-  { useServer } = require("graphql-ws/lib/use/ws");
+  { useServer } = require("graphql-ws/lib/use/ws")
 <%_}_%>
-
-const { createServer } = require('http')
 
 <%_ if(dataLayer == "knex") {_%>
 const { dbInstanceFactory } = require("./db");
