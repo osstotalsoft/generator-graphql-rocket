@@ -54,7 +54,6 @@ const { createServer } = require('http')
 
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken'),
-  { createServer } = require("http"),
   { WebSocketServer } = require("ws"),
   { useServer } = require("graphql-ws/lib/use/ws")
 <%_}_%>
@@ -166,10 +165,10 @@ const subscriptionServer = useServer(
             ...ctx,
             <%_ if(dataLayer == "knex") {_%>
             dbInstance,
-            dataSources: initializedDataSources(context, dbInstance, dataSources),
+            dataSources: initializedDataSources(ctx, dbInstance, dataSources),
             dataLoaders: getDataLoaders(dbInstance),
             <%_}else{_%>
-            dataSources: initializedDataSources(context, dataSources),
+            dataSources: initializedDataSources(ctx, dataSources),
             <%_}_%>
             <%_ if(addGqlLogging){ _%>
             logger: { logInfo, logDebug, logError }
