@@ -1,7 +1,9 @@
 const jwt = require("koa-jwt");
 const jwksRsa = require("jwks-rsa");
 const jsonwebtoken = require('jsonwebtoken');
+<% if(addSubscriptions){ %>
 const { CloseCode } = require("graphql-ws");
+<%}%>
 const { IDENTITY_AUTHORITY, IDENTITY_OPENID_CONFIGURATION } = process.env;
 
 const client = {
@@ -54,6 +56,7 @@ const validateToken = async (token) => {
   return jsonwebtoken.verify(token, key.getPublicKey());
 }
 
+<% if(addSubscriptions){ %>
 const validateWsToken = async (token, socket) => {
   try {
     await validateToken(token);
@@ -61,5 +64,6 @@ const validateWsToken = async (token, socket) => {
     return socket?.close(CloseCode.Forbidden, "Forbidden! Jwt token is not valid!");
   }
 }
+<%}%>
 
-module.exports = { jwtTokenValidation, jwtTokenUserIdentification, validateToken, validateWsToken }
+module.exports = { jwtTokenValidation, jwtTokenUserIdentification, validateToken<% if(addSubscriptions){ %>, validateWsToken<%}%> }
