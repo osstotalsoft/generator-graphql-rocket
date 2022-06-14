@@ -4,7 +4,7 @@ const { tenantFactory } = require("../../multiTenancy")
 
 const tenantIdentification = () => async (ctx, next) => {
     const externalTenantId = getTenantIdFromJwt(ctx)
-    const tenant = await tenantFactory.getTenantFromId(tenantId)
+    const tenant = await tenantFactory.getTenantFromId(externalTenantId)
     if (tenant) {
       ctx.tenantId = tenant?.id
       ctx.externalTenantId = externalTenantId
