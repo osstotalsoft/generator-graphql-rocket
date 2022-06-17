@@ -57,7 +57,7 @@
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
     <%_ if(addGqlLogging) {_%>
-    "@totalsoft/apollo-logger": "^1.0.5",
+    "@totalsoft/apollo-logger": "^1.0.6",
     <%_}_%>
     "apollo-datasource": "^3.3.2",
     "apollo-datasource-rest": "^3.6.1",
