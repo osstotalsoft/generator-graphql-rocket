@@ -96,8 +96,7 @@ describe('generator-graphql-rocket:app', () => {
     })
     .run()
     .then(() => {
-      const root = `${tempRoot}/${projectName}/src/plugins/logging`
-      assert.file([`${root}/loggingPlugin.js`, `${root}/loggingUtils.js`])
+      assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"@totalsoft/apollo-logger": `)
     }))
 
   it('Permissions and rights are ready to be used', () => helpers

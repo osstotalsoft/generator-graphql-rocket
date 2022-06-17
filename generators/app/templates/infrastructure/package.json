@@ -56,6 +56,9 @@
     "@totalsoft/message-bus": "^2.3.0",
     "@totalsoft/messaging-host": "^2.3.0",
     <%_}_%>
+    <%_ if(addGqlLogging) {_%>
+    "@totalsoft/apollo-logger": "^1.0.5",
+    <%_}_%>
     "apollo-datasource": "^3.3.1",
     "apollo-datasource-rest": "^3.5.1",
     "apollo-server": "3.6.2",
