@@ -57,7 +57,7 @@
     "test": "jest --runInBand --detectOpenHandles --collectCoverage",
     "test:coverage": "jest --collectCoverage",
     "eslint:report": "eslint --fix --ext .js .",
-    "ejslint": "ejslint generators/app/templates/infrastructure",
+    "ejslint": "npx ejslint generators/app/templates/infrastructure",
     "release": "git push --follow-tags && gh-release -y"
   },
   "jest": {
