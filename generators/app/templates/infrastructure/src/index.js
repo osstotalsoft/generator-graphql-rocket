@@ -20,7 +20,7 @@ const bodyParser = require("koa-bodyparser");
 
 <%_ if(addMessaging) {_%>
 // Messaging
-const { msgHandlers, middleware } = require("./messaging")
+const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging")
 const { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
 <%_}_%>
 <%_ if(addGqlLogging) {_%>

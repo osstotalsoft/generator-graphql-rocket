@@ -1,6 +1,6 @@
 const { map } = require('ramda')
 <%_ if(dataLayer == "prisma") {_%>
-  const { prisma } = require('../../prisma')
+  const { prisma } = require('../prisma')
 <%_}_%>
 
 const saveLogs = async (context) => {
