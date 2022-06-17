@@ -38,9 +38,10 @@
   "dependencies": {
     "boxen": "5.1.2",
     "chalk": "4.1.2",
+    "ejs-lint": "^1.2.2",
     "gulp-filter": "^7.0.0",
-    "jest-cli": "27.0.6",
     "jest": "27.0.6",
+    "jest-cli": "27.0.6",
     "lodash": "^4.17.21",
     "prettier": "^2.5.1",
     "ramda": "^0.27.1",
@@ -57,7 +58,7 @@
     "test": "jest --runInBand --detectOpenHandles --collectCoverage",
     "test:coverage": "jest --collectCoverage",
     "eslint:report": "eslint --fix --ext .js .",
-    "ejslint": "npx ejslint generators/app/templates/infrastructure",
+    "ejslint": "ejslint generators/app/templates/infrastructure",
     "release": "git push --follow-tags && gh-release -y"
   },
   "jest": {
