@@ -83,7 +83,7 @@ module.exports = class extends Generator {
         ignoreFiles
       )
     if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/__mocks__/opentracing.js'], ignoreFiles)
-    if (!addGqlLogging) ignoreFiles = concat(['**/plugins/logging/**'], ignoreFiles)
+    if (!addGqlLogging) ignoreFiles = concat(['**/utils/logging.js'], ignoreFiles)
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],

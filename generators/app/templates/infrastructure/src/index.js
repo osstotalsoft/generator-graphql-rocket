@@ -20,14 +20,13 @@ const bodyParser = require("koa-bodyparser");
 
 <%_ if(addMessaging) {_%>
 // Messaging
-const { msgHandlers, middleware } = require("./messaging")
+const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging")
 const { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
 <%_}_%>
 <%_ if(addGqlLogging) {_%>
 // Logging
-const { initializeDbLogging } = require('./plugins/logging/loggingUtils');
-const loggingPlugin = require('./plugins/logging/loggingPlugin')
-const { v4 } = require('uuid');
+const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger')
+const { saveLogs } = require('./utils/logging')
 <%_}_%>
 <%_ if(addTracing){ _%>
 // Tracing
@@ -102,7 +101,7 @@ const plugins = [
         },
     <%_}_%>
     <%_ if(addGqlLogging) {_%>
-        loggingPlugin,
+      new ApolloLoggerPlugin({ persistLogs: true, persistLogsFn: saveLogs, securedMessages: true }),
     <%_}_%>
     <%_ if(addTracing){ _%>
         tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {}
@@ -155,10 +154,7 @@ const subscriptionServer = useServer(
         <%_}_%>
         const dataSources = getDataSources()
         <%_ if(addGqlLogging){ _%>
-        const { logInfo, logDebug, logError } = initializeDbLogging(
-          { dbInstance, requestId: v4() },
-          msg?.payload?.operationName
-        );
+        const { logInfo, logDebug, logError } = initializeLogger(<% if(dataLayer == "knex") {%>{...ctx, dbInstance}<%} else {%> ctx <%}%>, msg?.payload?.operationName, true, saveLogs)
         <%_}_%>
 
         return {
@@ -194,7 +190,7 @@ const server = new ApolloServer({
     context: async ({ ctx }) => {
         const { token, <% if(withMultiTenancy){ %>tenantId, externalTenantId, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
         <%_ if(addGqlLogging) {_%>
-            const { logInfo, logDebug, logError } = initializeDbLogging({ ...ctx, requestId: v4() }, request.operationName)
+          const { logInfo, logDebug, logError } = initializeLogger(<% if(dataLayer == "knex") {%>{...ctx, dbInstance}<%} else {%> ctx <%}%>, request?.body?.operationName, true, saveLogs)
         <%_}_%>
         return {
             token,

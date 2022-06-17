@@ -6,6 +6,7 @@
 
 > If you are creating a new web application we recommend you to use our [Webapp Rocket Generator](https://github.com/osstotalsoft/generator-webapp-rocket).
 
+> Also check-out [osstotalsoft/rocket-toolkit](https://github.com/osstotalsoft/rocket-toolkit), a collection of plugins and other GraphQL utilities that may come in handy.
 ## Installation
 
 First, install [Yeoman](http://yeoman.io) and @totalsoft/generator-graphql-rocket using [npm](https://www.npmjs.com/) (we assume you have pre-installed [NodeJS Latest LTS Version](https://nodejs.org/). Old versions of NodeJS are also supported.)
@@ -36,7 +37,7 @@ To upgrade an existing project that was scaffold using this **GraphQL Rocket Gen
 9. [Multi-tenancy](#multi-tenancy)
 10. [Subscriptions](#subscriptions)  
 11. [Messaging](#messaging)  
-12. [Error logging](#error-logging) 
+12. [Logging](#logging) 
 13. [OpenTracing](#opentracing)
 14. [Code examples](#code-examples)
 15. [Deployment](#deployment)
@@ -364,13 +365,17 @@ When using messaging, you need to opt-in between two existing messaging transpor
 
 You can find more details [here](https://github.com/osstotalsoft/nodebb/blob/master/packages/message-bus/README.md#transport)
 
-## Error logging
+## Logging
 
-This features includes a logging plugin, that helps you monitor the execution of your GraphQL operations with the use of the request life cycle events. Read  more about Apollo Server plugins here: [Plugins](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)
+This features uses [@totalsoft/apollo-logger](https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/apollo-logger#apollo-logger) which comes with an Apollo logging plugin, that helps you monitor the execution of your GraphQL operations with the use of the request life cycle events. 
 
-By default all the logs are saved in the application database ( this can be changed by modifying the `saveLogs()` method found in `src/plugins/logging/loggingUtils.js` file. 
+Read  more about Apollo Server plugins here: [Plugins](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)
 
-You need the following table in your database to store your logs:
+If desired, the logs can be persisted in a database, file or somewhere else, see [documentation](https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/apollo-logger#--apollologgingoptions) for more details.
+
+This generator whishes to provide an example of `saveLogs` implementation that can be found in `utils/logging.js` file. 
+
+Assuming that by default all the logs are saved in an SQL Server database, the following table should be created: 
 
 ```
 CREATE TABLE [dbo].[EventLog](
@@ -386,7 +391,7 @@ CREATE TABLE [dbo].[EventLog](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 ```
 
-In addition, the errors thrown inside Apollo Server, are wrapped in a 'user friendly message'. This helps you not to leak sensitive data from unauthorized users.
+In addition, the errors thrown inside Apollo Server, are wrapped in a 'user friendly message'. This increases the security of your application by making sure there are no sensitive data leaks.
 
 ## OpenTracing
 
