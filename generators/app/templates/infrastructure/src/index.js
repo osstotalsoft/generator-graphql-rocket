@@ -155,10 +155,10 @@ const subscriptionServer = useServer(
       onError: (ctx, msg, errors) => console.error("Subscription error!", { ctx, msg, errors }),
       context: async (ctx, msg, _args) => {
         <%_ if(withMultiTenancy){ _%>
-            const { tenantId } = ctx;
+            const { tenant } = ctx;
         <%_}_%>
         <%_ if(dataLayer == "knex") {_%>
-            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenantId <%}%>)
+            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenant?.id<%}%>)
 
             if (!dbInstance) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
@@ -171,6 +171,9 @@ const subscriptionServer = useServer(
 
         return {
             ...ctx,
+            <%_ if(withMultiTenancy){ _%>
+              tenant,
+            <%_}_%>
             <%_ if(dataLayer == "knex") {_%>
             dbInstance,
             dataSources: initializedDataSources(ctx, dbInstance, dataSources),
@@ -212,8 +215,7 @@ const server = new ApolloServer({
             dataLoaders: getDataLoaders(dbInstance),
             <%_}_%>
             <%_ if(withMultiTenancy){ _%>
-            externalTenantId,
-            tenantId,
+            tenant,
             <%_}_%>
             externalUser,
             correlationId,

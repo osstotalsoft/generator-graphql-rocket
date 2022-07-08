@@ -9,7 +9,7 @@
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "cross-env NODE_ENV=development nodemon src/index.js",
     "start:production": "cross-env NODE_ENV=production node src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",
     "test:watchAll": "<%=packageManager%> run test -- --watchAll",

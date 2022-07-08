@@ -4,6 +4,9 @@ const { tenantService } = require("@totalsoft/tenant-configuration");
 <%if(dataLayer == "prisma") {%>
 const { useTenantContext } = require("../../../multiTenancy")
 <% } %>
+<%_ if(withMultiTenancy){ _%>
+  const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
+<%_}_%>
 
 const tenantIdentification = () => async (ctx, next) => {
     if (!isMultiTenant) {

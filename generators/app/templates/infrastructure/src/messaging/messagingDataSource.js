@@ -1,5 +1,8 @@
 const { DataSource } = require('apollo-datasource')
 const { messageBus } = require('@totalsoft/message-bus')
+<%_ if(withMultiTenancy){ _%>
+  const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
+<%_}_%>
 
 class MessagingDataSource extends DataSource {
   constructor() {

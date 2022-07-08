@@ -45,7 +45,7 @@ const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()
   let connectionInfo
 
   if (isMultiTenant) {
-    connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%_dbConnectionName_%>')
+    connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
 
     if (!connectionInfo)
       throw new Error(`Could not find database configuration info for tenant id: ${tenantId}`)

@@ -9,7 +9,10 @@
       "request": "launch",
       "name": "Program",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\src\\index.js"
+      "program": "${workspaceFolder}\\src\\index.js",
+      "env": {
+        "NODE_ENV": "development"
+      }
     },
     {
       "type": "node",
@@ -44,7 +47,8 @@
         "JAEGER_SAMPLER_PARAM": "1",
         "JAEGER_REPORTER_FLUSH_INTERVAL": "100",
         "JAEGER_DISABLED": "false",
-        "JAEGER_SERVICE_NAME": "eSigner.GraphQL"
+        "JAEGER_SERVICE_NAME": "eSigner.GraphQL",
+        "NODE_ENV": "development"
       },
       "program": "${workspaceFolder}\\src\\index.js"
     }

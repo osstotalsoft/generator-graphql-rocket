@@ -4,6 +4,7 @@ const { messagingHost } = require('@totalsoft/messaging-host')
 jest.mock('../../../../multiTenancy')
 jest.mock('@totalsoft/tenant-configuration')
 
+const OLD_ENV = process.env
 describe('tenant identification tests:', () => {
   beforeEach(() => {
     jest.resetModules() // Most important - it clears the cache
@@ -28,7 +29,7 @@ describe('tenant identification tests:', () => {
     await tenantIdentification()(ctx, next)
 
     //assert
-    expect(ctx.tenantId).toBe(tenantId)
+    expect(ctx.tenant.id).toBe(tenantId)
   })
 
   it('should identify tenant from tid header:', async () => {
@@ -45,6 +46,6 @@ describe('tenant identification tests:', () => {
     await tenantIdentification()(ctx, next)
 
     //assert
-    expect(ctx.tenantId).toBe(tenantId)
+    expect(ctx.tenant.id).toBe(tenantId)
   })
 })

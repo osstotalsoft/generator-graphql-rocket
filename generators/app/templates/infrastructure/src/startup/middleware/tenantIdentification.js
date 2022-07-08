@@ -8,7 +8,7 @@ const tenantIdentification = async (resolve, root, args, context, info) => {
   if (cacheMap.has(tenantId)) tenantManager = cacheMap.get(tenantId)
   else{
     const tenant = await tenantService.getTenantFromId(tenantId)
-    const connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%_dbConnectionName_%>')
+    const connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
     if (tenant) {
       tenantManager = { ...tenant, connectionInfo }
       cacheMap.set(id, tenantManager)
