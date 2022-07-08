@@ -68,7 +68,7 @@ module.exports = class extends Generator {
         ignoreFiles
       )
     if (dataLayer === 'knex' && withMultiTenancy)
-      ignoreFiles = concat(['**/multiTenancy/tenantManager.js', '**/multiTenancy/index.js', '**/startup/middleware'], ignoreFiles)
+      ignoreFiles = concat(['**/multiTenancy/tenantManager.js', '**/multiTenancy/index.js', '**/db/dbInstanceFactory.js', '**/startup/middleware'], ignoreFiles)
     if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
 
