@@ -1,4 +1,4 @@
-const { dbInstanceFactory } = require("../../db");
+const { dbInstanceFactory } = require('../../db');
 
 const contextDbInstance = () => async (ctx, next) => {
   <%_ if(withMultiTenancy){ _%>
@@ -12,8 +12,8 @@ const contextDbInstance = () => async (ctx, next) => {
     ctx.dbInstance = dbInstance
   <%_}_%>
 
-  await next();
-};
+  await next()
+}
 
 
 module.exports = contextDbInstance
