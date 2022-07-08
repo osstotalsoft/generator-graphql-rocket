@@ -36,6 +36,7 @@ module.exports = class extends Generator {
       addMessaging,
       addHelm,
       withMultiTenancy,
+      hasSharedDb,
       addTracing,
       addGqlLogging,
       withRights,
@@ -67,7 +68,7 @@ module.exports = class extends Generator {
         ignoreFiles
       )
     if (dataLayer === 'knex' && withMultiTenancy)
-      ignoreFiles = concat(['**/multiTenancy/tenantManager.js', '**/startup/middleware'], ignoreFiles)
+      ignoreFiles = concat(['**/multiTenancy/tenantManager.js', '**/multiTenancy/index.js', '**/startup/middleware'], ignoreFiles)
     if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
 
@@ -82,6 +83,7 @@ module.exports = class extends Generator {
         ],
         ignoreFiles
       )
+    if (!hasSharedDb) ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js'], ignoreFiles)
     if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/__mocks__/opentracing.js'], ignoreFiles)
     if (!addGqlLogging) ignoreFiles = concat(['**/utils/logging.js'], ignoreFiles)
     if (!withRights)

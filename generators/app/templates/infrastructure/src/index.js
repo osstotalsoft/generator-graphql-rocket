@@ -5,6 +5,14 @@ if (result.error) {
     const path = `.env`;
     dotenv.config({ path });
 }
+
+if (process.env.NODE_ENV) {
+  dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
+}
+
+const keyPerFileEnv = require('@totalsoft/key-per-file-configuration')
+const configMonitor = keyPerFileEnv.load()
+
 const { graphqlUploadKoa } = require('graphql-upload')
 require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l)'
@@ -43,8 +51,9 @@ const tracingEnabled = !JSON.parse(JAEGER_DISABLED)
 const { introspectionRoute } = require('./utils/functions')
 const ignore = require('koa-ignore')
 <%_ if(addSubscriptions){ _%>
-    const tenantFactory = require('./multiTenancy/tenantFactory');
+const { tenantService } = require("@totalsoft/tenant-configuration");
 <%_}_%>
+const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false');
 <%_}_%>
 
 
@@ -85,7 +94,7 @@ app.use(jwtTokenUserIdentification);
 <%_ if(dataLayer == "knex") {_%>
 app.use(contextDbInstance());
 <%_}_%>
-       
+
 <%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
 const plugins = [
     ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -132,9 +141,12 @@ const subscriptionServer = useServer(
         };
 
         <%_ if(withMultiTenancy){ _%>
-            ctx.externalTenantId = decoded?.tid
-            const tenant = await tenantFactory.getTenantFromId(decoded?.tid) ?? {};
-            ctx.tenantId = tenant?.id
+            if (isMultiTenant) {
+              const tenantId = decoded.tid;
+              ctx.tenant = await tenantService.getTenantFromId(tenantId);
+            } else {
+              ctx.tenant = {};
+            }
         <%_}_%>
       },
       onSubscribe: async ctx => await validateWsToken(ctx?.token, ctx?.extra?.socket),
@@ -262,16 +274,24 @@ msgHost
           throw err
         })
       })
-
-process.on("SIGINT", () => {
-    msgHost.stopImmediate();
-});
-process.on("SIGTERM", () => {
-    msgHost.stopImmediate();
-});
 <%_}_%>
 
+process.on("SIGINT", () => {
+    configMonitor.close()
+    <%_ if(addMessaging) {_%>
+    msgHost.stopImmediate();
+    <%_}_%>
+});
+process.on("SIGTERM", () => {
+    configMonitor.close()
+    <%_ if(addMessaging) {_%>
+    msgHost.stopImmediate();
+    <%_}_%>
+});
+
+
 process.on('uncaughtException', function (error) {
+    configMonitor.close()
     <%_ if(addMessaging) {_%>
     msgHost.stopImmediate();
     <%_}_%>

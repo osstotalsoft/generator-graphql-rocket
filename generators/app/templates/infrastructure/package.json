@@ -36,19 +36,21 @@
     "lodash.set": "^4.3.2",
       <%_} _%>
     <%_} _%>
+    "@totalsoft/key-per-file-configuration": "1.0.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
     "koa-ignore": "^1.0.1",
       <%_ if(addQuickStart) {_%>
     "datasource-sql": "^2.0.1",
       <%_}_%>
+    "@totalsoft/tenant-configuration": "1.0.0",
     <%_}_%>
     <%_ if(dataLayer === "knex") {_%>
     "dataloader": "^2.1.0",
     "knex-tiny-logger": "^2.1.0",
     "mssql": "^8.1.2",
     "knex": "^0.95.0",
-      <%_ if(withMultiTenancy) {_%>
+      <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "@totalsoft/knex-filters": "^2.4.1",
       <%_} _%>
     <%_}_%>

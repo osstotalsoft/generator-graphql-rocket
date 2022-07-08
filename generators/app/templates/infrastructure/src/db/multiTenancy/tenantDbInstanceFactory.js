@@ -1,4 +1,6 @@
+<%_ if(hasSharedDb){ _%>
 const { registerTenancyFilter } = require("./tenancyFilter")
+<%_}_%>
 const dbConfigService = require("../dbConfigService")
 const Knex = require("knex")
 const knexTinyLogger = require("knex-tiny-logger").default;
@@ -20,7 +22,7 @@ const logger = (_format, duration, query) => {
 const tenantDbInstanceFactory = async tenantId => {
 
     return await dbInstanceGetOrAdd(tenantId, async () => {
-        const [dbConfig, isSharedDb] = await dbConfigService.getDbConfig(tenantId)
+        const dbConfig = await dbConfigService.getDbConfig(tenantId);
 
         const dbInstance = Knex(dbConfig)
 
@@ -40,9 +42,9 @@ const tenantDbInstanceFactory = async tenantId => {
             useKnexTracer(dbInstance)
         }
         <%_}_%>
-        if (isSharedDb) {
-            await registerTenancyFilter("TenantId", tenantId, dbInstance)
-        }
+        <%_ if(hasSharedDb){ _%>
+        await registerTenancyFilter("TenantId", tenantId, dbInstance)
+        <%_}_%>
 
         return dbInstance
     })

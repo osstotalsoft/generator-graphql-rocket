@@ -9,10 +9,13 @@ describe('generator-graphql-rocket:app', () => {
   const tempRoot = `../.tmp`
   const projectName = 'test-graphql'
   const helmChartName = 'test-helm'
+  const dbConnectionName = 'testDatabase'
   const defaultAnswers = {
     projectName,
     gqlPort: '',
     withMultiTenancy: true,
+    hasSharedDb: false,
+    dbConnectionName,
     addSubscriptions: false,
     addMessaging: false,
     withRights: false,

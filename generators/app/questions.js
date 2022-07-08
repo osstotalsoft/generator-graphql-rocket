@@ -48,6 +48,20 @@ module.exports = [
   },
   {
     type: 'confirm',
+    name: 'hasSharedDb',
+    when: prompts => prompts.withMultiTenancy,
+    message: 'Do you have a database that is shared by multiple tenants?',
+    default: false
+  },
+  {
+    type: 'input',
+    name: 'dbConnectionName',
+    when: prompts => prompts.withMultiTenancy,
+    message: 'What is your database connection name?',
+    default: 'myDatabase'
+  },
+  {
+    type: 'confirm',
     name: 'addSubscriptions',
     message: 'Would you like to support subscriptions?',
     default: false

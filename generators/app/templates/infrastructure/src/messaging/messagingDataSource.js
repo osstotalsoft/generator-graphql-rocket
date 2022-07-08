@@ -13,21 +13,18 @@ class MessagingDataSource extends DataSource {
     const ctx = config.context
     this.context = {
         <%_ if(withMultiTenancy){ _%>
-        tenantId: ctx.externalTenantId,
-        <%_}_%> 
+        tenantId:isMultiTenant ? ctx.tenant && ctx.tenant.id : undefined,
+        <%_}_%>
         correlationId: ctx.correlationId,
         token: ctx.token,
-        userId: ctx.externalUser?.id
+        externalUser: ctx.externalUser
     }
-    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.context.UserId })
+    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.externalUser.id })
     this.msgBus = messageBus()
   }
 
   publish(topic, msg) {
-    return this.msgBus.publish(topic, msg, this.context, headers => ({
-      ...headers,
-      userId: this.context.UserId
-    }))
+    return this.msgBus.publish(topic, msg, this.context, this.envelopeCustomizer)
   }
 
   subscribe(topic, handler, opts) {

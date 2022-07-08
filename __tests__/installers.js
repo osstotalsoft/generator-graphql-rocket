@@ -9,7 +9,7 @@ describe('test package installers', () => {
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
-
+  const dbConnectionName   = 'testDatabase'
   const npm = '>= 7.16.0'
   const yarn = '>= 1.22.4'
 
@@ -29,6 +29,8 @@ describe('test package installers', () => {
         projectName,
         gqlPort,
         withMultiTenancy: true,
+        hasSharedDb: false,
+        dbConnectionName,
         addSubscriptions: true,
         addMessaging: false,
         withRights: true,
@@ -53,6 +55,8 @@ describe('test package installers', () => {
         projectName,
         gqlPort,
         withMultiTenancy: true,
+        hasSharedDb: false,
+        dbConnectionName,
         addSubscriptions: true,
         addMessaging: false,
         withRights: true,
