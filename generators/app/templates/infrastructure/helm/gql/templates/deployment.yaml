@@ -84,7 +84,7 @@ spec:
             value: {{ $global.db.password | quote }}
 <%_ if(addVaultConfigs){ _%>
           {{- end }}
-<%_}_%>            
+<%_}_%>
           - name: DB_INSTANCE_NAME
             value: {{ $global.db.instanceName | quote }}
           - name: DB_TRUST_SERVER_CERTIFICATE
@@ -137,6 +137,15 @@ spec:
           - name: {{ $key }}
             value: {{ $value | quote }}
           {{- end }}
+          {{- if $global.runtimeConfiguration.enabled }}
+          volumeMounts:
+            - name: runtime-configs
+              readOnly: true
+              mountPath: /usr/src/app/runtime/configs
+            - name: runtime-secrets
+              readOnly: true
+              mountPath: /usr/src/app/runtime/secrets
+          {{- end }}
 <%_ if(addTracing){ _%>
           {{- if and (eq $global.jaeger.enabled true) (eq $global.jaeger.agentAutoInject false) }}
         - image: jaegertracing/jaeger-agent:{{ $global.jaeger.agentImageTag }}
@@ -156,6 +165,19 @@ spec:
       {{- if $global.imagePullSecrets }}
       imagePullSecrets:
       {{- toYaml $global.imagePullSecrets | trim | nindent 8 }}
+      {{- end }}
+      {{- if $global.runtimeConfiguration.enabled }}
+      volumes:
+        - name: runtime-configs
+          configMap:
+            name: {{ $global.runtimeConfiguration.configMap }}
+            defaultMode: 420
+        - name: runtime-secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ $global.runtimeConfiguration.csi.secretProviderClass }}
       {{- end }}
       {{- with $current.nodeSelector }}
       nodeSelector:

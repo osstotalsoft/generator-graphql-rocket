@@ -1,7 +1,6 @@
 const { envelope } = require('@totalsoft/message-bus')
 const { messagingHost } = require('@totalsoft/messaging-host')
 
-jest.mock('../../../../multiTenancy')
 jest.mock('@totalsoft/tenant-configuration')
 
 const OLD_ENV = process.env

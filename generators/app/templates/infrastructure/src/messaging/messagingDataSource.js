@@ -22,7 +22,7 @@ class MessagingDataSource extends DataSource {
         token: ctx.token,
         externalUser: ctx.externalUser
     }
-    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.externalUser.id })
+    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.context.externalUser.id })
     this.msgBus = messageBus()
   }
 

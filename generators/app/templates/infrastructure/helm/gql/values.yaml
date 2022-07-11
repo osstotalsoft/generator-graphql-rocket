@@ -17,6 +17,12 @@ global:
     key: key
 <%_}_%>
 
+  runtimeConfiguration:
+    enabled: false
+    configMap: <%= helmChartName %>-runtime-config
+    csi:
+      secretProviderClass: <%= helmChartName %>-runtime-secrets
+
 <%_ if(addTracing){ _%>
   jaeger:
     enabled: true
@@ -90,6 +96,9 @@ gql:
     IDENTITY_AUTHORITY: "[IDENTITY_AUTHORITY_URL]"
 <%_ if(addGqlLogging){ _%>
     APOLLO_LOGGING_LEVEL: "DEBUG"
+<%_}_%>
+<%_ if(withMultiTenancy){ _%>
+    IS_MULTITENANT: "false"
 <%_}_%>
     KNEX_LOGGING: "true"
     PORT: "4000"

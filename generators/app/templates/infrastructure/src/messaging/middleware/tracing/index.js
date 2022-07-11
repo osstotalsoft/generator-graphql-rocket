@@ -1,6 +1,7 @@
 const { envelope } = require('@totalsoft/message-bus')
 const opentracing = require('opentracing')
 const { useSpanManager } = require('../../../tracing/spanManager')
+const { getExternalSpan } = require('../../../tracing/tracingUtils')
 
 const tracing = () => async (ctx, next) => {
     const tracer = opentracing.globalTracer()

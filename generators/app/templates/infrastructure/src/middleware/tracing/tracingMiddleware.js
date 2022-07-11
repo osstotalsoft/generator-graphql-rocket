@@ -26,7 +26,7 @@ const tracingMiddleWare = () => async (ctx, next) => {
         span.setTag(opentracing.Tags.HTTP_METHOD, req.method);
         span.setTag(opentracing.Tags.SPAN_KIND, opentracing.Tags.HTTP_URL);
         span.setTag(opentracing.Tags.HTTP_URL, req.url);
-        span.setTag("nbb.correlation-id", ctx.correlationId);
+        span.setTag("nbb.correlation_id", ctx.correlationId);
 
         // add the span to the request object for any other handler to use the span
         ctx.requestSpan = span;
