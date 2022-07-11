@@ -5,7 +5,7 @@ const { useSpanManager } = require('../../../tracing/spanManager')
 const tracing = () => async (ctx, next) => {
     const tracer = opentracing.globalTracer()
 
-    const externalSpan = getExternalSpan(tracer, ctx.request)
+    const externalSpan = getExternalSpan(tracer, ctx.received.msg)
     const span = tracer.startSpan('messagingHost ' + ctx.received.topic, {
         childOf: externalSpan ? externalSpan : undefined
     })
