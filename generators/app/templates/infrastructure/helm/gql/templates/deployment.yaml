@@ -12,16 +12,10 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 <%_ if(addTracing){ _%>
-  {{- if and (eq $global.jaeger.enabled true) (eq $global.jaeger.agentAutoInject true) }}
+  {{- if $global.jaeger.enabled | and $global.jaeger.agentAutoInject }}
   annotations:
-    "sidecar.jaegertracing.io/inject": "true"
-  {{- else }}
-  annotations:
-    "sidecar.jaegertracing.io/inject": "false"
+    sidecar.jaegertracing.io/inject: "true"
   {{- end }}
-<%_} else {_%>
-  annotations:
-    "sidecar.jaegertracing.io/inject": "false"
 <%_}_%>
 spec:
   replicas: {{ $current.replicaCount }}
@@ -60,7 +54,7 @@ spec:
     {{- end }}
       containers:
         - name: {{ $current.name }}
-          image: "{{ $current.image.repository }}{{ $current.image.name}}:{{ $current.image.tag }}"
+          image: "{{ $current.image.repository }}{{ $current.image.name}}:{{ $current.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ $current.image.pullPolicy }}
           ports:
             - name: http
@@ -147,7 +141,7 @@ spec:
               mountPath: /usr/src/app/runtime/secrets
           {{- end }}
 <%_ if(addTracing){ _%>
-          {{- if and (eq $global.jaeger.enabled true) (eq $global.jaeger.agentAutoInject false) }}
+        {{- if $global.jaeger.enabled | and (not $global.jaeger.agentAutoInject) }}
         - image: jaegertracing/jaeger-agent:{{ $global.jaeger.agentImageTag }}
           name: jaeger-agent{{ $current.nameSuffix}}
           ports:

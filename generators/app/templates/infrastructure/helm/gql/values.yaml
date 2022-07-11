@@ -67,7 +67,7 @@ gql:
     repository: "[ORGANIZATION].azurecr.io/"
     pullPolicy: IfNotPresent
     name: <%= helmChartName %>
-    tag: latest # overwrite from pipeline
+    tag: "" # overwrite from pipeline
 
   service:
     type: ClusterIP
