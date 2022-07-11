@@ -16,7 +16,7 @@ const tracing = () => async (ctx, next) => {
     const correlationId = ctx?.correlationId
     span.setTag(envelope.headers.correlationId, correlationId)
     <%_ if(withMultiTenancy){ _%>
-    const tenantId = ctx?.externalTenantId
+    const tenantId = ctx?.tenant?.id
     span.setTag(envelope.headers.tenantId, tenantId)
     <%_}_%>
 

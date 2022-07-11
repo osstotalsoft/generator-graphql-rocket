@@ -16,7 +16,7 @@ class MessagingDataSource extends DataSource {
     const ctx = config.context
     this.context = {
         <%_ if(withMultiTenancy){ _%>
-        tenantId:isMultiTenant ? ctx.tenant && ctx.tenant.id : undefined,
+        tenantId:isMultiTenant ? ctx?.tenant?.id : undefined,
         <%_}_%>
         correlationId: ctx.correlationId,
         token: ctx.token,

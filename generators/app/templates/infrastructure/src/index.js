@@ -203,7 +203,7 @@ const server = new ApolloServer({
     <%_}_%>
     dataSources: getDataSources,
     context: async ({ ctx }) => {
-        const { token, <% if(withMultiTenancy){ %>tenantId, externalTenantId, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
+        const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
         <%_ if(addGqlLogging) {_%>
           const { logInfo, logDebug, logError } = initializeLogger(<% if(dataLayer == "knex") {%>{...ctx, dbInstance}<%} else {%> ctx <%}%>, request?.body?.operationName, true, saveLogs)
         <%_}_%>

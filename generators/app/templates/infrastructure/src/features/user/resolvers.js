@@ -59,7 +59,7 @@ const userResolvers = {
         userList: async (_parent, { pager, filters }, _ctx) => {
         const { pageSize, afterId, sortBy, direction } = pager
         const orderBy = pascalizeKeys(sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { Id: 'asc' })
-    
+
         const values = await prisma().user.findMany({
             take: pageSize ? pageSize + 1 : undefined,
             cursor: afterId
@@ -70,7 +70,7 @@ const userResolvers = {
             where: filters ? pascalizeKeys(filters) : undefined,
             orderBy
         })
-    
+
         return pageSize ? { values: values?.slice(0, pageSize), orderBy, nextAfterId: values?.[pageSize]?.id } : { values }
         }
     },
@@ -87,11 +87,11 @@ const userResolvers = {
         pagination: async ({ orderBy, nextAfterId }, { pager, filters }, _ctx) => {
             const { pageSize, afterId } = pager
             if (!pageSize) return
-      
+
             let res = { dbContext: prisma().userInformation, nextPage: { ...pager, afterId: nextAfterId ?? null } }
-      
+
             if (!afterId) return res
-      
+
             const prevPageValues = await prisma().user.findMany({
               select: { Id: true },
               skip: 1,
@@ -115,7 +115,7 @@ const userResolvers = {
             return prisma().user.update({ data: pascalizeKeys(input), where: { Id: input?.id } })
         }
     },
-    <%_}_%>    
+    <%_}_%>
     <%_ if(addSubscriptions){ _%>
     //Not working! Only for demonstration
     Subscription: {
@@ -126,12 +126,12 @@ const userResolvers = {
             <%_ if(withMultiTenancy){ _%>
             subscribe: withFilter(
                 (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED),
-                (message, _params, { externalTenantId, logger }, _info) => {
+                (message, _params, { tenant, logger }, _info) => {
                     logger.logInfo(`📨   Message received from ${topics.USER_CHANGED}: ${JSON.stringify(message)}`, '[Message_Received]', true);
-                    logger.logInfo(`📨   Message tenant id =  ${envelope.getTenantId(message).toUpperCase()}; Context tenant id = ${externalTenantId.toUpperCase()}`,
+                    logger.logInfo(`📨   Message tenant id =  ${envelope.getTenantId(message).toUpperCase()}; Context tenant id = ${tenant?.id?.toUpperCase()}`,
                         '[Message_Tenant_Check]', true);
-                    return envelope.getTenantId(message).toUpperCase() === externalTenantId.toUpperCase()
-                }                
+                    return envelope.getTenantId(message).toUpperCase() === tenant?.id?.toUpperCase()
+                }
             )
             <%_} else { _%>
             subscribe: (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED)
