@@ -1,5 +1,4 @@
 jest.mock('jsonwebtoken')
-jest.mock('../../../multiTenancy')
 jest.mock('@totalsoft/tenant-configuration')
 
 const OLD_ENV = process.env
