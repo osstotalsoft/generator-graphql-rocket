@@ -142,7 +142,7 @@ const subscriptionServer = useServer(
 
         <%_ if(withMultiTenancy){ _%>
             if (isMultiTenant) {
-              const tenantId = decoded.tid;
+              const tenantId = decoded?.tid;
               ctx.tenant = await tenantService.getTenantFromId(tenantId);
             } else {
               ctx.tenant = {};
