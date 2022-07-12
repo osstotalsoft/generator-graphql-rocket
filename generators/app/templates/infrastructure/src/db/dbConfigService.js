@@ -61,7 +61,7 @@ const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()
       DB_TRUST_SERVER_CERTIFICATE: trustServerCertificate
     } = process.env
 
-    connectionInfo = { server, port, userId, password, database, trustServerCertificate }
+    connectionInfo = { server, port, userId, password, database, instanceName, trustServerCertificate }
   <%_ if(withMultiTenancy){ _%>
   }
   <%_}_%>
