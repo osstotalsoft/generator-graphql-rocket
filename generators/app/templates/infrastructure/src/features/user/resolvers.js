@@ -1,5 +1,5 @@
 <%_ if(addSubscriptions){ _%>
-const { topics, redisPubSub } = require('../../pubSub')
+const { topics, pubSub } = require('../../pubSub')
 <%_}_%>
 <%_ if(addSubscriptions && withMultiTenancy){ _%>
 const { envelope } = require("@totalsoft/message-bus")
@@ -125,7 +125,7 @@ const userResolvers = {
             },
             <%_ if(withMultiTenancy){ _%>
             subscribe: withFilter(
-                (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED),
+                (_parent, _args, _context) => pubSub.asyncIterator(topics.USER_CHANGED),
                 (message, _params, { tenant, logger }, _info) => {
                     logger.logInfo(`📨   Message received from ${topics.USER_CHANGED}: ${JSON.stringify(message)}`, '[Message_Received]', true);
                     logger.logInfo(`📨   Message tenant id =  ${envelope.getTenantId(message).toUpperCase()}; Context tenant id = ${tenant?.id?.toUpperCase()}`,
@@ -134,7 +134,7 @@ const userResolvers = {
                 }
             )
             <%_} else { _%>
-            subscribe: (_parent, _args, _context) => redisPubSub.asyncIterator(topics.USER_CHANGED)
+            subscribe: (_parent, _args, _context) => pubSub.asyncIterator(topics.USER_CHANGED)
             <%_}_%>
         }
     }

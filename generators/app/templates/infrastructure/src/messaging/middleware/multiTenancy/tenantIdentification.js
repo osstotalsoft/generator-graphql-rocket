@@ -1,9 +1,9 @@
 
 const { envelope } = require("@totalsoft/message-bus")
 const { tenantService } = require("@totalsoft/tenant-configuration");
-<%if(dataLayer == "prisma") {%>
+<%_ if(dataLayer == "prisma") { _%>
 const { useTenantContext } = require("../../../multiTenancy")
-<% } %>
+<%_ } _%>
 <%_ if(withMultiTenancy){ _%>
   const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>

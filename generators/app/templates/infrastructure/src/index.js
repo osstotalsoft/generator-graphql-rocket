@@ -18,47 +18,45 @@ require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l)'
   })
 
-const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('apollo-server-koa');
-const Koa = require("koa");
+const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('apollo-server-koa'),
+  Koa = require("koa"),
+  { ApolloServerPluginDrainHttpServer } = require("apollo-server-core"),
+  { createServer } = require('http')
 
 // Auth
-// eslint-disable-next-line node/no-extraneous-require
 const cors = require("@koa/cors");
 const bodyParser = require("koa-bodyparser");
 
 <%_ if(addMessaging) {_%>
 // Messaging
-const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging")
-const { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
+const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging"),
+  { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
 <%_}_%>
 <%_ if(addGqlLogging) {_%>
 // Logging
-const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger')
-const { saveLogs } = require('./utils/logging')
+const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger'),
+  { saveLogs } = require('./utils/logging')
 <%_}_%>
 <%_ if(addTracing){ _%>
 // Tracing
-const tracingPlugin = require('./plugins/tracing/tracingPlugin');
-const { initGqlTracer, getApolloTracerPluginConfig } = require("./tracing/gqlTracer");
-const opentracing = require('opentracing');
-const defaultTracer = initGqlTracer();
-opentracing.initGlobalTracer(defaultTracer);
-const { JAEGER_DISABLED } = process.env;
-const tracingEnabled = !JSON.parse(JAEGER_DISABLED)
+const tracingPlugin = require('./plugins/tracing/tracingPlugin'),,
+  { initGqlTracer, getApolloTracerPluginConfig } = require("./tracing/gqlTracer"),
+  opentracing = require('opentracing'),
+  defaultTracer = initGqlTracer(),
+  { JAEGER_DISABLED } = process.env,
+  tracingEnabled = !JSON.parse(JAEGER_DISABLED)
+
+opentracing.initGlobalTracer(defaultTracer)
 <%_}_%>
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
-const { introspectionRoute } = require('./utils/functions')
-const ignore = require('koa-ignore')
+const { introspectionRoute } = require('./utils/functions'),
+  ignore = require('koa-ignore'),
 <%_ if(addSubscriptions){ _%>
-const { tenantService } = require("@totalsoft/tenant-configuration");
+  { tenantService } = require("@totalsoft/tenant-configuration"),
 <%_}_%>
-const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false');
+  isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
-
-
-const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core")
-const { createServer } = require('http')
 
 <%_ if(addSubscriptions){ _%>
 const jsonwebtoken = require('jsonwebtoken'),
@@ -67,14 +65,13 @@ const jsonwebtoken = require('jsonwebtoken'),
 <%_}_%>
 
 <%_ if(dataLayer == "knex") {_%>
-const { dbInstanceFactory } = require("./db");
+const { dbInstanceFactory } = require("./db")
 <%_}_%>
 const { <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateWsToken,  <%}%>jwtTokenValidation, jwtTokenUserIdentification,
-    <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware");
-const { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index');
+  { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index'),
+  <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware")
 
 async function startServer(httpServer) {
-
 const app = new Koa();
 
 app.use(errorHandlingMiddleware())
