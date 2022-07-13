@@ -32,14 +32,16 @@ const bodyParser = require("koa-bodyparser");
 const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging"),
   { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
 <%_}_%>
+
 <%_ if(addGqlLogging) {_%>
 // Logging
 const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger'),
   { saveLogs } = require('./utils/logging')
 <%_}_%>
+
 <%_ if(addTracing){ _%>
 // Tracing
-const tracingPlugin = require('./plugins/tracing/tracingPlugin'),,
+const tracingPlugin = require('./plugins/tracing/tracingPlugin'),
   { initGqlTracer, getApolloTracerPluginConfig } = require("./tracing/gqlTracer"),
   opentracing = require('opentracing'),
   defaultTracer = initGqlTracer(),
@@ -48,6 +50,7 @@ const tracingPlugin = require('./plugins/tracing/tracingPlugin'),,
 
 opentracing.initGlobalTracer(defaultTracer)
 <%_}_%>
+
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
 const { introspectionRoute } = require('./utils/functions'),
@@ -238,8 +241,6 @@ process.on('uncaughtException', function (error) {
 const httpServer = createServer()
 startServer(httpServer)
 const port = process.env.PORT || 4000;
-// This `listen` method launches a web-server.  Existing apps
-// can utilize middleware options, which we'll discuss later.
 httpServer.listen(port, () => {
     console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
     <%_ if(addSubscriptions){ _%>

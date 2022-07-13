@@ -1,5 +1,5 @@
 const { camelizeKeys } = require('humps')
-const { PRISMA_DEBUG<% if(withMultiTenancy && !hasSharedDb){ %>, PRISMA_DB_URL_PATTERN <%}%>} = process.env
+const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
 const { getTenantContext } = require('../multiTenancy/tenantManager')
@@ -8,6 +8,7 @@ const { getTenantContext } = require('../multiTenancy/tenantManager')
 <%_}else{_%>
 const { sanitizeConnectionInfo } = require('../utils/functions')
 <%_}_%>
+const isMultiTenant = JSON.parse(IS_MULTITENANT)
 <%_}_%>
 
 const cacheMap = new Map()
@@ -31,6 +32,7 @@ const applyMiddleware = prismaClient => {
 function prisma() {
   let prismaClient
   <%_ if(withMultiTenancy){ _%>
+  if (isMultiTenant) {
     const { id, connectionInfo } = getTenantContext()
     if (!id || !connectionInfo) throw new Error(`Could not identify tenant!`)
 
@@ -58,17 +60,23 @@ function prisma() {
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_} else { _%>
-      const { server, port, database, user, password } = sanitizeConnectionInfo(connectionInfo)
+      const { server, port, database, userName, password } = sanitizeConnectionInfo(connectionInfo)
       const url = PRISMA_DB_URL_PATTERN.replace('{server}', server)
         .replace('{port}', port)
         .replace('{database}', database)
-        .replace('{user}', user)
+        .replace('{user}', userName)
         .replace('{password}', password)
 
       prismaClient = new PrismaClient({ datasources: { db: { url } } }, prismaOptions)
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_}_%>
+    } else {
+      if (cacheMap.has('default')) return cacheMap.get('default')
+      prismaClient = new PrismaClient(prismaOptions)
+      applyMiddleware(prismaClient)
+      cacheMap.set('default', prismaClient)
+    }
   <%_} else { _%>
     if (cacheMap.has('default')) return cacheMap.get('default')
     prismaClient = new PrismaClient(prismaOptions)
