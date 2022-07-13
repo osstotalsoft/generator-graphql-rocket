@@ -2,9 +2,9 @@
 const UserApi = require('../features/user/dataSources/userApi');
 <%_ if(dataLayer == "knex") {_%>
 const UserDb = require('../features/user/dataSources/userDb');
-    <%_ if(withMultiTenancy){ _%>
+<%_}_%>
+<%_ if(withMultiTenancy){ _%>
 const TenantIdentityApi = require('../features/tenant/dataSources/tenantIdentityApi');
-    <%_}_%>
 <%_}_%>
 <%_}_%>
 

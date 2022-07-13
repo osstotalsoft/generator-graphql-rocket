@@ -1,14 +1,17 @@
 const { camelizeKeys } = require('humps')
-const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, PRISMA_DB_URL_PATTERN <%}%>} = process.env
+const { PRISMA_DEBUG<% if(withMultiTenancy && hasSharedDb){ %>, PRISMA_DB_URL_PATTERN <%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
 const { getTenantContext } = require('../multiTenancy/tenantManager')
+<%_ if(hasSharedDb){ _%>
+  const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
+<%_}else{_%>
 const { sanitizeConnectionInfo } = require('../utils/functions')
-const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
+<%_}_%>
 <%_}_%>
 
 const cacheMap = new Map()
-const prismaOptions = { log: JSON.parse(PRISMA_DEBUG) ? ['query'] : ['error'] }
+const prismaOptions = { log: JSON.parse(PRISMA_DEBUG ?? false) ? ['query'] : ['error'] }
 
 const applyMiddleware = prismaClient => {
   prismaClient.$on('warn', e => {
@@ -34,7 +37,7 @@ function prisma() {
     if (cacheMap.has(id)) return cacheMap.get(id)
 
     <%_ if(hasSharedDb){ _%>
-      const prismaClient = new PrismaClient(prismaOptions)
+      prismaClient = new PrismaClient(prismaOptions)
 
       // tenancy where filter
       buildTableHasColumnPredicate('TenantId', prismaClient).then(tableHasColumnTenantId => {

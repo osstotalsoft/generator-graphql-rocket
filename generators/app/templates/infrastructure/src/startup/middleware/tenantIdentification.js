@@ -11,7 +11,7 @@ const tenantIdentification = async (resolve, root, args, context, info) => {
     const connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
     if (tenant) {
       tenantManager = { ...tenant, connectionInfo }
-      cacheMap.set(id, tenantManager)
+      cacheMap.set(tenantId, tenantManager)
     } else {
       throw new Error(`Could not identify tenant!`)
     }
