@@ -1,5 +1,5 @@
 const { camelizeKeys } = require('humps')
-const { PRISMA_DEBUG<% if(withMultiTenancy && hasSharedDb){ %>, PRISMA_DB_URL_PATTERN <%}%>} = process.env
+const { PRISMA_DEBUG<% if(withMultiTenancy && !hasSharedDb){ %>, PRISMA_DB_URL_PATTERN <%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
 const { getTenantContext } = require('../multiTenancy/tenantManager')
