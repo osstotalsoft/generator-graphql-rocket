@@ -1,4 +1,5 @@
-const { tenantFactory, tenantConfiguration, useTenantContext } = require('../../multiTenancy')
+const { useTenantContext } = require('../../multiTenancy')
+const { tenantConfiguration, tenantService } = require('@totalsoft/tenant-configuration')
 const cacheMap = new Map()
 
 const tenantIdentification = async (resolve, root, args, context, info) => {
@@ -6,10 +7,10 @@ const tenantIdentification = async (resolve, root, args, context, info) => {
   let tenantManager = {}
   if (cacheMap.has(tenantId)) tenantManager = cacheMap.get(tenantId)
   else{
-    const tenant = await tenantFactory.getTenantFromId(tenantId)
-    const dbConfig = await tenantConfiguration.getDataSourceInfo(tenantId)
+    const tenant = await tenantService.getTenantFromId(tenantId)
+    const connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
     if (tenant) {
-      tenantManager = { ...tenant, ...dbConfig }
+      tenantManager = { ...tenant, connectionInfo }
       cacheMap.set(id, tenantManager)
     } else {
       throw new Error(`Could not identify tenant!`)

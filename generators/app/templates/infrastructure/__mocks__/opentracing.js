@@ -1,4 +1,4 @@
-const opentracing = jest.genMockFromModule('opentracing');
+const opentracing = jest.createMockFromModule('opentracing');
 
 opentracing.globalTracer = jest.fn().mockReturnValue({
     startSpan: jest.fn().mockReturnValue({
@@ -6,7 +6,8 @@ opentracing.globalTracer = jest.fn().mockReturnValue({
         setTag: jest.fn(),
         finish: jest.fn()
     }),
-    finish: jest.fn()
+    finish: jest.fn(),
+    extract: jest.fn()
 });
 
 module.exports = opentracing;

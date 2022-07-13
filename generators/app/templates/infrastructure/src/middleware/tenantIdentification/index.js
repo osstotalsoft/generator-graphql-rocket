@@ -1,28 +1,32 @@
 
-const jsonwebtoken = require('jsonwebtoken');
-const { tenantFactory } = require("../../multiTenancy")
+const jsonwebtoken = require('jsonwebtoken')
+const { tenantService } = require('@totalsoft/tenant-configuration')
+const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 
 const tenantIdentification = () => async (ctx, next) => {
-    const externalTenantId = getTenantIdFromJwt(ctx)
-    const tenant = await tenantFactory.getTenantFromId(externalTenantId)
-    if (tenant) {
-      ctx.tenantId = tenant?.id
-      ctx.externalTenantId = externalTenantId
-    } else {
-      throw new Error(`Could not identify tenant!`)
+  if (!ctx.tenant) {
+    if (!isMultiTenant) {
+      ctx.tenant = {}
+      await next()
+      return
     }
-    await next();
+
+    const tenantId = getTenantIdFromJwt(ctx)
+
+    ctx.tenant = await tenantService.getTenantFromId(tenantId)
+  }
+  await next()
 }
 
 const getTenantIdFromJwt = ({ token }) => {
-    let tenantId = null;
-    if (token) {
-        const decoded = jsonwebtoken.decode(token.replace("Bearer ", ""));
-        if (decoded) {
-            tenantId = decoded.tid;
-        }
+  let tenantId = null
+  if (token) {
+    const decoded = jsonwebtoken.decode(token.replace('Bearer ', ''))
+    if (decoded) {
+        tenantId = decoded.tid
     }
-    return tenantId;
+  }
+  return tenantId
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -36,11 +40,11 @@ const getTenantIdFromHost = ctx => ctx.hostname
 
 // eslint-disable-next-line no-unused-vars
 const getTenantIdFromRefererHost = async ctx => {
-    if (!ctx.request.headers.referer) {
-        return;
-    }
-    var url = new URL.parse(ctx.request.headers.referer);
-    return url.hostname
-};
+  if (!ctx.request.headers.referer) {
+    return
+  }
+  var url = new URL.parse(ctx.request.headers.referer)
+  return url.hostname
+}
 
-module.exports = tenantIdentification;
+module.exports = tenantIdentification

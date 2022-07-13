@@ -2,21 +2,21 @@
     const { pascalizeKeys } = require('humps')
     const { prisma } = require('../../prisma')
 <%_}_%>
+const { tenantService } = require('@totalsoft/tenant-configuration')
+const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 
 const tenantResolvers = {
     Query: {
         myTenants: async (_parent, _params, { dataSources }) => {
+            if (!isMultiTenant)
+              return []
+
             const tenants = await dataSources.tenantIdentityApi.getTenants()
-            return tenants.map(({ tenantId, ...rest }) => ({ externalId: tenantId, ...rest }))
+            return tenants
         }
     },
-    ExternalTenant: {
-        <%_ if(dataLayer == "knex") {_%>
-        tenant: ({ externalId }, _params, { dataLoaders }) => dataLoaders.tenantByExternalId.load(externalId)
-        <%_}_%>
-        <%_ if(dataLayer == "prisma") {_%>
-        tenant: ({ externalId }, _params, _ctx) => prisma().tenant.findUnique({ where: { ExternalId: externalId } })
-        <%_}_%>
+    IdentityTenant: {
+        tenant: async ({ tenantId }) => await tenantService.getTenantFromId(tenantId)
     }
 }
 

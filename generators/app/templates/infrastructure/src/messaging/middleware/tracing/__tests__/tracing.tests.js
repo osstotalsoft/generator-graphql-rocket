@@ -16,7 +16,9 @@ describe("Tracing tests", () => {
         const msg = envelope({}, { tenantId: someTenantId, correlationId: someCorrelationId })
         const ctx = messagingHost()._contextFactory("topic1", msg)
         ctx.correlationId = someCorrelationId;
-        ctx.externalTenantId = someTenantId
+        ctx.tenant = {
+          id: someTenantId
+        }
         <%_} else { _%>
         const msg = envelope({}, { correlationId: someCorrelationId })
         const ctx = messagingHost()._contextFactory("topic1", msg)

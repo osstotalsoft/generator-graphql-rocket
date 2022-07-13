@@ -9,12 +9,15 @@ describe('test package installers', () => {
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const gqlPort = '4000'
+  const dbConnectionName = 'testDatabase'
   const messageBus = /^@totalsoft[/]message-bus/
   const defaultAnswers = {
     projectName,
     gqlPort,
     dataLayer: 'knex',
     withMultiTenancy: false,
+    hasSharedDb: false,
+    dbConnectionName,
     addSubscriptions: false,
     addMessaging: false,
     withRights: false,

@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "Gql.fullname" . }}
     helm.sh/chart: {{ include "Gql.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }} 
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   type: {{ $current.service.type }}
@@ -21,6 +21,5 @@ spec:
       nodePort: {{ $current.service.nodePort }}
       {{- end }}
   selector:
-    app.kubernetes.io/name: {{ $current.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "Gql.selectorLabels" . | nindent 4 }}
 {{- end -}}

@@ -37,7 +37,7 @@ const parseConnectionString = connectionString => {
       return (a[prop[0]] = prop[1]), a;
     }, {});
 
-  return humps.camelizeKeys(parsed);
+  return sanitizeConnectionInfo(parsed);
 };
 
 
@@ -63,7 +63,7 @@ const sanitizeConnectionInfo = connectionInfo => {
   if (otherParams) {
     connectionInfo = { ...connectionInfo, ...humps.camelizeKeys(Object.fromEntries(otherParams)) }
   }
-  connectionInfo.user = connectionInfo.userId || connectionInfo.userName
+  connectionInfo.userId = connectionInfo.userId || connectionInfo.userName
 
   return connectionInfo
 }

@@ -1,6 +1,7 @@
-const { postProcessDbResponse<% if(withMultiTenancy){ %>, parseConnectionString <%}%>} = require("../utils/functions");
+const { postProcessDbResponse, sanitizeConnectionInfo} = require("../utils/functions")
 <%_ if(withMultiTenancy){ _%>
-const { tenantConfiguration } = require("../multiTenancy");
+const { tenantConfiguration } = require('@totalsoft/tenant-configuration')
+const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
 const generateKnexConfig = ({
@@ -21,7 +22,7 @@ const generateKnexConfig = ({
     database,
     options: {
       enableArithAbort: true,
-      trustServerCertificate: JSON.parse(trustServerCertificate),
+      trustServerCertificate: JSON.parse(trustServerCertificate?.trim().toLowerCase() || 'false'),
       encrypt: true,
       instanceName: instanceName || undefined
     }
@@ -41,15 +42,13 @@ const generateKnexConfig = ({
 
 const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()<%}%> => {
   <%_ if(withMultiTenancy){ _%>
-  const tenantDsInfo = await tenantConfiguration.getDataSourceInfo(tenantId);
+  let connectionInfo
 
-  if (tenantDsInfo) {
-    if (!tenantDsInfo.isSharedDb && !tenantDsInfo.connectionInfo)
-        throw new Error(`Could not find database configuration info for tenant id: ${tenantId}`)
+  if (isMultiTenant) {
+    connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
 
-    const connection = parseConnectionString(tenantDsInfo.connectionInfo);
-    const dbConfig = generateKnexConfig(connection)
-    return [dbConfig, tenantDsInfo.isSharedDb]
+    if (!connectionInfo)
+      throw new Error(`Could not find database configuration info for tenant id: ${tenantId}`)
   } else {
   <%_}_%>
     const {
@@ -62,11 +61,14 @@ const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()
       DB_TRUST_SERVER_CERTIFICATE: trustServerCertificate
     } = process.env
 
-    const dbConfig = generateKnexConfig({ server, port, userId, password, database, instanceName, trustServerCertificate })
-    return [dbConfig, true]
+    connectionInfo = { server, port, userId, password, database, instanceName, trustServerCertificate }
   <%_ if(withMultiTenancy){ _%>
   }
   <%_}_%>
+
+  connectionInfo = sanitizeConnectionInfo(connectionInfo)
+  const dbConfig = generateKnexConfig(connectionInfo)
+  return dbConfig
 }
 
 module.exports = { getDbConfig, generateKnexConfig }

@@ -4,8 +4,8 @@ type Tenant {
     code: String!
 }
 
-type ExternalTenant {
-    externalId: ID!
+type IdentityTenant {
+    tenantId: ID!
     name: String
     code: String
     tier: String
@@ -13,5 +13,5 @@ type ExternalTenant {
     tenant: Tenant
 }
 extend type Query {
-    myTenants: [ExternalTenant!]!
+    myTenants: [IdentityTenant!]!
 }

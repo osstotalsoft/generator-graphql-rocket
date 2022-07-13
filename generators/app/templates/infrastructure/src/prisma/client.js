@@ -28,12 +28,12 @@ const applyMiddleware = prismaClient => {
 function prisma() {
   let prismaClient
   <%_ if(withMultiTenancy){ _%>
-    const { id, connectionInfo, isSharedDb } = getTenantContext()
+    const { id, connectionInfo } = getTenantContext()
     if (!id || !connectionInfo) throw new Error(`Could not identify tenant!`)
 
     if (cacheMap.has(id)) return cacheMap.get(id)
 
-    if(isSharedDb){
+    <%_ if(hasSharedDb){ _%>
       const prismaClient = new PrismaClient(prismaOptions)
 
       // tenancy where filter
@@ -54,7 +54,7 @@ function prisma() {
 
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
-    }else{
+    <%_} else { _%>
       const { server, port, database, user, password } = sanitizeConnectionInfo(connectionInfo)
       const url = PRISMA_DB_URL_PATTERN.replace('{server}', server)
         .replace('{port}', port)
@@ -65,7 +65,7 @@ function prisma() {
       prismaClient = new PrismaClient({ datasources: { db: { url } } }, prismaOptions)
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
-   }
+    <%_}_%>
   <%_} else { _%>
     if (cacheMap.has('default')) return cacheMap.get('default')
     prismaClient = new PrismaClient(prismaOptions)

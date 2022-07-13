@@ -1,5 +1,8 @@
 const { DataSource } = require('apollo-datasource')
 const { messageBus } = require('@totalsoft/message-bus')
+<%_ if(withMultiTenancy){ _%>
+  const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
+<%_}_%>
 
 class MessagingDataSource extends DataSource {
   constructor() {
@@ -13,21 +16,18 @@ class MessagingDataSource extends DataSource {
     const ctx = config.context
     this.context = {
         <%_ if(withMultiTenancy){ _%>
-        tenantId: ctx.externalTenantId,
-        <%_}_%> 
+        tenantId:isMultiTenant ? ctx?.tenant?.id : undefined,
+        <%_}_%>
         correlationId: ctx.correlationId,
         token: ctx.token,
-        userId: ctx.externalUser?.id
+        externalUser: ctx.externalUser
     }
-    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.context.UserId })
+    this.envelopeCustomizer = headers => ({ ...headers, UserId: this.context.externalUser.id })
     this.msgBus = messageBus()
   }
 
   publish(topic, msg) {
-    return this.msgBus.publish(topic, msg, this.context, headers => ({
-      ...headers,
-      userId: this.context.UserId
-    }))
+    return this.msgBus.publish(topic, msg, this.context, this.envelopeCustomizer)
   }
 
   subscribe(topic, handler, opts) {

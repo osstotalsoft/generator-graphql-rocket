@@ -1,13 +1,24 @@
 
-const { tenantFactory <%if(dataLayer == "prisma") {%>, useTenantContext<% } %>  } = require("../../../multiTenancy")
 const { envelope } = require("@totalsoft/message-bus")
+const { tenantService } = require("@totalsoft/tenant-configuration");
+<%if(dataLayer == "prisma") {%>
+const { useTenantContext } = require("../../../multiTenancy")
+<% } %>
+<%_ if(withMultiTenancy){ _%>
+  const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
+<%_}_%>
 
 const tenantIdentification = () => async (ctx, next) => {
-    const externalTenantId = getTenantIdFromMessage(ctx.received.msg)
-    const tenant = await tenantFactory.getTenantFromId(tenantId)
+    if (!isMultiTenant) {
+      ctx.tenant = {};
+      await next();
+      return;
+    }
+    const tenantId = getTenantIdFromMessage(ctx.received.msg);
+    const tenant = await tenantService.getTenantFromId(tenantId);
+
     if (tenant) {
-        ctx.tenantId = tenant?.id
-        ctx.externalTenantId = externalTenantId
+        ctx.tenant = tenant;
 
         <%_ if(dataLayer == "prisma") {_%>
         await useTenantContext(tenant, async () => {
