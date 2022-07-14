@@ -21,6 +21,11 @@ RUN <%=packageManager%> install
 # Bundle app source
 COPY --chown=$imageUser:$imageUserGroup . .
 
+<%_ if(dataLayer === "prisma"){ _%>
+RUN apt update && apt install openssl
+RUN npx prisma generate --schema=./prisma/schema.prisma
+<%_}_%>
+
 USER $imageUser
 
 EXPOSE 4000
