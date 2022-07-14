@@ -8,7 +8,7 @@ const generateKnexConfig = ({
   server,
   instanceName,
   port,
-  userId,
+  userName,
   password,
   database,
   trustServerCertificate
@@ -17,7 +17,7 @@ const generateKnexConfig = ({
   connection: {
     server,
     port: parseInt(port) || null,
-    user: userId,
+    user: userName,
     password,
     database,
     options: {
@@ -54,14 +54,14 @@ const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()
     const {
       DB_HOST: server,
       DB_PORT: port,
-      DB_USER: userId,
+      DB_USER: userName,
       DB_PASSWORD: password,
       DB_DATABASE: database,
       DB_INSTANCE_NAME: instanceName,
       DB_TRUST_SERVER_CERTIFICATE: trustServerCertificate
     } = process.env
 
-    connectionInfo = { server, port, userId, password, database, instanceName, trustServerCertificate }
+    connectionInfo = { server, port, userName, password, database, instanceName, trustServerCertificate }
   <%_ if(withMultiTenancy){ _%>
   }
   <%_}_%>

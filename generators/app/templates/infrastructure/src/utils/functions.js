@@ -63,7 +63,6 @@ const sanitizeConnectionInfo = connectionInfo => {
   if (otherParams) {
     connectionInfo = { ...connectionInfo, ...humps.camelizeKeys(Object.fromEntries(otherParams)) }
   }
-  connectionInfo.userId = connectionInfo.userId || connectionInfo.userName
 
   return connectionInfo
 }
