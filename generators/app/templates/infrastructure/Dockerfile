@@ -22,7 +22,7 @@ RUN <%=packageManager%> install
 COPY --chown=$imageUser:$imageUserGroup . .
 
 <%_ if(dataLayer === "prisma"){ _%>
-RUN apt update && apt install openssl
+RUN apt update && apt install openssl -y
 RUN npx prisma generate --schema=./prisma/schema.prisma
 <%_}_%>
 
