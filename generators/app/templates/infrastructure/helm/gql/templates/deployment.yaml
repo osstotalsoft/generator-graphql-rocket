@@ -63,6 +63,7 @@ spec:
           resources:
             {{- toYaml $current.resources | trim | nindent 12 }}
           env:
+<%_ if(dataLayer == "knex"){ _%>
           - name: DB_HOST
             value: {{ $global.db.host | quote }}
           - name: DB_PORT
@@ -83,6 +84,7 @@ spec:
             value: {{ $global.db.instanceName | quote }}
           - name: DB_TRUST_SERVER_CERTIFICATE
             value: {{ $global.db.trustServerCertificate | quote }}
+<%_}_%>
 <%_ if(addMessaging) { _%>
           - name: Messaging__TopicPrefix
             value: {{ $global.messaging.topicPrefix | quote }}
@@ -126,6 +128,10 @@ spec:
           {{- else }}
             value: "true"
           {{- end }}
+<%_}_%>
+<%_ if(withMultiTenancy){ _%>
+          - name: IS_MULTITENANT
+            value: {{ $global.multiTenancy.tenancyType | eq "MultiTenant" | quote }}
 <%_}_%>
           {{- range $key, $value := $current.env }}
           - name: {{ $key }}

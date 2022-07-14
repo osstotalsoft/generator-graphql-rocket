@@ -153,7 +153,7 @@ const subscriptionServer = useServer(
       onDisconnect: (_ctx, code, reason) =>
         code != 1000 && console.info(`Subscription server disconnected! Code: ${code} Reason: ${reason}`),
       onError: (ctx, msg, errors) => console.error("Subscription error!", { ctx, msg, errors }),
-      context: async (ctx, msg, _args) => {
+      context: async (ctx, <% if(addGqlLogging){ %>_<%}%>msg, _args) => {
         <%_ if(withMultiTenancy){ _%>
             const { tenant } = ctx;
         <%_}_%>

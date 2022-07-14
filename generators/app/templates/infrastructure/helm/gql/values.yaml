@@ -23,6 +23,10 @@ global:
     csi:
       secretProviderClass: <%= helmChartName %>-runtime-secrets
 
+<%_ if(withMultiTenancy){ _%>
+  multiTenancy:
+    tenancyType: "MonoTenant" # "MultiTenant" "MonoTenant"
+<%_}_%>
 <%_ if(addTracing){ _%>
   jaeger:
     enabled: true
@@ -97,9 +101,12 @@ gql:
 <%_ if(addGqlLogging){ _%>
     APOLLO_LOGGING_LEVEL: "DEBUG"
 <%_}_%>
-<%_ if(withMultiTenancy){ _%>
-    IS_MULTITENANT: "false"
+<%_ if(dataLayer == "prisma"){ _%>
+    DATABASE_URL: "sqlserver://{server}:{port};database={database};user={user};password={password};trustServerCertificate=true"
+    PRISMA_DB_URL_PATTERN: "sqlserver://{server}:{port};database={database};user={user};password={password};trustServerCertificate=true"
 <%_}_%>
+<%_ if(dataLayer == "knex"){ _%>
     KNEX_LOGGING: "true"
+<%_}_%>
     PORT: "4000"
     #
