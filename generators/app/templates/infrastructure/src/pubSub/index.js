@@ -1,2 +1,2 @@
 module.exports.topics = require("./topics")
-module.exports.redisPubSub = require("./redisPubSub")
+module.exports.pubSub = require("./redisPubSub")

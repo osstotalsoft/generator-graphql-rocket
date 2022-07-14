@@ -2,9 +2,9 @@
 const UserApi = require('../features/user/dataSources/userApi');
 <%_ if(dataLayer == "knex") {_%>
 const UserDb = require('../features/user/dataSources/userDb');
-    <%_ if(withMultiTenancy){ _%>
+<%_}_%>
+<%_ if(withMultiTenancy){ _%>
 const TenantIdentityApi = require('../features/tenant/dataSources/tenantIdentityApi');
-    <%_}_%>
 <%_}_%>
 <%_}_%>
 
@@ -21,7 +21,6 @@ module.exports.getDataSources = () => ({
 <%_}_%>
 })
 
-// This is a temporary fix to pass dataSources to ws requests. This will be fixed in Apollo server v3.0
 module.exports.initializedDataSources = (context <% if(dataLayer == "knex") {%>, dbInstance<%}%>, dataSources) => {
 // You need to initialize you datasources here e.g.: dataSources.userApi.initialize({ context })
 <%_if(addQuickStart){ _%>

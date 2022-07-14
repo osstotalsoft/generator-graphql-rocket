@@ -1,9 +1,9 @@
 const jwt = require("koa-jwt");
 const jwksRsa = require("jwks-rsa");
 const jsonwebtoken = require('jsonwebtoken');
-<% if(addSubscriptions){ %>
+<%_ if(addSubscriptions){ _%>
 const { CloseCode } = require("graphql-ws");
-<%}%>
+<%_}_%>
 const { IDENTITY_AUTHORITY, IDENTITY_OPENID_CONFIGURATION } = process.env;
 
 const client = {

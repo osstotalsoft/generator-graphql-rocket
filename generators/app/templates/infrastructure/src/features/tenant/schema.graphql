@@ -5,7 +5,7 @@ type Tenant {
 }
 
 type IdentityTenant {
-    tenantId: ID!
+    id: ID!
     name: String
     code: String
     tier: String

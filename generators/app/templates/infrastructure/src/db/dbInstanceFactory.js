@@ -21,13 +21,13 @@ const dbInstanceFactory = async () => {
     const {
       DB_HOST: server,
       DB_PORT: port,
-      DB_USER: userId,
+      DB_USER: userName,
       DB_PASSWORD: password,
       DB_DATABASE: database,
       DB_INSTANCE_NAME: instanceName,
       DB_TRUST_SERVER_CERTIFICATE: trustServerCertificate
     } = process.env
-    const dbConfig = generateKnexConfig({ server, port, userId, password, database, instanceName, trustServerCertificate })
+    const dbConfig = generateKnexConfig({ server, port, userName, password, database, instanceName, trustServerCertificate })
     let dbInstance = new Knex(dbConfig)
 
     if (!dbInstance) {

@@ -6,14 +6,14 @@ const defaultPrettierOptions = {
   tabWidth: 2,
   singleQuote: true,
   semi: false,
-  trailingComma: "none",
-  arrowParens: "avoid"
+  trailingComma: 'none',
+  arrowParens: 'avoid'
 }
 
 const prettierTransform = function (defaultOptions) {
   const transform = (file, encoding, callback) => {
     /* Resolve from the projects config */
-    prettier.resolveConfig(file.relative).then((options) => {
+    prettier.resolveConfig(file.relative).then(options => {
       const str = file.contents.toString('utf8')
       if (!options || Object.keys(options).length === 0) {
         options = defaultOptions
@@ -32,5 +32,5 @@ const prettierTransform = function (defaultOptions) {
 
 module.exports = {
   prettierTransform,
-  defaultTsPrettierOptions: defaultPrettierOptions,
+  defaultPrettierOptions
 }

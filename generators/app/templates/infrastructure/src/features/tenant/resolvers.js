@@ -1,7 +1,3 @@
-<%_ if(dataLayer == "prisma") {_%>
-    const { pascalizeKeys } = require('humps')
-    const { prisma } = require('../../prisma')
-<%_}_%>
 const { tenantService } = require('@totalsoft/tenant-configuration')
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 
