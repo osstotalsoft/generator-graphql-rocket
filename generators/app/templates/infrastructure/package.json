@@ -9,6 +9,7 @@
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
+    "postinstall": "npx sort-package-json",
     "start": "cross-env NODE_ENV=development nodemon src/index.js",
     "start:production": "cross-env NODE_ENV=production node src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",

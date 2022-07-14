@@ -6,7 +6,7 @@ const yosay = require('yosay')
 const { append, concat } = require('ramda')
 const questions = require('./questions')
 const { checkForLatestVersion } = require('../utils')
-const { prettierTransform, defaultTsPrettierOptions: defaultPrettierOptions } = require('../generator-transforms')
+const { prettierTransform, defaultPrettierOptions } = require('../generator-transforms')
 const filter = require('gulp-filter')
 
 module.exports = class extends Generator {
