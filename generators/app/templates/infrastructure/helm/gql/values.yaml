@@ -98,12 +98,12 @@ gql:
 <%_}_%>
     IDENTITY_API_URL: "[IDENTITY_API_URI]"
     IDENTITY_AUTHORITY: "[IDENTITY_AUTHORITY_URL]"
-<%_ if(addGqlLogging){ _%>
-    APOLLO_LOGGING_LEVEL: "DEBUG"
-<%_}_%>
+    APOLLO_LOGGING_LEVEL: "ERROR"
 <%_ if(dataLayer == "prisma"){ _%>
     DATABASE_URL: "sqlserver://{server}:{port};database={database};user={user};password={password};trustServerCertificate=true"
+  <%_ if(withMultiTenancy && !hasSharedDb){ _%>
     PRISMA_DB_URL_PATTERN: "sqlserver://{server}:{port};database={database};user={user};password={password};trustServerCertificate=true"
+  <%_}_%>
 <%_}_%>
 <%_ if(dataLayer == "knex"){ _%>
     KNEX_LOGGING: "true"

@@ -38,7 +38,6 @@ module.exports = class extends Generator {
       withMultiTenancy,
       hasSharedDb,
       addTracing,
-      addGqlLogging,
       withRights,
       packageManager,
       helmChartName,
@@ -94,7 +93,6 @@ module.exports = class extends Generator {
     if (!hasSharedDb)
       ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
     if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/__mocks__/opentracing.js'], ignoreFiles)
-    if (!addGqlLogging) ignoreFiles = concat(['**/utils/logging.js'], ignoreFiles)
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],
