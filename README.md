@@ -398,7 +398,7 @@ CREATE TABLE [dbo].[EventLog](
 ```
 
 In addition, the errors thrown inside Apollo Server, can be wrapped in a 'user friendly message'. This increases the security of your application by making sure there are no sensitive data leaks. 
-To activate this feature, use the `secure: true` option when instantiating the plugin:
+To activate this feature, use the `securedMessages: true` option when instantiating the plugin:
 
 ```javascript
 new ApolloLoggerPlugin({ securedMessages: false })
