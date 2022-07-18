@@ -8,8 +8,7 @@ describe('test package installers', () => {
   jest.setTimeout(10 * 1000)
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
-  const gqlPort = '4000'
-  const dbConnectionName   = 'testDatabase'
+  const dbConnectionName = 'testDatabase'
   const npm = '>= 7.16.0'
   const yarn = '>= 1.22.4'
 
@@ -27,14 +26,12 @@ describe('test package installers', () => {
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
         projectName,
-        gqlPort,
         withMultiTenancy: true,
         hasSharedDb: false,
         dbConnectionName,
         addSubscriptions: true,
         addMessaging: false,
         withRights: true,
-        addGqlLogging: true,
         addHelm: true,
         addTracing: true,
         packageManager: 'npm'
@@ -53,14 +50,12 @@ describe('test package installers', () => {
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
         projectName,
-        gqlPort,
         withMultiTenancy: true,
         hasSharedDb: false,
         dbConnectionName,
         addSubscriptions: true,
         addMessaging: false,
         withRights: true,
-        addGqlLogging: true,
         addHelm: true,
         addTracing: true,
         packageManager: 'yarn'

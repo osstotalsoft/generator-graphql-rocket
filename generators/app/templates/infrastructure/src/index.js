@@ -33,11 +33,8 @@ const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy)
   { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
 <%_}_%>
 
-<%_ if(addGqlLogging) {_%>
 // Logging
-const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger'),
-  { saveLogs } = require('./utils/logging')
-<%_}_%>
+const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger')
 
 <%_ if(addTracing){ _%>
 // Tracing
@@ -95,28 +92,24 @@ app.use(jwtTokenUserIdentification);
 app.use(contextDbInstance());
 <%_}_%>
 
-<%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
 const plugins = [
-    ApolloServerPluginDrainHttpServer({ httpServer }),
-    <%_ if(addSubscriptions) {_%>
-    {
-        async serverWillStart() {
-            return {
-            async drainServer() {
-                await subscriptionServer.dispose();
-            }
-            };
-        }
-        },
-    <%_}_%>
-    <%_ if(addGqlLogging) {_%>
-      new ApolloLoggerPlugin({ persistLogs: true, persistLogsFn: saveLogs, securedMessages: true }),
-    <%_}_%>
-    <%_ if(addTracing){ _%>
-        tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {}
-    <%_}_%>
+  ApolloServerPluginDrainHttpServer({ httpServer }),
+  new ApolloLoggerPlugin({ persistLogs: false, securedMessages: false }),
+  <%_ if(addSubscriptions) {_%>
+  {
+      async serverWillStart() {
+          return {
+          async drainServer() {
+              await subscriptionServer.dispose();
+          }
+          };
+      }
+      },
+  <%_}_%>
+  <%_ if(addTracing){ _%>
+      tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {}
+  <%_}_%>
 ]
-<%_}_%>
 
 
 <%_ if(addSubscriptions){ _%>
@@ -153,7 +146,7 @@ const subscriptionServer = useServer(
       onDisconnect: (_ctx, code, reason) =>
         code != 1000 && console.info(`Subscription server disconnected! Code: ${code} Reason: ${reason}`),
       onError: (ctx, msg, errors) => console.error("Subscription error!", { ctx, msg, errors }),
-      context: async (ctx, <% if(addGqlLogging){ %>_<%}%>msg, _args) => {
+      context: async (ctx, msg, _args) => {
         <%_ if(withMultiTenancy){ _%>
             const { tenant } = ctx;
         <%_}_%>
@@ -165,9 +158,7 @@ const subscriptionServer = useServer(
             }
         <%_}_%>
         const dataSources = getDataSources()
-        <%_ if(addGqlLogging){ _%>
-        const { logInfo, logDebug, logError } = initializeLogger(<% if(dataLayer == "knex") {%>{...ctx, dbInstance}<%} else {%> ctx <%}%>, msg?.payload?.operationName, true, saveLogs)
-        <%_}_%>
+        const { logInfo, logDebug, logError } = initializeLogger(ctx, msg?.payload?.operationName, true, saveLogs)
 
         return {
             ...ctx,
@@ -181,9 +172,7 @@ const subscriptionServer = useServer(
             <%_}else{_%>
             dataSources: initializedDataSources(ctx, dataSources),
             <%_}_%>
-            <%_ if(addGqlLogging){ _%>
             logger: { logInfo, logDebug, logError }
-            <%_}_%>
         }
       }
     },
@@ -198,33 +187,27 @@ console.info('Creating Apollo Server...')
 const server = new ApolloServer({
     schema,
     uploads: false,
-    <%_ if(addGqlLogging || addTracing || addSubscriptions) {_%>
     plugins,
-    <%_}_%>
     dataSources: getDataSources,
     context: async ({ ctx }) => {
-        const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
-        <%_ if(addGqlLogging) {_%>
-          const { logInfo, logDebug, logError } = initializeLogger(<% if(dataLayer == "knex") {%>{...ctx, dbInstance}<%} else {%> ctx <%}%>, request?.body?.operationName, true, saveLogs)
+      const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
+      const { logInfo, logDebug, logError } = initializeLogger(ctx, request?.body?.operationName, true, saveLogs)
+      return {
+        token,
+        <%_ if(dataLayer == "knex") {_%>
+        dbInstance,
+        dbInstanceFactory,
+        dataLoaders: getDataLoaders(dbInstance),
         <%_}_%>
-        return {
-            token,
-            <%_ if(dataLayer == "knex") {_%>
-            dbInstance,
-            dbInstanceFactory,
-            dataLoaders: getDataLoaders(dbInstance),
-            <%_}_%>
-            <%_ if(withMultiTenancy){ _%>
-            tenant,
-            <%_}_%>
-            externalUser,
-            correlationId,
-            request,
-            requestSpan
-            <%_ if(addGqlLogging) {_%>,
-            logger: { logInfo, logDebug, logError }
-            <%_}_%>
-        };
+        <%_ if(withMultiTenancy){ _%>
+        tenant,
+        <%_}_%>
+        externalUser,
+        correlationId,
+        request,
+        requestSpan,
+        logger: { logInfo, logDebug, logError }
+      }
     }
 })
 

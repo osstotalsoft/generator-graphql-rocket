@@ -18,12 +18,6 @@ module.exports = [
     default: 'new-gql-server'
   },
   {
-    type: 'input',
-    name: 'gqlPort',
-    message: 'What will be your gql server port?',
-    default: '4000'
-  },
-  {
     type: 'list',
     name: 'dataLayer',
     message: 'What data integration layer technology you would like to use?',
@@ -81,12 +75,6 @@ module.exports = [
     choices: ['nats', 'rusi'],
     when: prompts => prompts.addMessaging,
     default: 'nats'
-  },
-  {
-    type: 'confirm',
-    name: 'addGqlLogging',
-    message: 'Would you like to include GraphQL logging plugin?',
-    default: false
   },
   {
     type: 'confirm',

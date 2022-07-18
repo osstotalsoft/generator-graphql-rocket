@@ -59,29 +59,29 @@ yo @totalsoft/graphql-rocket
 You will be prompted to introduce the following information:
 
 1. The project name. This will also be the name of the folder in which the new server will live. A valid project name, only includes lower and upper case letters, digits and '-' or '_' separators! No special characters and whitespace are allowed and do not start or end with a separator!
-2. GraphQL port. By default it would be set to `4000`
-3. What data integration layer technology you would like to use? You can choose between `Prisma` and `Knex JS`
-4. Include multi-tenancy. By default is set to false. <mark>(⚠ For now multi-tenancy option is not available with `Prisma`)</mark>
-5. Use shared database. By default set to false. (only for multi-tenant projects)
-6. Database connection name. (only for multi-tenant projects)
-7. Use subscriptions. By default is set to false.
-8. Add messaging integration. By default is set to false.
-9. Implement authorization. By default is set to false. This includes rights and permissions.
-10. Include GraphQL logging plugin. By default is set to false. This also catches all error and throws an error friendly message. Read more bellow.
-11. Whether to generate default helm files or not.
-12. The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
-13. Add Opentracing using Jaeger. By default is set to false.
-14. Would you like to include quick start examples? If so, some end to end examples will be included in your new generated project to help you get started.
-15. What package manager you wish to use to install the application dependencies. (npm or yarn).
+2. What data integration layer technology you would like to use? You can choose between `Prisma` and `Knex JS`
+3. Include multi-tenancy. By default is set to false.
+   - Does your multi-tenancy implementation uses a single shared database? By default set to false.
+   - Your multi-tenant database connection name.
+4. Use subscriptions. By default is set to false.
+5. Add messaging integration. By default is set to false.
+6. Implement authorization. By default is set to false. This includes rights and permissions.
+7. Whether to generate default helm files or not.
+   -  The name of your helm chart. Provide a valid helm chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!
+8.  Add Opentracing using Jaeger. By default is set to false.
+9.  Would you like to include quick start examples? If so, some end to end examples will be included in your new generated project to help you get started.
+10. What package manager you wish to use to install the application dependencies. (npm or yarn).
 
-> ⚠If you decided to use **Prisma** as you data layer technology, make sure you introspected your database and generated **Prisma Client **instance. 
+> ⚠ If you decided to use **Prisma** as you data layer technology, make sure you introspected your database and generated **Prisma Client **instance. 
 > 
 > You can find more information here -> [Setting up Prisma to an existing project](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases-typescript-postgres/)
 > 
-> Or you can just run the following command:`npm run prisma` 
+> Or you can just run the following command: `npm run prisma` 
 
 
-If you would like to start the application, simply run ``npm start`` in the newly created folder, otherwise you can begin editing and writing your application!
+To start the application, simply run: ``npm start``
+
+>Your newly generated GraphQL server runs by default on port  `4000`. To change it check-out .ENV variable `PORT`.
 
 ## Upgrade existing project
 
@@ -373,7 +373,7 @@ You can find more details [here](https://github.com/osstotalsoft/nodebb/blob/mas
 
 ## Logging
 
-This features uses [@totalsoft/apollo-logger](https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/apollo-logger#apollo-logger) which comes with an Apollo logging plugin, that helps you monitor the execution of your GraphQL operations with the use of the request life cycle events. 
+This features uses [@totalsoft/apollo-logger](https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/apollo-logger#apollo-logger) which comes with an Apollo logging plugin, that helps you monitor the execution of your GraphQL operations with the use of the request lifecycle events. 
 
 Read  more about Apollo Server plugins here: [Plugins](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)
 
@@ -381,7 +381,7 @@ If desired, the logs can be persisted in a database, file or somewhere else, see
 
 This generator whishes to provide an example of `saveLogs` implementation that can be found in `utils/logging.js` file. 
 
-Assuming that by default all the logs are saved in an SQL Server database, the following table should be created: 
+The provided helper function for logging persistance, requires the following `EventLogs` table to be created in your database.
 
 ```
 CREATE TABLE [dbo].[EventLog](
@@ -397,7 +397,12 @@ CREATE TABLE [dbo].[EventLog](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 ```
 
-In addition, the errors thrown inside Apollo Server, are wrapped in a 'user friendly message'. This increases the security of your application by making sure there are no sensitive data leaks.
+In addition, the errors thrown inside Apollo Server, can be wrapped in a 'user friendly message'. This increases the security of your application by making sure there are no sensitive data leaks. 
+To activate this feature, use the `securedMessages: true` option when instantiating the plugin:
+
+```javascript
+new ApolloLoggerPlugin({ securedMessages: false })
+```
 
 ## OpenTracing
 
