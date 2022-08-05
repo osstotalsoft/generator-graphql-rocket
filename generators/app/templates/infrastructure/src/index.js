@@ -263,7 +263,7 @@ const skipMiddleware = (_ctx, next) => next()
 <%_ if(addMessaging) {_%>
 const msgHost = messagingHost();
 msgHost
-    .subscribe([/*topics*/])
+    .subscribe(Object.keys(msgHandlers), SubscriptionOptions.PUB_SUB)
     .use(exceptionHandling())
     .use(middleware.correlation())
     <%_ if(addMessaging && withMultiTenancy) {_%>
