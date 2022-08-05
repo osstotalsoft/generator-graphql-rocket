@@ -102,7 +102,6 @@ spec:
             value: {{ $current.messaging.source | quote }}
           - name: Messaging__Transport
             value: {{ $global.messaging.transport | quote }}
-          {{- if lower $global.messaging.transport | eq "nats" }}
           - name: NATS_URL
             value: {{ $global.messaging.natsUrl | quote }}
           - name: NATS_CLUSTER
@@ -113,7 +112,6 @@ spec:
             value: {{ $current.messaging.clientId | quote }}
           - name: NATS_Q_GROUP
             value: {{ $current.messaging.natsQGroup | quote }}
-          {{- end }}
 <%_}_%>
           - name: DIAGNOSTICS_ENABLED
             value: {{ $global.diagnostics.enabled | quote }}
