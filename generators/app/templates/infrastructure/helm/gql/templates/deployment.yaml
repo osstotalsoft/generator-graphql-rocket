@@ -81,7 +81,7 @@ spec:
           - name: DB_DATABASE
             value: {{ $global.db.database | quote }}
 <%_ if(addVaultConfigs){ _%>
-          {{- if not $global.vaultEnvironment | ne "true" }}
+          {{- if not $global.vaultEnvironment | eq "false" }}
 <%_}_%>
           - name: DB_USER
             value: {{ $global.db.user | quote }}
