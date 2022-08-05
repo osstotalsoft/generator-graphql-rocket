@@ -26,7 +26,7 @@ spec:
     metadata:
       annotations:
     <%_ if(addVaultConfigs){ _%>
-    {{- if $global.vaultEnvironment }}
+    {{- if $global.vaultEnvironment | eq "true" }}
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-pre-populate-only: "true"
         vault.hashicorp.com/role: {{ $global.vaultConfigs.role }}
@@ -44,7 +44,7 @@ spec:
         {{- include "Gql.selectorLabels" . | nindent 8 }}
     spec:
     <%_ if(addVaultConfigs){ _%>
-      {{- if $global.vaultEnvironment }}
+      {{- if $global.vaultEnvironment | eq "true" }}
       serviceAccountName: {{ $global.vaultConfigs.sa }}
       {{- end }}
     <%_}_%>
@@ -81,7 +81,7 @@ spec:
           - name: DB_DATABASE
             value: {{ $global.db.database | quote }}
 <%_ if(addVaultConfigs){ _%>
-          {{- if not $global.vaultEnvironment  }}
+          {{- if not $global.vaultEnvironment | ne "true" }}
 <%_}_%>
           - name: DB_USER
             value: {{ $global.db.user | quote }}

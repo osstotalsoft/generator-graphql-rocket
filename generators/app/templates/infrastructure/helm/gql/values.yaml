@@ -6,7 +6,7 @@ global:
   - name: "registrykey"
 
 <%_ if(addVaultConfigs){ _%>
-  vaultEnvironment: false
+  vaultEnvironment: "false"
 
   vaultConfigs:
     sa: "sa"

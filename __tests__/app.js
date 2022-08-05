@@ -125,7 +125,7 @@ describe('generator-graphql-rocket:app', () => {
       .then(() => {
         assert.fileContent(
           path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
-          `vaultEnvironment: false`
+          `vaultEnvironment: "false"`
         )
       }))
 
