@@ -69,14 +69,14 @@ module.exports = class extends Generator {
     if (dataLayer === 'knex' && withMultiTenancy)
       ignoreFiles = concat(
         [
-          '**/multiTenancy/tenantManager.js',
+          '**/multiTenancy/tenantContextAccessor.js',
           '**/multiTenancy/index.js',
           '**/db/dbInstanceFactory.js',
           '**/startup/middleware'
         ],
         ignoreFiles
       )
-    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**'], ignoreFiles)
+    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/startup/subscriptions/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
 
     if (!withMultiTenancy)
@@ -85,14 +85,15 @@ module.exports = class extends Generator {
           '**/features/tenant/**',
           '**/multiTenancy/**',
           '**/middleware/tenantIdentification/**',
-          '**/startup/middleware',
-          '**/prisma/tenancyFilter.js'
+          '**/startup/subscriptions/middleware/tenantContext.js',
+          '**/prisma/tenancyFilter.js',
+          '**/pubsub/middleware/tenantPublish.js'
         ],
         ignoreFiles
       )
     if (!hasSharedDb)
       ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
-    if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/__mocks__/opentracing.js'], ignoreFiles)
+    if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/startup/middleware/tracing.js', '**/pubsub/middlware/tracingPublish.js', '**/__mocks__/opentracing.js'], ignoreFiles)
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],

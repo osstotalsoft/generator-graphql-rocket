@@ -1,9 +1,12 @@
 
 const { dbInstanceFactory } = require('../../db');
+<%_ if(withMultiTenancy){ _%>
+const { tenantContextAccessor } = require("../../multiTenancy");
+<%_}_%>
 
 const dbInstance = () => async (ctx, next) => {
   <%_ if(withMultiTenancy){ _%>
-  const { tenant } = ctx
+  const { tenant } = tenantContextAccessor.getTenantContext();
   if (tenant) {
     const dbInstance = await dbInstanceFactory(tenant.id)
     ctx.dbInstance = dbInstance

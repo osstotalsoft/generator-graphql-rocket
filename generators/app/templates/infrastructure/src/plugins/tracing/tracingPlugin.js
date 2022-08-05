@@ -1,8 +1,10 @@
 const { getExternalSpan, traceError, traceErrors } = require("../../tracing/tracingUtils");
 const SpanContext = require("./spanContext");
+const opentracing = require("opentracing");
 
 const alwaysTrue = () => true;
 const emptyFunction = () => { };
+const componentName = "gql-apollo";
 
 function getFieldName(info) {
     if (
@@ -34,18 +36,21 @@ module.exports = ({
             }
 
             const activeSpan = context.requestSpan || getExternalSpan(tracer, request)
-            const rootSpan =
+            const requestSpan =
                 tracer.startSpan("request " + request.operationName, {
                     childOf: activeSpan || undefined,
                 });
+            requestSpan.setTag(opentracing.Tags.COMPONENT, componentName);
 
-            onRequestResolving(rootSpan, requestInfo);
+            onRequestResolving(requestSpan, requestInfo);
 
             return {
                 parsingDidStart(_requestContext) {
                     const parseSpan = tracer.startSpan("parse", {
-                        childOf: rootSpan
+                        childOf: requestSpan
                     });
+                    parseSpan.setTag(opentracing.Tags.COMPONENT, componentName);
+
                     return (error) => {
                         traceError(parseSpan, error)
                         parseSpan.finish()
@@ -53,8 +58,10 @@ module.exports = ({
                 },
                 validationDidStart(_requestContext) {
                     const validationSpan = tracer.startSpan("validation", {
-                        childOf: rootSpan
+                        childOf: requestSpan
                     });
+                    validationSpan.setTag(opentracing.Tags.COMPONENT, componentName);
+
                     return (errors) => {
                         traceErrors(validationSpan, errors)
                         validationSpan.finish()
@@ -62,8 +69,10 @@ module.exports = ({
                 },
                 executionDidStart(_requestContext) {
                     const executionSpan = tracer.startSpan("execution", {
-                        childOf: rootSpan
+                        childOf: requestSpan
                     });
+                    executionSpan.setTag(opentracing.Tags.COMPONENT, componentName);
+
                     const spanContext = SpanContext()
                     return ({
                         willResolveField(fieldContext) {
@@ -80,6 +89,7 @@ module.exports = ({
                             const resolveFieldSpan = tracer.startSpan("resolve " + getFieldName(info), {
                                 childOf: parentSpan
                             });
+                            resolveFieldSpan.setTag(opentracing.Tags.COMPONENT, componentName);
 
                             spanContext.addSpan(resolveFieldSpan, info);
                             onFieldResolving(fieldContext);
@@ -96,20 +106,20 @@ module.exports = ({
                     })
                 },
                 didResolveSource({ request }) {
-                    rootSpan.log({ event: 'didResolveSource', operation: request.operationName });
+                    requestSpan.log({ event: 'didResolveSource', operation: request.operationName });
                 },
                 didResolveOperation({ request }) {
-                    rootSpan.log({ event: 'didResolveOperation', operation: request.operationName });
+                    requestSpan.log({ event: 'didResolveOperation', operation: request.operationName });
                 },
                 responseForOperation({ request }) {
-                    rootSpan.log({ event: 'responseForOperation', operation: request.operationName });
+                    requestSpan.log({ event: 'responseForOperation', operation: request.operationName });
                 },
                 didEncounterErrors: async ({ errors, ..._requestContext }) => {
-                    traceErrors(rootSpan, errors, false)
+                    traceErrors(requestSpan, errors, false)
                 },
                 willSendResponse: async ({ context: _requestContext, response }) => {
-                    onRequestResolved(rootSpan, response)
-                    rootSpan.finish();
+                    onRequestResolved(requestSpan, response)
+                    requestSpan.finish();
                 }
             }
         }

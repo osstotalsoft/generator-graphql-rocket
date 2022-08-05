@@ -2,7 +2,7 @@ const { camelizeKeys } = require('humps')
 const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
-const { getTenantContext } = require('../multiTenancy/tenantManager')
+const { tenantContextAccessor } = require('../multiTenancy')
 <%_ if(hasSharedDb){ _%>
   const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
 <%_}else{_%>
@@ -33,7 +33,7 @@ function prisma() {
   let prismaClient
   <%_ if(withMultiTenancy){ _%>
   if (isMultiTenant) {
-    const { id, connectionInfo } = getTenantContext()
+    const { tenant: { id }, connectionInfo } = tenantContextAccessor.getTenantContext()
     if (!id || !connectionInfo) throw new Error(`Could not identify tenant!`)
 
     if (cacheMap.has(id)) return cacheMap.get(id)

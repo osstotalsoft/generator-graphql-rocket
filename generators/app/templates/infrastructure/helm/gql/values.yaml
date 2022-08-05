@@ -2,14 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-
   imagePullSecrets:
   - name: "registrykey"
 
 <%_ if(addVaultConfigs){ _%>
-  vaultEnvironment: "false"
+  vaultEnvironment: false
 
-#default values
   vaultConfigs:
     sa: "sa"
     role: "role"
@@ -23,10 +21,22 @@ global:
     csi:
       secretProviderClass: <%= helmChartName %>-runtime-secrets
 
+  gateway:
+    enabled: false
+
+  metrics:
+    enabled: false
+    port: 9464
+
+  diagnostics:
+    enabled: false
+    port: 40001
+
 <%_ if(withMultiTenancy){ _%>
   multiTenancy:
     tenancyType: "MonoTenant" # "MultiTenant" "MonoTenant"
 <%_}_%>
+
 <%_ if(addTracing){ _%>
   jaeger:
     enabled: true
@@ -43,16 +53,10 @@ global:
 <%_ if(addMessaging) { _%>
   messaging:
     env: <%= projectName %>
-    topicPrefix: <%= projectName %>.
-<%_ if(messagingTransport == 'nats') { _%>
     natsUrl: "nats://[SERVICE].[NAMESPACE]:[PORT]"
     natsCluster: "[CLUSTER_NAME]"
     natsDurableName: durable
-<%_}_%>
-<%_ if(messagingTransport == 'rusi') { _%>
-    rusiPubSubName: "[RUSI_PUBSUB_COMPONENT_NAME]"
-    rusiConfigName: "[RUSI_CONFIG_NAME]"
-<%_}_%>
+    transport: "<%= messagingTransport %>"
 <%_}_%>
   db:
     host: "[DB_HOST]"
@@ -84,17 +88,15 @@ gql:
 <%_ if(addMessaging) { _%>
   messaging:
     source: <%= projectName %>
-<%_ if(messagingTransport == 'nats') { _%>
     clientId: <%= projectName %>
     natsQGroup: <%= projectName %>
-<%_}_%>
 <%_}_%>
 
   # Additional environment variables
   env:
 <%_ if(addSubscriptions) { _%>
-    REDIS_DOMAIN_NAME: ""
-    REDIS_PORT_NUMBER: ""
+    REDIS_DOMAIN_NAME: "[REDIS_DOMAIN_NAME]"
+    REDIS_PORT_NUMBER: "[REDIS_PORT_NUMBER]"
 <%_}_%>
     IDENTITY_API_URL: "[IDENTITY_API_URI]"
     IDENTITY_AUTHORITY: "[IDENTITY_AUTHORITY_URL]"

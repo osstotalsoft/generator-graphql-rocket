@@ -10,6 +10,11 @@ metadata:
     helm.sh/chart: {{ include "Gql.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if $global.gateway.enabled }}
+    api-gateway/oidc.audience: {{ include "Gql.name" . }}{{ $current.nameSuffix }}
+    api-gateway/resource: {{ include "Gql.fullname" . }}{{ $current.nameSuffix }}
+    api-gateway/secured: "false"
+    {{- end }}
 spec:
   type: {{ $current.service.type }}
   ports:

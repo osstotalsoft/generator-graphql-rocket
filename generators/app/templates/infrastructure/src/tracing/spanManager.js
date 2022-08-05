@@ -12,7 +12,7 @@ async function useSpanManager(rootSpan, scopeAction) {
   const context = [rootSpan]
 
   return asyncLocalStorage.run(context, async () => {
-    await scopeAction()
+    return await scopeAction();
   })
 }
 

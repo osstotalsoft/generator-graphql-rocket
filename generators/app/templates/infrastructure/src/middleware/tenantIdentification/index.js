@@ -1,21 +1,14 @@
 
 const jsonwebtoken = require('jsonwebtoken')
 const { tenantService } = require('@totalsoft/tenant-configuration')
+const { tenantContextAccessor } = require("../../multiTenancy");
+
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 
 const tenantIdentification = () => async (ctx, next) => {
-  if (!ctx.tenant) {
-    if (!isMultiTenant) {
-      ctx.tenant = {}
-      await next()
-      return
-    }
+  const tenant = isMultiTenant ? await tenantService.getTenantFromId(getTenantIdFromJwt(ctx)) : {};
 
-    const tenantId = getTenantIdFromJwt(ctx)
-
-    ctx.tenant = await tenantService.getTenantFromId(tenantId)
-  }
-  await next()
+  await tenantContextAccessor.useTenantContext({ tenant }, next);
 }
 
 const getTenantIdFromJwt = ({ token }) => {

@@ -1,4 +1,5 @@
 const jaeger = require('jaeger-client')
+const { correlationManager } = require("../correlation");
 const spanManager = require('./spanManager')
 const CORRELATION_ID = 'nbb.correlation_id'
 
@@ -22,14 +23,14 @@ function _isPrimitive(value) {
   return typeof value !== 'object'
 }
 
-function _shouldTraceFiledResolver({ source, info }) {
+function _shouldTraceFieldResolver({ source, info }) {
   const isResolved = source && typeof source === 'object' && info.path.key in source
   const isPrimitive = isResolved && _isPrimitive(source[info.path.key])
   return !isResolved || !isPrimitive
 }
 
-const _onRequestResolving = (span, info) => {
-  span.setTag(CORRELATION_ID, info.context.correlationId)
+const _onRequestResolving = (span, _info) => {
+  span.setTag(CORRELATION_ID, correlationManager.getCorrelationId());
   spanManager.beginScope(span)
 }
 
@@ -41,7 +42,7 @@ const getApolloTracerPluginConfig = tracer => ({
   tracer,
   onRequestResolving: _onRequestResolving,
   onRequestResolved: _onRequestResolved,
-  shouldTraceFieldResolver: _shouldTraceFiledResolver
+  shouldTraceFieldResolver: _shouldTraceFieldResolver
 })
 
 const shouldTracerSkipLogging = ctx => {

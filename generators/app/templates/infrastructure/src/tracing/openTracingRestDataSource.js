@@ -25,6 +25,7 @@ class OpenTracingRESTDataSource extends RESTDataSource {
     networkSpan.setTag(opentracing.Tags.SPAN_KIND, 'client')
     networkSpan.setTag(opentracing.Tags.HTTP_METHOD, request.method)
     networkSpan.setTag(opentracing.Tags.HTTP_URL, this.baseURL + request.path)
+    networkSpan.setTag(opentracing.Tags.COMPONENT, "gql-rest-data-source");
 
     let injectHeaders = {}
     tracer.inject(networkSpan, opentracing.FORMAT_HTTP_HEADERS, injectHeaders)

@@ -38,6 +38,8 @@
     "lodash.set": "^4.3.2",
       <%_} _%>
     <%_} _%>
+    "@opentelemetry/exporter-prometheus": "^0.27.0",
+    "@opentelemetry/sdk-metrics-base": "^0.27.0",
     "@totalsoft/key-per-file-configuration": "1.0.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
@@ -120,5 +122,8 @@
     "setupFilesAfterEnv": [
       "jest-extended"
     ]
+  },
+  "nodemonConfig": {
+    "ext": "js,mjs,json,graphql"
   }
 }
