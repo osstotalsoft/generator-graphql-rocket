@@ -105,7 +105,7 @@ app.use(contextDbInstance());
 
 const plugins = [
   ApolloServerPluginDrainHttpServer({ httpServer }),
-  new ApolloLoggerPlugin({ persistLogs: false, securedMessages: false }),
+  new ApolloLoggerPlugin({ securedMessages: false }),
   <%_ if(addSubscriptions) {_%>
   {
       async serverWillStart() {
@@ -177,7 +177,11 @@ const subscriptionServer = useServer(
             }
         <%_}_%>
         const dataSources = getDataSources()
-        const { logInfo, logDebug, logError } = initializeLogger(ctx, msg?.payload?.operationName, true)
+        const { logInfo, logDebug, logError } = initializeLogger({
+          context: ctx,
+          operationName: msg?.payload?.operationName,
+          securedMessages: true
+        })
 
         return {
             ...ctx,
@@ -216,7 +220,7 @@ const server = new ApolloServer({
     dataSources: getDataSources,
     context: async ({ ctx }) => {
       const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
-      const { logInfo, logDebug, logError } = initializeLogger(ctx, request?.body?.operationName, true)
+      const { logInfo, logDebug, logError } = initializeLogger({context: ctx, operationName: request?.body?.operationName, securedMessages: true})
       return {
         token,
         <%_ if(dataLayer == "knex") {_%>
