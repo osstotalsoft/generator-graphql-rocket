@@ -23,13 +23,13 @@ function subscribe({ middleware, filter }) {
       : subscribeImpl(
           {
             schema: argsOrSchema,
-            document: document,
-            rootValue: rootValue,
-            contextValue: contextValue,
-            variableValues: variableValues,
-            operationName: operationName,
-            fieldResolver: fieldResolver,
-            subscribeFieldResolver: subscribeFieldResolver
+            document,
+            rootValue,
+            contextValue,
+            variableValues,
+            operationName,
+            fieldResolver,
+            subscribeFieldResolver
           },
           pipeline,
           filter
@@ -63,15 +63,18 @@ function filterAsyncIterable(asyncIterable, predicate) {
 }
 
 function subscribeImpl(args, pipeline, filter) {
-  var schema = args.schema,
-    document = args.document,
-    rootValue = args.rootValue,
-    contextValue = args.contextValue,
-    variableValues = args.variableValues,
-    operationName = args.operationName,
-    fieldResolver = args.fieldResolver,
-    subscribeFieldResolver = args.subscribeFieldResolver;
-  var sourcePromise = createSourceEventStream(
+  const {
+    schema,
+    document,
+    rootValue,
+    contextValue,
+    variableValues,
+    operationName,
+    fieldResolver,
+    subscribeFieldResolver
+  } = args
+
+  const sourcePromise = createSourceEventStream(
     schema,
     document,
     rootValue,
@@ -87,16 +90,16 @@ function subscribeImpl(args, pipeline, filter) {
   // the GraphQL specification. The `execute` function provides the
   // "ExecuteSubscriptionEvent" algorithm, as it is nearly identical to the
   // "ExecuteQuery" algorithm, for which `execute` is also used.
-  var mapSourceToResponse = async function mapSourceToResponse(payload) {
+  const mapSourceToResponse = async function mapSourceToResponse(payload) {
     return pipeline({ message: payload, context: contextValue }, () =>
       execute({
-        schema: schema,
-        document: document,
+        schema,
+        document,
         rootValue: payload,
-        contextValue: contextValue,
-        variableValues: variableValues,
-        operationName: operationName,
-        fieldResolver: fieldResolver
+        contextValue,
+        variableValues,
+        operationName,
+        fieldResolver
       })
     );
   };

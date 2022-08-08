@@ -35,7 +35,6 @@ const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy)
 
 // Logging
 const { ApolloLoggerPlugin, initializeLogger } = require('@totalsoft/apollo-logger')
-const { saveLogs } = require("./utils/logging")
 
 <%_ if(addTracing){ _%>
 // Tracing
@@ -70,7 +69,7 @@ const { introspectionRoute } = require('./utils/functions'),
 
 <%_ if(addSubscriptions){ _%>
 // Subscriptions
-const { middleware: subscriptionMiddleware, subscribe } = require("./startup/subscriptions");
+const { middleware: subscriptionMiddleware, subscribe } = require("./subscriptions");
 const jsonwebtoken = require('jsonwebtoken'),
   { WebSocketServer } = require("ws"),
   { useServer } = require("graphql-ws/lib/use/ws")
@@ -106,7 +105,7 @@ app.use(contextDbInstance());
 
 const plugins = [
   ApolloServerPluginDrainHttpServer({ httpServer }),
-  new ApolloLoggerPlugin({ persistLogs: false, securedMessages: false, persistLogsFn: saveLogs }),
+  new ApolloLoggerPlugin({ persistLogs: false, securedMessages: false }),
   <%_ if(addSubscriptions) {_%>
   {
       async serverWillStart() {
@@ -178,7 +177,7 @@ const subscriptionServer = useServer(
             }
         <%_}_%>
         const dataSources = getDataSources()
-        const { logInfo, logDebug, logError } = initializeLogger(ctx, msg?.payload?.operationName, saveLogs, true)
+        const { logInfo, logDebug, logError } = initializeLogger(ctx, msg?.payload?.operationName, true)
 
         return {
             ...ctx,
@@ -217,7 +216,7 @@ const server = new ApolloServer({
     dataSources: getDataSources,
     context: async ({ ctx }) => {
       const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
-      const { logInfo, logDebug, logError } = initializeLogger(ctx, request?.body?.operationName, saveLogs, true)
+      const { logInfo, logDebug, logError } = initializeLogger(ctx, request?.body?.operationName, true)
       return {
         token,
         <%_ if(dataLayer == "knex") {_%>

@@ -76,7 +76,7 @@ module.exports = class extends Generator {
         ],
         ignoreFiles
       )
-    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/startup/subscriptions/**'], ignoreFiles)
+    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**'], ignoreFiles)
     if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
 
     if (!withMultiTenancy)
@@ -85,7 +85,7 @@ module.exports = class extends Generator {
           '**/features/tenant/**',
           '**/multiTenancy/**',
           '**/middleware/tenantIdentification/**',
-          '**/startup/subscriptions/middleware/tenantContext.js',
+          '**/subscriptions/middleware/tenantContext.js',
           '**/prisma/tenancyFilter.js',
           '**/pubSub/middleware/tenantPublish.js'
         ],
