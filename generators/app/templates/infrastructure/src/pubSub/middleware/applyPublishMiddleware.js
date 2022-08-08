@@ -13,4 +13,4 @@ function applyPublishMiddleware(pubsub, ...middleware) {
   return pubsub
 }
 
-module.exports = { applyPublishMiddleware }
+module.exports = applyPublishMiddleware
