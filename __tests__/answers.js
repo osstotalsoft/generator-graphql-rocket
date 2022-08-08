@@ -58,7 +58,7 @@ describe('test package installers', () => {
       })
       .run()
       .then(() => {
-        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
+        assert.noFile(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/pubSub.js`))
       }))
 
   it('does not contain messaging', () =>

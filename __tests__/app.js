@@ -72,7 +72,7 @@ describe('generator-graphql-rocket:app', () => {
       })
       .run()
       .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
+        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/pubSub.js`))
       }))
 
   it('helm files are added when addHelm option is true', () =>
