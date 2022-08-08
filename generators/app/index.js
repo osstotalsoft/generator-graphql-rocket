@@ -87,13 +87,13 @@ module.exports = class extends Generator {
           '**/middleware/tenantIdentification/**',
           '**/startup/subscriptions/middleware/tenantContext.js',
           '**/prisma/tenancyFilter.js',
-          '**/pubsub/middleware/tenantPublish.js'
+          '**/pubSub/middleware/tenantPublish.js'
         ],
         ignoreFiles
       )
     if (!hasSharedDb)
       ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
-    if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/startup/middleware/tracing.js', '**/pubsub/middlware/tracingPublish.js', '**/__mocks__/opentracing.js'], ignoreFiles)
+    if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/startup/middleware/tracing.js', '**/pubSub/middlware/tracingPublish.js', '**/__mocks__/opentracing.js'], ignoreFiles)
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],

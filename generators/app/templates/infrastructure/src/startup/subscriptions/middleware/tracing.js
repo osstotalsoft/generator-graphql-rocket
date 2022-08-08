@@ -4,7 +4,7 @@ const { useSpanManager } = require("../../../tracing/spanManager");
 const { getExternalSpan, traceError } = require("../../../tracing/tracingUtils");
 const { tenantContextAccessor } = require("../../../multiTenancy");
 const { correlationManager } = require("../../../correlation");
-const messagingEnvelopeHeaderSpanTagPrefix = "pubsub_header"
+const messagingEnvelopeHeaderSpanTagPrefix = "pubSub_header"
 
 const tracing = async (ctx, next) => {
   const tracer = opentracing.globalTracer();

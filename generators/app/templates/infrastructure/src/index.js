@@ -157,7 +157,7 @@ const subscriptionServer = useServer(
       },
       subscribe: subscribe({
         middleware: [subscriptionMiddleware.correlation<% if(withMultiTenancy) {%>, subscriptionMiddleware.tenantContext<%}%><% if(addTracing) {%>, subscriptionMiddleware.tracing<%}%>],
-        <% if(withMultiTenancy) {%>filter: ctx => message => ctx?.tenant?.id?.toLowerCase() === message?.headers?.pubsubTenantId?.toLowerCase()<%}%>
+        <% if(withMultiTenancy) {%>filter: ctx => message => ctx?.tenant?.id?.toLowerCase() === message?.headers?.pubSubTenantId?.toLowerCase()<%}%>
       }),
       onSubscribe: async (ctx, msg) => {
         await validateWsToken(ctx?.token, ctx?.extra?.socket);

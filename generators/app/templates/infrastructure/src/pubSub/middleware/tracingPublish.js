@@ -2,7 +2,7 @@ const opentracing = require('opentracing')
 const { correlationManager } = require('../../correlation')
 const { getActiveSpan } = require('../../tracing/spanManager')
 const { traceError } = require('../../tracing/tracingUtils')
-const messagingEnvelopeHeaderSpanTagPrefix = 'pubsub_header'
+const messagingEnvelopeHeaderSpanTagPrefix = 'pubSub_header'
 
 
 const tracingPublish = async (ctx, next) => {
