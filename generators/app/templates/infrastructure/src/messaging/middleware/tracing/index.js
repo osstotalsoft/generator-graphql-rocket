@@ -35,11 +35,14 @@ const tracing = () => async (ctx, next) => {
       span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, ctx.received.msg.headers[header]);
     }
 
-    await useSpanManager(span, async () => {
-        await next()
-    })
-
-    span.finish()
+    try {
+      await useSpanManager(span, next);
+    } catch (error) {
+      traceError(span, error);
+      throw error;
+    } finally {
+      span.finish();
+    }
 }
 
 const tracingPublish = () => async (ctx, next) => {
