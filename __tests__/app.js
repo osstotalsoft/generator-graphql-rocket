@@ -12,7 +12,7 @@ describe('generator-graphql-rocket:app', () => {
   const dbConnectionName = 'testDatabase'
   const defaultAnswers = {
     projectName,
-    withMultiTenancy: true,
+    withMultiTenancy: false,
     hasSharedDb: false,
     dbConnectionName,
     addSubscriptions: false,
@@ -79,9 +79,11 @@ describe('generator-graphql-rocket:app', () => {
     helpers
       .run(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
+      .withPrompts({ projectName })
       .withPrompts({
         ...defaultAnswers,
-        addHelm: true
+        addHelm: true,
+        helmChartName
       })
       .then(() => {
         assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
@@ -118,7 +120,7 @@ describe('generator-graphql-rocket:app', () => {
       .withPrompts({
         ...defaultAnswers,
         addHelm: true,
-        helmChartName: 'test-helm',
+        helmChartName,
         addVaultConfigs: true
       })
       .run()

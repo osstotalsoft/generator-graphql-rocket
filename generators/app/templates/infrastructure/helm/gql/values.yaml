@@ -19,9 +19,9 @@ global:
 
   runtimeConfiguration:
     enabled: false
-    configMap: <%= helmChartName %>-runtime-config
+    configMap: <%= helmChartName ?? projectName %>-runtime-config
     csi:
-      secretProviderClass: <%= helmChartName %>-runtime-secrets
+      secretProviderClass: <%= helmChartName ?? projectName %>-runtime-secrets
 
 <%_ if(withMultiTenancy){ _%>
   multiTenancy:
@@ -66,11 +66,11 @@ global:
 gql:
   enabled: true
   replicaCount: 1
-  name: "<%= helmChartName %>"
+  name: "<%= helmChartName ?? projectName %>"
   image:
     repository: "[ORGANIZATION].azurecr.io/"
     pullPolicy: IfNotPresent
-    name: <%= helmChartName %>
+    name: <%= helmChartName ?? projectName %>
     tag: "" # overwrite from pipeline
 
   service:

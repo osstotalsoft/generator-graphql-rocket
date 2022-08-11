@@ -24,6 +24,8 @@
     "node/prefer-global/url": ["error", "always"],
     "node/prefer-promises/dns": "error",
     "node/prefer-promises/fs": "error",
+    "object-shorthand": "off",
+    "capitalized-comments": "off",
     "no-unused-vars": [
       1,
       {

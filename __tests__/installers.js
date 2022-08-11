@@ -26,14 +26,14 @@ describe('test package installers', () => {
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
         projectName,
-        withMultiTenancy: true,
+        withMultiTenancy: false,
         hasSharedDb: false,
         dbConnectionName,
-        addSubscriptions: true,
+        addSubscriptions: false,
         addMessaging: false,
         withRights: true,
-        addHelm: true,
-        addTracing: true,
+        addHelm: false,
+        addTracing: false,
         packageManager: 'npm'
       })
       .run()
@@ -50,14 +50,14 @@ describe('test package installers', () => {
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
         projectName,
-        withMultiTenancy: true,
+        withMultiTenancy: false,
         hasSharedDb: false,
         dbConnectionName,
         addSubscriptions: true,
         addMessaging: false,
-        withRights: true,
-        addHelm: true,
-        addTracing: true,
+        withRights: false,
+        addHelm: false,
+        addTracing: false,
         packageManager: 'yarn'
       })
       .run()

@@ -3,15 +3,17 @@ const Generator = require('yeoman-generator')
 require('lodash').extend(Generator.prototype, require('yeoman-generator/lib/actions/install'))
 const chalk = require('chalk')
 const yosay = require('yosay')
-const { append, concat } = require('ramda')
-const questions = require('./questions')
-const { checkForLatestVersion } = require('../utils')
+const path = require('path')
+const { append, concat, mergeLeft } = require('ramda')
+const { projectNameQ, usePrevConfigsQ, questions } = require('./questions')
+const { checkForLatestVersion, getCurrentVersion } = require('../utils')
 const { prettierTransform, defaultPrettierOptions } = require('../generator-transforms')
 const filter = require('gulp-filter')
+const { YO_RC_FILE, YARN_MIN_VERSION, NPM_MIN_VERSION } = require('./constants')
 
 module.exports = class extends Generator {
   constructor(args, opts) {
-    super(args, opts)
+    super(args, { ...opts, skipRegenerate: true, ignoreWhitespace: true, force: true, skipLocalCache: false })
     this.registerClientTransforms()
   }
 
@@ -24,7 +26,17 @@ module.exports = class extends Generator {
       yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
      Out of the box I include Apollo Server, Koa and token validation.`)
     )
-    this.answers = await this.prompt(questions)
+    this.answers = await this.prompt(projectNameQ)
+    this.destinationRoot(path.join(this.contextRoot, `/${this.answers.projectName}`))
+
+    const yorcPath = path.join(this.destinationPath(), `/${YO_RC_FILE}`)
+
+    if (this.fs.exists(yorcPath)) await this.prompt(usePrevConfigsQ)
+
+    this.answers = mergeLeft(this.answers, await this.prompt(questions, this.config))
+    this.config.set('__TIMESTAMP__', new Date().toLocaleString())
+    this.config.set('__VERSION__', await getCurrentVersion())
+    questions.forEach(q => this.config.set(q.name, this.answers[q.name]))
   }
 
   writing() {
@@ -46,7 +58,7 @@ module.exports = class extends Generator {
     } = this.answers
 
     const templatePath = this.templatePath('infrastructure/**/*')
-    const destinationPath = this.destinationPath(projectName)
+    const destinationPath = this.destinationPath()
 
     let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
 
@@ -112,7 +124,8 @@ module.exports = class extends Generator {
         ignoreFiles
       )
 
-    const packageManagerVersion = packageManager === 'npm' ? '7.16.0' : packageManager === 'yarn' ? '1.22.4' : '7.16.0'
+    const packageManagerVersion =
+      packageManager === 'npm' ? NPM_MIN_VERSION : packageManager === 'yarn' ? YARN_MIN_VERSION : NPM_MIN_VERSION
     const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
 
     this.fs.copyTpl(
@@ -124,12 +137,12 @@ module.exports = class extends Generator {
     )
 
     const gitignorePath = this.templatePath('infrastructure/.gitignore-template')
-    const gitignoreDestinationPath = this.destinationPath(`${projectName}/.gitignore`)
+    const gitignoreDestinationPath = path.join(destinationPath, `/.gitignore`)
     this.fs.copy(gitignorePath, gitignoreDestinationPath)
 
     if (addHelm) {
       const helmTemplatePath = this.templatePath('infrastructure/helm/gql/**')
-      const helmDestinationPath = this.destinationPath(`${projectName}/helm/${helmChartName}`)
+      const helmDestinationPath = path.join(destinationPath, `/helm/${helmChartName ?? projectName}`)
       this.fs.copyTpl(
         helmTemplatePath,
         helmDestinationPath,
