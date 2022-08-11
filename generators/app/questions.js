@@ -11,7 +11,7 @@ module.exports.projectNameQ = {
     }
 
     return `${chalk.red(
-      'Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!'
+      "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
     )}`
   },
   default: 'new-gql-server'
