@@ -25,7 +25,7 @@ module.exports.usePrevConfigsQ = {
   default: true
 }
 
-module.exports.questions = [
+module.exports.getQuestions = projectName => [
   {
     type: 'list',
     name: 'dataLayer',
@@ -95,9 +95,9 @@ module.exports.questions = [
     name: 'helmChartName',
     message: 'What is the name of your helm chart?',
     when: prompts => prompts.addHelm,
-    default: undefined,
+    default: projectName,
     validate: name => {
-      if (!name ?? name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)) {
+      if (name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)) {
         return true
       }
 

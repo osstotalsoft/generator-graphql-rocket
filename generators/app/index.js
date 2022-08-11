@@ -5,7 +5,7 @@ const chalk = require('chalk')
 const yosay = require('yosay')
 const path = require('path')
 const { append, concat, mergeLeft } = require('ramda')
-const { projectNameQ, usePrevConfigsQ, questions } = require('./questions')
+const { projectNameQ, usePrevConfigsQ, getQuestions } = require('./questions')
 const { checkForLatestVersion, getCurrentVersion } = require('../utils')
 const { prettierTransform, defaultPrettierOptions } = require('../generator-transforms')
 const filter = require('gulp-filter')
@@ -27,15 +27,21 @@ module.exports = class extends Generator {
      Out of the box I include Apollo Server, Koa and token validation.`)
     )
     this.answers = await this.prompt(projectNameQ)
-    this.destinationRoot(path.join(this.contextRoot, `/${this.answers.projectName}`))
+    const { projectName } = this.answers
+    this.destinationRoot(path.join(this.contextRoot, `/${projectName}`))
 
-    const yorcPath = path.join(this.destinationPath(), `/${YO_RC_FILE}`)
+    if (this.fs.exists(path.join(this.destinationPath(), `/${YO_RC_FILE}`)))
+      this.answers = mergeLeft(this.answers, await this.prompt(usePrevConfigsQ))
 
-    if (this.fs.exists(yorcPath)) await this.prompt(usePrevConfigsQ)
-
-    this.answers = mergeLeft(this.answers, await this.prompt(questions, this.config))
     this.config.set('__TIMESTAMP__', new Date().toLocaleString())
     this.config.set('__VERSION__', await getCurrentVersion())
+
+    const questions = getQuestions(projectName)
+    const { usePrevConfigs } = this.answers
+    this.answers = usePrevConfigs
+      ? mergeLeft(this.answers, await this.prompt(questions, this.config))
+      : mergeLeft(this.answers, await this.prompt(questions))
+
     questions.forEach(q => this.config.set(q.name, this.answers[q.name]))
   }
 
@@ -43,7 +49,6 @@ module.exports = class extends Generator {
     if (!this.isLatest) return
 
     const {
-      projectName,
       addSubscriptions,
       addMessaging,
       addHelm,
@@ -142,7 +147,7 @@ module.exports = class extends Generator {
 
     if (addHelm) {
       const helmTemplatePath = this.templatePath('infrastructure/helm/gql/**')
-      const helmDestinationPath = path.join(destinationPath, `/helm/${helmChartName ?? projectName}`)
+      const helmDestinationPath = path.join(destinationPath, `/helm/${helmChartName}`)
       this.fs.copyTpl(
         helmTemplatePath,
         helmDestinationPath,
