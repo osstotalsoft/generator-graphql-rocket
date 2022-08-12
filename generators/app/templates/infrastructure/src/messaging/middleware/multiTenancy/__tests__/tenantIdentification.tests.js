@@ -19,16 +19,20 @@ describe('tenant identification tests:', () => {
     const tenantId = 'some-tenant-id'
     const tenantIdentification = require('../tenantIdentification')
     const { tenantService } = require('@totalsoft/tenant-configuration')
+    const { tenantContextAccessor } = require("../../../../multiTenancy");
     tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }))
     const msg = envelope({}, { tenantId })
     const ctx = messagingHost()._contextFactory('topic1', msg)
-    const next = jest.fn().mockResolvedValue(undefined)
+    let resolvedTenantContext;
+    const next = async () => {
+      resolvedTenantContext = tenantContextAccessor.getTenantContext();
+    };
 
     //act
     await tenantIdentification()(ctx, next)
 
     //assert
-    expect(ctx.tenant.id).toBe(tenantId)
+    expect(resolvedTenantContext.tenant.id).toBe(tenantId);
   })
 
   it('should identify tenant from tid header:', async () => {
@@ -36,15 +40,19 @@ describe('tenant identification tests:', () => {
     const tenantId = 'some-tenant-id'
     const { tenantService } = require('@totalsoft/tenant-configuration')
     const tenantIdentification = require('../tenantIdentification')
+    const { tenantContextAccessor } = require("../../../../multiTenancy");
     tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }))
     const msg = envelope({}, {}, _ => ({ tid: tenantId }))
     const ctx = messagingHost()._contextFactory('topic1', msg)
-    const next = jest.fn().mockResolvedValue(undefined)
+    let resolvedTenantContext;
+    const next = async () => {
+      resolvedTenantContext = tenantContextAccessor.getTenantContext();
+    };
 
     //act
     await tenantIdentification()(ctx, next)
 
     //assert
-    expect(ctx.tenant.id).toBe(tenantId)
+    expect(resolvedTenantContext.tenant.id).toBe(tenantId);
   })
 })

@@ -5,32 +5,14 @@ const { tenantService } = require("@totalsoft/tenant-configuration");
 const { useTenantContext } = require("../../../multiTenancy")
 <%_ } _%>
 <%_ if(withMultiTenancy){ _%>
+  const { tenantContextAccessor } = require("../../../multiTenancy");
   const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
 const tenantIdentification = () => async (ctx, next) => {
-    if (!isMultiTenant) {
-      ctx.tenant = {};
-      await next();
-      return;
-    }
-    const tenantId = getTenantIdFromMessage(ctx.received.msg);
-    const tenant = await tenantService.getTenantFromId(tenantId);
+  const tenant = isMultiTenant ? await tenantService.getTenantFromId(getTenantIdFromMessage(ctx.received.msg)) : {};
 
-    if (tenant) {
-        ctx.tenant = tenant;
-
-        <%_ if(dataLayer == "prisma") {_%>
-        await useTenantContext(tenant, async () => {
-            await next()
-        })
-        <%_} else { _%>
-        await next();
-        <%_}_%>
-    }
-    else {
-        throw new Error(`Could not identify tenant!`)
-    }
+  await tenantContextAccessor.useTenantContext({ tenant }, next);
 }
 
 function getTenantIdFromMessage(msg) {

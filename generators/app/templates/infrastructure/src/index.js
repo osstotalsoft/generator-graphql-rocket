@@ -30,7 +30,7 @@ const bodyParser = require("koa-bodyparser");
 <%_ if(addMessaging) {_%>
 // Messaging
 const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy) {%>, middleware <%}%> } = require("./messaging"),
-  { messagingHost, exceptionHandling, correlation, dispatcher } = require("@totalsoft/messaging-host")
+  { messagingHost, exceptionHandling, dispatcher, SubscriptionOptions } = require("@totalsoft/messaging-host")
 <%_}_%>
 
 // Logging
@@ -48,17 +48,28 @@ const tracingPlugin = require('./plugins/tracing/tracingPlugin'),
 opentracing.initGlobalTracer(defaultTracer)
 <%_}_%>
 
+// Metrics, diagnostics
+const
+  { DIAGNOSTICS_ENABLED, METRICS_ENABLED } = process.env,
+  diagnosticsEnabled = JSON.parse(DIAGNOSTICS_ENABLED),
+  metricsEnabled = JSON.parse(METRICS_ENABLED),
+  diagnostics = require("./monitoring/diagnostics"),
+  metrics = require("./monitoring/metrics"),
+  metricsPlugin = require("./plugins/metrics/metricsPlugin")
+
+
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
 const { introspectionRoute } = require('./utils/functions'),
   ignore = require('koa-ignore'),
-<%_ if(addSubscriptions){ _%>
   { tenantService } = require("@totalsoft/tenant-configuration"),
-<%_}_%>
+  { tenantContextAccessor } = require("./multiTenancy"),
   isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
 <%_ if(addSubscriptions){ _%>
+// Subscriptions
+const { middleware: subscriptionMiddleware, subscribe } = require("./subscriptions");
 const jsonwebtoken = require('jsonwebtoken'),
   { WebSocketServer } = require("ws"),
   { useServer } = require("graphql-ws/lib/use/ws")
@@ -94,7 +105,7 @@ app.use(contextDbInstance());
 
 const plugins = [
   ApolloServerPluginDrainHttpServer({ httpServer }),
-  new ApolloLoggerPlugin({ persistLogs: false, securedMessages: false }),
+  new ApolloLoggerPlugin({ securedMessages: false }),
   <%_ if(addSubscriptions) {_%>
   {
       async serverWillStart() {
@@ -104,11 +115,12 @@ const plugins = [
           }
           };
       }
-      },
+  },
   <%_}_%>
   <%_ if(addTracing){ _%>
-      tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {}
+      tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {},
   <%_}_%>
+  metricsEnabled ? metricsPlugin() : {}
 ]
 
 
@@ -142,7 +154,14 @@ const subscriptionServer = useServer(
             }
         <%_}_%>
       },
-      onSubscribe: async ctx => await validateWsToken(ctx?.token, ctx?.extra?.socket),
+      subscribe: subscribe({
+        middleware: [subscriptionMiddleware.correlation<% if(withMultiTenancy) {%>, subscriptionMiddleware.tenantContext<%}%><% if(addTracing) {%>, subscriptionMiddleware.tracing<%}%>],
+        <% if(withMultiTenancy) {%>filter: ctx => message => ctx?.tenant?.id?.toLowerCase() === message?.headers?.pubSubTenantId?.toLowerCase()<%}%>
+      }),
+      onSubscribe: async (ctx, msg) => {
+        await validateWsToken(ctx?.token, ctx?.extra?.socket);
+        metrics.recordSubscriptionStarted(ctx, msg);
+      },
       onDisconnect: (_ctx, code, reason) =>
         code != 1000 && console.info(`Subscription server disconnected! Code: ${code} Reason: ${reason}`),
       onError: (ctx, msg, errors) => console.error("Subscription error!", { ctx, msg, errors }),
@@ -158,7 +177,11 @@ const subscriptionServer = useServer(
             }
         <%_}_%>
         const dataSources = getDataSources()
-        const { logInfo, logDebug, logError } = initializeLogger(ctx, msg?.payload?.operationName, true, saveLogs)
+        const { logInfo, logDebug, logError } = initializeLogger({
+          context: ctx,
+          operationName: msg?.payload?.operationName,
+          securedMessages: true
+        })
 
         return {
             ...ctx,
@@ -167,7 +190,13 @@ const subscriptionServer = useServer(
             <%_}_%>
             <%_ if(dataLayer == "knex") {_%>
             dbInstance,
+            <%_ if(withMultiTenancy){ _%>
+            dataSources: tenantContextAccessor.useTenantContext({ tenant }, async () =>
+              initializedDataSources(ctx, dbInstance, dataSources)
+            ),
+            <%_} else {_%>
             dataSources: initializedDataSources(ctx, dbInstance, dataSources),
+            <%_}_%>
             dataLoaders: getDataLoaders(dbInstance),
             <%_}else{_%>
             dataSources: initializedDataSources(ctx, dataSources),
@@ -191,7 +220,7 @@ const server = new ApolloServer({
     dataSources: getDataSources,
     context: async ({ ctx }) => {
       const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
-      const { logInfo, logDebug, logError } = initializeLogger(ctx, request?.body?.operationName, true, saveLogs)
+      const { logInfo, logDebug, logError } = initializeLogger({context: ctx, operationName: request?.body?.operationName, securedMessages: true})
       return {
         token,
         <%_ if(dataLayer == "knex") {_%>
@@ -237,14 +266,14 @@ const skipMiddleware = (_ctx, next) => next()
 <%_ if(addMessaging) {_%>
 const msgHost = messagingHost();
 msgHost
-    .subscribe([/*topics*/])
+    .subscribe(Object.keys(msgHandlers), SubscriptionOptions.PUB_SUB)
     .use(exceptionHandling())
-    .use(correlation())
-    <%_ if(addMessaging && addTracing){ _%>
-    .use(tracingEnabled ? middleware.tracing() : skipMiddleware)
-    <%_}_%>
+    .use(middleware.correlation())
     <%_ if(addMessaging && withMultiTenancy) {_%>
     .use(middleware.tenantIdentification())
+    <%_}_%>
+    <%_ if(addMessaging && addTracing){ _%>
+    .use(tracingEnabled ? middleware.tracing() : skipMiddleware)
     <%_}_%>
     <%_ if(dataLayer == "knex") {_%>
     .use(middleware.dbInstance())
@@ -280,3 +309,6 @@ process.on('uncaughtException', function (error) {
     <%_}_%>
     throw new Error(`Error occurred while processing the request: ${error.stack}`)
 })
+
+diagnosticsEnabled && diagnostics.startServer();
+metricsEnabled && metrics.startServer();

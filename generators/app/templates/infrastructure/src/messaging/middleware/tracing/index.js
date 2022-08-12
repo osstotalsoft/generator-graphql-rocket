@@ -1,7 +1,16 @@
 const { envelope } = require('@totalsoft/message-bus')
-const opentracing = require('opentracing')
+  const opentracing = require('opentracing')
 const { useSpanManager } = require('../../../tracing/spanManager')
-const { getExternalSpan } = require('../../../tracing/tracingUtils')
+const { traceError, getExternalSpan } = require('../../../tracing/tracingUtils')
+const { getActiveSpan } = require("../../../tracing/spanManager");
+<%_ if(withMultiTenancy){ _%>
+const { tenantContextAccessor } = require("../../../multiTenancy");
+<%_}_%>
+const { correlationManager } = require("../../../correlation");
+
+const messagingEnvelopeHeaderSpanTagPrefix = "messaging_header";
+const componentName = "nodebb-messaging";
+
 
 const tracing = () => async (ctx, next) => {
     const tracer = opentracing.globalTracer()
@@ -14,18 +23,59 @@ const tracing = () => async (ctx, next) => {
     ctx.requestSpan = span
     span.log({ event: 'message', message: ctx.received.msg })
 
-    const correlationId = ctx?.correlationId
-    span.setTag(envelope.headers.correlationId, correlationId)
+    span.setTag("nbb.correlation_id", correlationManager.getCorrelationId());
     <%_ if(withMultiTenancy){ _%>
-    const tenantId = ctx?.tenant?.id
-    span.setTag(envelope.headers.tenantId, tenantId)
+    span.setTag(envelope.headers.tenantId, tenantContextAccessor.getTenantContext()?.tenant?.id);
     <%_}_%>
+    span.setTag(opentracing.Tags.SPAN_KIND, "consumer");
+    span.setTag(opentracing.Tags.COMPONENT, componentName);
+    span.setTag(opentracing.Tags.MESSAGE_BUS_DESTINATION, ctx.received.topic);
 
-    await useSpanManager(span, async () => {
-        await next()
-    })
+    for (const header in ctx.received.msg.headers) {
+      span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, ctx.received.msg.headers[header]);
+    }
 
-    span.finish()
+    try {
+      await useSpanManager(span, next);
+    } catch (error) {
+      traceError(span, error);
+      throw error;
+    } finally {
+      span.finish();
+    }
 }
 
-module.exports = tracing
+const tracingPublish = () => async (ctx, next) => {
+  const activeSpan = getActiveSpan();
+  const tracer = opentracing.globalTracer();
+  const span = tracer.startSpan(`messageBus publish ${ctx.topic}`, {
+    childOf: activeSpan
+  });
+  span.setTag(opentracing.Tags.SPAN_KIND, "producer");
+  span.setTag(opentracing.Tags.MESSAGE_BUS_DESTINATION, ctx.topic);
+  span.setTag(opentracing.Tags.COMPONENT, componentName);
+  span.setTag("nbb.correlation_id", correlationManager.getCorrelationId());
+  span.setTag(envelope.headers.tenantId, tenantContextAccessor.getTenantContext()?.tenant?.id);
+
+  const existingCustomizer = ctx.envelopeCustomizer;
+  ctx.envelopeCustomizer = headers => {
+    tracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, headers);
+
+    for (const header in headers) {
+      span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, headers[header]);
+    }
+
+    return existingCustomizer(headers);
+  };
+  try {
+    return await next();
+  } catch (error) {
+    traceError(span, error);
+    throw error;
+  } finally {
+    span.finish();
+  }
+};
+
+module.exports = { tracing, tracingPublish };
+

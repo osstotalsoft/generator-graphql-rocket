@@ -8,11 +8,11 @@ ARG imageUserGroup=appgroup
 ARG imageUserId=1375
 ARG imageUserGroupId=1375
 
-RUN addgroup --system --gid $imageUserGroupId $imageUserGroup && \     
+RUN addgroup --system --gid $imageUserGroupId $imageUserGroup && \
     adduser --system --uid $imageUserId --ingroup $imageUserGroup $imageUser
 
 # Install app dependencies
-COPY --chown=$imageUser:$imageUserGroup package.json <%=packageManagerLockFile%>* ./
+COPY --chown=$imageUser:$imageUserGroup package.json <%=packageManagerLockFile%> ./
 
 RUN <%=packageManager%> install
 # If you are building your code for production

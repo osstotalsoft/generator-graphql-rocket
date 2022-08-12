@@ -32,12 +32,14 @@
     "@koa/cors": "^3.3.0",
     "@koa/router": "^11.0.1",
     <%_ if(dataLayer === "prisma") {_%>
-    "@prisma/client": "^4.0.0",
-    "prisma": "^4.0.0",
+    "@prisma/client": "^4.1.1",
+    "prisma": "^4.1.1",
       <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "lodash.set": "^4.3.2",
       <%_} _%>
     <%_} _%>
+    "@opentelemetry/exporter-prometheus": "^0.27.0",
+    "@opentelemetry/sdk-metrics-base": "^0.27.0",
     "@totalsoft/key-per-file-configuration": "1.0.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
@@ -60,7 +62,7 @@
     "@totalsoft/message-bus": "^2.4.2",
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
-    "@totalsoft/apollo-logger": "^1.0.6",
+    "@totalsoft/apollo-logger": "^1.0.7",
     "apollo-datasource": "^3.3.2",
     "apollo-datasource-rest": "^3.6.1",
     "apollo-server": "^3.10.0",
@@ -120,5 +122,8 @@
     "setupFilesAfterEnv": [
       "jest-extended"
     ]
+  },
+  "nodemonConfig": {
+    "ext": "js,mjs,json,graphql"
   }
 }

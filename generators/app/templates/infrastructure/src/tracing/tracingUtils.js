@@ -20,7 +20,7 @@ function getExternalSpan(tracer, request) {
     headers = tmpHeaders
   }
 
-  return request && request.headers ? tracer.extract(FORMAT_HTTP_HEADERS, headers) : undefined
+  return headers ? tracer.extract(FORMAT_HTTP_HEADERS, headers) : undefined
 }
 
 function _logError(activeSpan, error) {

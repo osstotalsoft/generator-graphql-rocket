@@ -17,6 +17,18 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Program with Kubernetes",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\src\\index.js",
+      "preLaunchTask": "bridge-to-kubernetes.resource",
+      "env": {
+        "GRPC_DNS_RESOLVER": "native",
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Jest Current File",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
       "args": ["${fileBasenameNoExtension}"],
@@ -34,20 +46,19 @@
       "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
       "args": ["-i"],
       "skipFiles": ["<node_internals>/**/*.js", "node_modules"]
-    }
-    <%_ if(addTracing){ _%>,
+    }<%_ if(addTracing){ _%>,
     {
       "type": "node",
       "request": "launch",
       "name": "Opentracing",
       "skipFiles": ["<node_internals>/**"],
       "env": {
-        "JAEGER_ENDPOINT": "http://localhost:7000/api/traces",
+        "JAEGER_ENDPOINT": "http://kube-worker1.totalsoft.local:31034/api/traces",
         "JAEGER_SAMPLER_TYPE": "const",
         "JAEGER_SAMPLER_PARAM": "1",
         "JAEGER_REPORTER_FLUSH_INTERVAL": "100",
         "JAEGER_DISABLED": "false",
-        "JAEGER_SERVICE_NAME": "eSigner.GraphQL",
+        "JAEGER_SERVICE_NAME": "<%= projectName %>",
         "NODE_ENV": "development"
       },
       "program": "${workspaceFolder}\\src\\index.js"

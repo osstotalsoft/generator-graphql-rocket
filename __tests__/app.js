@@ -72,7 +72,7 @@ describe('generator-graphql-rocket:app', () => {
       })
       .run()
       .then(() => {
-        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/redisPubSub.js`))
+        assert.file(path.join(__dirname, `${tempRoot}/${projectName}/src/pubSub/pubSub.js`))
       }))
 
   it('helm files are added when addHelm option is true', () =>
@@ -144,8 +144,7 @@ describe('generator-graphql-rocket:app', () => {
       .then(() => {
         const valuesYaml = path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
         assert.fileContent([
-          [valuesYaml, `rusiPubSubName: "[RUSI_PUBSUB_COMPONENT_NAME]"`],
-          [valuesYaml, `rusiConfigName: "[RUSI_CONFIG_NAME]"`]
+          [valuesYaml, `transport: "rusi"`]
         ])
 
         const deploymentYaml = path.join(
@@ -154,8 +153,7 @@ describe('generator-graphql-rocket:app', () => {
         )
         assert.fileContent([
           [deploymentYaml, `rusi.io/app-id: {{ $current.messaging.source | quote }}`],
-          [deploymentYaml, `rusi.io/config: {{ $global.messaging.rusiConfigName | quote }}`],
-          [deploymentYaml, `rusi.io/enabled: "true"`]
+          [deploymentYaml, `rusi.io/enabled: {{ lower $global.messaging.transport | eq "rusi" | quote }}`]
         ])
       }))
 })
