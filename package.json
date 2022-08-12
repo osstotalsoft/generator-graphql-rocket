@@ -28,7 +28,7 @@
     "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "gh-release": "^6.0.1",
+    "gh-release": "^6.0.4",
     "lint-staged": "^12.1.2"
   },
   "engines": {
@@ -44,12 +44,12 @@
     "jest-cli": "27.0.6",
     "lodash": "^4.17.21",
     "prettier": "^2.5.1",
-    "ramda": "^0.27.1",
+    "ramda": "^0.28.0",
     "rimraf": "^3.0.2",
     "through2": "^4.0.2",
     "update-notifier": "^5.1.0",
     "yeoman-assert": "^3.1.1",
-    "yeoman-generator": "^5.4.2",
+    "yeoman-generator": "^5.7.0",
     "yeoman-test": "6.1.0",
     "yo": "^4.3.0",
     "yosay": "^2.0.2"

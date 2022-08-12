@@ -1,22 +1,31 @@
 const chalk = require('chalk')
 
-module.exports = [
-  {
-    type: 'input',
-    name: 'projectName',
-    message: 'What is the name of your project?',
-    validate: appName => {
-      const pass = appName.match(/^((?!-)[A-Za-z-._]{1,63}(?<!-))+$/)
-      if (pass) {
-        return true
-      }
+module.exports.projectNameQ = {
+  type: 'input',
+  name: 'projectName',
+  message: 'What is the name of your project?',
+  validate: appName => {
+    const pass = appName.match(/^((?!-)[A-Za-z-._]{1,63}(?<!-))+$/)
+    if (pass) {
+      return true
+    }
 
-      return `${chalk.red(
-        "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
-      )}`
-    },
-    default: 'new-gql-server'
+    return `${chalk.red(
+      "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
+    )}`
   },
+  default: 'new-gql-server'
+}
+
+module.exports.usePrevConfigsQ = {
+  type: 'confirm',
+  name: 'usePrevConfigs',
+  message:
+    'You are regenerating over an existing project, would you like to use its previously saved generator configurations?',
+  default: true
+}
+
+module.exports.getQuestions = projectName => [
   {
     type: 'list',
     name: 'dataLayer',
@@ -63,8 +72,7 @@ module.exports = [
   {
     type: 'confirm',
     name: 'addMessaging',
-    message:
-      'Would you like to use messaging? This will allow you to react to messages in the event-driven fashion. Read more here: https://github.com/osstotalsoft/nodebb/tree/master/packages/messaging-host#readme.',
+    message: 'Would you like to use messaging? This will allow you to react to messages in the event-driven fashion.',
     default: false
   },
   {
@@ -87,10 +95,9 @@ module.exports = [
     name: 'helmChartName',
     message: 'What is the name of your helm chart?',
     when: prompts => prompts.addHelm,
-    default: prompts => prompts.projectName.toLowerCase().replace('_', '-'),
+    default: projectName,
     validate: name => {
-      const pass = name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)
-      if (pass) {
+      if (name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)) {
         return true
       }
 
