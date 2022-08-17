@@ -1,5 +1,5 @@
 const boxen = require('boxen')
-const UpdateNotifier = require('update-notifier')
+const { UpdateNotifier } = require('update-notifier')
 const pkg = require('../package.json')
 const chalk = require('chalk')
 
