@@ -1,10 +1,7 @@
-const { createFilter, registerFilter, dbSchema } = require('@totalsoft/knex-filters')
+const { createFilter, registerFilter, mssql } = require('@totalsoft/knex-filters')
 
 async function registerTenancyFilter(columnTenantId, tenantId, knex) {
-  const tableHasColumnTenantId = await dbSchema.mssql.buildTableHasColumnPredicate(
-    columnTenantId,
-    knex,
-  )
+  const tableHasColumnTenantId = await mssql(columnTenantId, knex)
 
   const addWhereTenantIdClause = (table, alias, queryBuilder) => {
     queryBuilder.andWhere(
