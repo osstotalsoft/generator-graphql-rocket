@@ -1,4 +1,4 @@
-const { correlationManager } = require("../../correlation");
+const { correlationManager } = require("@totalsoft/correlation");
 const CORRELATION_ID = "x-correlation-id";
 
 const correlationMiddleware = () => async (ctx, next) => {

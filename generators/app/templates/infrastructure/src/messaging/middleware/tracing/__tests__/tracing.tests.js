@@ -3,9 +3,9 @@ const opentracing = require("opentracing");
 const { envelope } = require("@totalsoft/message-bus");
 const { messagingHost } = require("@totalsoft/messaging-host");
 <%_ if(withMultiTenancy){ _%>
-const { useTenantContext } = require("../../../../multiTenancy/tenantContextAccessor");
+const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
 <%_}_%>
-const { useCorrelationId } = require("../../../../correlation/correlationManager");
+const { correlationManager } = require("@totalsoft/correlation");
 
 describe("Tracing tests", () => {
     beforeEach(() => {
@@ -31,7 +31,9 @@ describe("Tracing tests", () => {
         const next = jest.fn().mockResolvedValue(undefined);
 
         //act
-        useCorrelationId(someCorrelationId, () => useTenantContext({ tenant }, () => tracing()(ctx, next)));
+        correlationManager.useCorrelationId(someCorrelationId, () =>
+          tenantContextAccessor.useTenantContext({ tenant }, () => tracing()(ctx, next))
+        );
 
         //assert
         const tracer = opentracing.globalTracer();

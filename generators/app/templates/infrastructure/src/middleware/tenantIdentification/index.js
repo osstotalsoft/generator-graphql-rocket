@@ -1,7 +1,6 @@
 
 const jsonwebtoken = require('jsonwebtoken')
-const { tenantService } = require('@totalsoft/tenant-configuration')
-const { tenantContextAccessor } = require("../../multiTenancy");
+const { tenantService, tenantContextAccessor } = require('@totalsoft/multitenancy-core')
 
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 

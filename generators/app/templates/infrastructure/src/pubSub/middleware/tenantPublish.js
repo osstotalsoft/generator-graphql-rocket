@@ -1,4 +1,4 @@
-const { tenantContextAccessor } = require('../../multiTenancy')
+const { tenantContextAccessor } = require('@totalsoft/multitenancy-core')
 
 const tenantPublish = async (ctx, next) => {
   const tenantContext = tenantContextAccessor.getTenantContext()

@@ -1,4 +1,4 @@
-const { correlationManager } = require('../../correlation')
+const { correlationManager } = require('@totalsoft/correlation')
 
 const correlationPublish = async (ctx, next) => {
   ctx.message.headers.pubSubCorrelationId = correlationManager.getCorrelationId()

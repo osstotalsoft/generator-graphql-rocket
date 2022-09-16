@@ -1,4 +1,4 @@
-const { tenantService } = require('@totalsoft/tenant-configuration')
+const { tenantService } = require('@totalsoft/multitenancy-core')
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 
 const tenantResolvers = {

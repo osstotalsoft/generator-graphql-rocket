@@ -1,9 +1,8 @@
 const { envelope } = require("@totalsoft/message-bus");
 const opentracing = require("opentracing");
-const { useSpanManager } = require("../../tracing/spanManager");
-const { getExternalSpan, traceError, traceErrors } = require("../../tracing/tracingUtils");
-const { tenantContextAccessor } = require("../../multiTenancy");
-const { correlationManager } = require("../../correlation");
+const { spanManager, traceError, traceErrors, getExternalSpan } = require("@totalsoft/opentracing");
+const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+const { correlationManager } = require("@totalsoft/correlation");
 const messagingEnvelopeHeaderSpanTagPrefix = "pubSub_header"
 
 const tracing = async (ctx, next) => {
@@ -24,7 +23,7 @@ const tracing = async (ctx, next) => {
   }
 
   try {
-    const gqlResult = await useSpanManager(span, next);
+    const gqlResult = await spanManager.useSpanManager(span, next);
     traceErrors(span, gqlResult.errors);
     return gqlResult;
   } catch (error) {

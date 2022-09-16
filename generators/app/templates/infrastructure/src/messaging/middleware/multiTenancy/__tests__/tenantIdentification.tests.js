@@ -1,7 +1,7 @@
 const { envelope } = require('@totalsoft/message-bus')
 const { messagingHost } = require('@totalsoft/messaging-host')
 
-jest.mock('@totalsoft/tenant-configuration')
+jest.mock('@totalsoft/multitenancy-core')
 
 const OLD_ENV = process.env
 describe('tenant identification tests:', () => {
@@ -16,43 +16,39 @@ describe('tenant identification tests:', () => {
 
   it('should identify tenant from nbb tenantId header:', async () => {
     //arrange
-    const tenantId = 'some-tenant-id'
-    const tenantIdentification = require('../tenantIdentification')
-    const { tenantService } = require('@totalsoft/tenant-configuration')
-    const { tenantContextAccessor } = require("../../../../multiTenancy");
-    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }))
-    const msg = envelope({}, { tenantId })
-    const ctx = messagingHost()._contextFactory('topic1', msg)
-    let resolvedTenantContext;
-    const next = async () => {
-      resolvedTenantContext = tenantContextAccessor.getTenantContext();
-    };
+    const tenantId = "some-tenant-id";
+    const tenantIdentification = require("../tenantIdentification");
+    const { tenantService, tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }));
+    const msg = envelope({}, { tenantId });
+    const ctx = messagingHost()._contextFactory("topic1", msg);
 
     //act
-    await tenantIdentification()(ctx, next)
+    await tenantIdentification()(ctx, () => Promise.resolve());
 
     //assert
-    expect(resolvedTenantContext.tenant.id).toBe(tenantId);
+    expect(tenantContextAccessor.useTenantContext).toBeCalledWith(
+      { tenant: expect.objectContaining({ id: tenantId }) },
+      expect.anything()
+    );
   })
 
   it('should identify tenant from tid header:', async () => {
     //arrange
-    const tenantId = 'some-tenant-id'
-    const { tenantService } = require('@totalsoft/tenant-configuration')
-    const tenantIdentification = require('../tenantIdentification')
-    const { tenantContextAccessor } = require("../../../../multiTenancy");
-    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }))
-    const msg = envelope({}, {}, _ => ({ tid: tenantId }))
-    const ctx = messagingHost()._contextFactory('topic1', msg)
-    let resolvedTenantContext;
-    const next = async () => {
-      resolvedTenantContext = tenantContextAccessor.getTenantContext();
-    };
+    const tenantId = "some-tenant-id";
+    const { tenantService, tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+    const tenantIdentification = require("../tenantIdentification");
+    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }));
+    const msg = envelope({}, {}, _ => ({ tid: tenantId }));
+    const ctx = messagingHost()._contextFactory("topic1", msg);
 
     //act
-    await tenantIdentification()(ctx, next)
+    await tenantIdentification()(ctx, () => Promise.resolve())
 
     //assert
-    expect(resolvedTenantContext.tenant.id).toBe(tenantId);
+    expect(tenantContextAccessor.useTenantContext).toBeCalledWith(
+      { tenant: expect.objectContaining({ id: tenantId }) },
+      expect.anything()
+    );
   })
 })

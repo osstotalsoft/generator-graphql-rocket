@@ -1,12 +1,10 @@
 const { envelope } = require('@totalsoft/message-bus')
-  const opentracing = require('opentracing')
-const { useSpanManager } = require('../../../tracing/spanManager')
-const { traceError, getExternalSpan } = require('../../../tracing/tracingUtils')
-const { getActiveSpan } = require("../../../tracing/spanManager");
+const opentracing = require('opentracing')
+const { spanManager, traceError, getExternalSpan } = require("@totalsoft/opentracing");
 <%_ if(withMultiTenancy){ _%>
-const { tenantContextAccessor } = require("../../../multiTenancy");
+const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
 <%_}_%>
-const { correlationManager } = require("../../../correlation");
+const { correlationManager } = require("@totalsoft/correlation");
 
 const messagingEnvelopeHeaderSpanTagPrefix = "messaging_header";
 const componentName = "nodebb-messaging";
@@ -36,7 +34,7 @@ const tracing = () => async (ctx, next) => {
     }
 
     try {
-      await useSpanManager(span, next);
+      await spanManager.useSpanManager(span, next);
     } catch (error) {
       traceError(span, error);
       throw error;
@@ -46,7 +44,7 @@ const tracing = () => async (ctx, next) => {
 }
 
 const tracingPublish = () => async (ctx, next) => {
-  const activeSpan = getActiveSpan();
+  const activeSpan = spanManager.getActiveSpan();
   const tracer = opentracing.globalTracer();
   const span = tracer.startSpan(`messageBus publish ${ctx.topic}`, {
     childOf: activeSpan

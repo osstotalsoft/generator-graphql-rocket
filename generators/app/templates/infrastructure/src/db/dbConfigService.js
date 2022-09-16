@@ -1,6 +1,6 @@
 const { postProcessDbResponse, sanitizeConnectionInfo} = require("../utils/functions")
 <%_ if(withMultiTenancy){ _%>
-const { tenantConfiguration } = require('@totalsoft/tenant-configuration')
+const { tenantConfiguration } = require('@totalsoft/multitenancy-core')
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 

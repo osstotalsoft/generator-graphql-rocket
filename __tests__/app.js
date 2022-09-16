@@ -89,16 +89,6 @@ describe('generator-graphql-rocket:app', () => {
         assert.file(path.join(__dirname, `${tempRoot}/${projectName}/helm`))
       }))
 
-  it('GraphQL logging plugin is added', () =>
-    helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts(defaultAnswers)
-      .run()
-      .then(() => {
-        assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/package.json`), `"@totalsoft/apollo-logger": `)
-      }))
-
   it('Permissions and rights are ready to be used', () =>
     helpers
       .create(path.join(__dirname, '../generators/app'))

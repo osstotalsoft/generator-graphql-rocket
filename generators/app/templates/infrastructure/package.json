@@ -5,12 +5,15 @@
   "main": "src/index.js",
   "type": "commonjs",
   "engines": {
-    "node": ">=14.15.0",
+    "node": ">=16.0.0",
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
     "postinstall": "npx sort-package-json",
-    "start": "cross-env NODE_ENV=development nodemon src/index.js",
+    "setcodepage": "run-script-os",
+    "setcodepage:linux": "",
+    "setcodepage:windows": "chcp 65001",
+    "start": "npm run setcodepage && npm run lint && cross-env NODE_ENV=development nodemon src/index.js",
     "start:production": "cross-env NODE_ENV=production node src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",
     "test:watchAll": "<%=packageManager%> run test -- --watchAll",
@@ -40,14 +43,20 @@
     <%_} _%>
     "@opentelemetry/exporter-prometheus": "^0.27.0",
     "@opentelemetry/sdk-metrics-base": "^0.27.0",
-    "@totalsoft/key-per-file-configuration": "1.0.0",
+    "@totalsoft/key-per-file-configuration": "^1.1.0",
+    "@totalsoft/graceful-shutdown": "^1.1.0",
+    "@totalsoft/correlation": "^1.1.0",
+    "@totalsoft/pino-apollo": "^1.1.0",
+    "@totalsoft/pino-correlation": "^1.1.0",
+    "@totalsoft/pino-mssqlserver": "^1.1.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
     "koa-ignore": "^1.0.1",
       <%_ if(addQuickStart) {_%>
     "datasource-sql": "^2.0.1",
       <%_}_%>
-    "@totalsoft/tenant-configuration": "1.0.0",
+    "@totalsoft/multitenancy-core": "^1.1.0",
+    "@totalsoft/pino-multitenancy": "^1.1.0",
     <%_}_%>
     <%_ if(dataLayer === "knex") {_%>
     "dataloader": "^2.1.0",
@@ -62,7 +71,6 @@
     "@totalsoft/message-bus": "^2.4.2",
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
-    "@totalsoft/apollo-logger": "^1.0.7",
     "apollo-datasource": "^3.3.2",
     "apollo-datasource-rest": "^3.6.1",
     "apollo-server": "^3.10.0",
@@ -91,6 +99,8 @@
     "jaeger-client": "^3.19.0",
     "opentracing": "^0.14.7",
     "apollo-opentracing": "^2.1.76",
+    "@totalsoft/opentracing": "^1.1.0",
+    "@totalsoft/pino-opentracing": "^1.1.0",
     <%_}_%>
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "^2.1.4",
@@ -102,7 +112,10 @@
     "path": "^0.12.7",
     "ramda": "^0.28.0",
     "tedious": "^14.7.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "pino": "^7.6.3",
+    "pino-abstract-transport": "^1.0.0",
+    "pino-pretty": "^8.1.0"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
@@ -116,7 +129,8 @@
     "jest-junit": "^14.0.0",
     "lint-staged": "^13.0.3",
     "nodemon": "^2.0.19",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "run-script-os": "^1.1.6"
   },
   "jest": {
     "setupFilesAfterEnv": [

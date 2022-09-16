@@ -11,12 +11,12 @@ const { Mutex } = require('async-mutex')
 const mutex = new Mutex()
 const { KNEX_LOGGING, KNEX_DEBUG } = process.env
 
-const logger = (_format, duration, query) => {
-  console.log(`${duration} ${query}`)
+const knexLogger = logger => (_format, duration, query) => {
+  logger.debug(`${duration} ${query}`)
 }
 
 let cachedDbInstance
-const dbInstanceFactory = async () => {
+const dbInstanceFactory = async ({ logger = console } = {}) => {
   return await dbInstanceGetOrAdd(() => {
     const {
       DB_HOST: server,
@@ -39,7 +39,7 @@ const dbInstanceFactory = async () => {
     }
 
     if (JSON.parse(KNEX_LOGGING)) {
-        knexTinyLogger(dbInstance, { logger })
+        knexTinyLogger(dbInstance, { logger: knexLogger(logger) })
     }
     <%_ if(addTracing){ _%>
     if (!JSON.parse(JAEGER_DISABLED)) {

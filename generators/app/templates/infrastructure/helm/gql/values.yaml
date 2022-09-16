@@ -100,7 +100,6 @@ gql:
 <%_}_%>
     IDENTITY_API_URL: "[IDENTITY_API_URI]"
     IDENTITY_AUTHORITY: "[IDENTITY_AUTHORITY_URL]"
-    APOLLO_LOGGING_LEVEL: "ERROR"
 <%_ if(dataLayer == "prisma"){ _%>
     DATABASE_URL: "sqlserver://{server}:{port};database={database};user={user};password={password};trustServerCertificate=true"
   <%_ if(withMultiTenancy && !hasSharedDb){ _%>

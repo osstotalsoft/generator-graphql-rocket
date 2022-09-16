@@ -1,5 +1,5 @@
 jest.mock('jsonwebtoken')
-jest.mock('@totalsoft/tenant-configuration')
+jest.mock('@totalsoft/multitenancy-core')
 
 const OLD_ENV = process.env
 describe('tenant identification tests:', () => {
@@ -14,31 +14,28 @@ describe('tenant identification tests:', () => {
 
   it('should identify tenant from jwt token:', async () => {
     //arrange
-    const tenantId = 'some-tenant-id'
-    const tenantIdentification = require('../index')
-    const { tenantService } = require('@totalsoft/tenant-configuration')
-    const { tenantContextAccessor } = require("../../../multiTenancy");
-    const jsonwebtoken = require('jsonwebtoken')
-    jsonwebtoken.decode = () => ({ tid: tenantId })
-    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }))
+    const tenantId = "some-tenant-id";
+    const tenantIdentification = require("../index");
+    const { tenantService, tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+    const jsonwebtoken = require("jsonwebtoken");
+    jsonwebtoken.decode = () => ({ tid: tenantId });
+    tenantService.getTenantFromId.mockImplementation(tid => Promise.resolve({ id: tid }));
 
     const ctx = {
       request: {
-        path: '/graphql',
+        path: "/graphql"
       },
-      method: 'POST',
-      token: 'jwt',
-    }
-
-    let resolvedTenantContext;
-    const next = async () => {
-      resolvedTenantContext = tenantContextAccessor.getTenantContext();
+      method: "POST",
+      token: "jwt"
     };
 
     //act
-    await tenantIdentification()(ctx, next)
+    await tenantIdentification()(ctx, () => Promise.resolve());
 
     //assert
-    expect(resolvedTenantContext?.tenant?.id).toBe(tenantId);
+    expect(tenantContextAccessor.useTenantContext).toBeCalledWith(
+      { tenant: expect.objectContaining({ id: tenantId }) },
+      expect.anything()
+    );
   })
 })

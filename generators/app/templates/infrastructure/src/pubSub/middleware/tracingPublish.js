@@ -1,12 +1,11 @@
 const opentracing = require('opentracing')
-const { correlationManager } = require('../../correlation')
-const { getActiveSpan } = require('../../tracing/spanManager')
-const { traceError } = require('../../tracing/tracingUtils')
+const { correlationManager } = require('@totalsoft/correlation')
+const { spanManager, traceError } = require('@totalsoft/opentracing')
 const messagingEnvelopeHeaderSpanTagPrefix = 'pubSub_header'
 
 
 const tracingPublish = async (ctx, next) => {
-  const activeSpan = getActiveSpan()
+  const activeSpan = spanManager.getActiveSpan()
   const tracer = opentracing.globalTracer()
   const span = tracer.startSpan(`pub-sub publish ${ctx.clientTopic}`, {
     childOf: activeSpan
