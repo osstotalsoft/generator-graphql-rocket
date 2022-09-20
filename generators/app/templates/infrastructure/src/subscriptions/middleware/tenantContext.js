@@ -1,5 +1,4 @@
-const { tenantContextAccessor } = require("../../multiTenancy");
-const { tenantConfiguration } = require("@totalsoft/tenant-configuration");
+const { tenantConfiguration, tenantContextAccessor } = require("@totalsoft/multitenancy-core");
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT);
 
 const tenantContext = async (ctx, next) => {

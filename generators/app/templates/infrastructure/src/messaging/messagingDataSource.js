@@ -1,7 +1,7 @@
 const { DataSource } = require('apollo-datasource')
 const { messageBus } = require('@totalsoft/message-bus')
 <%_ if(withMultiTenancy){ _%>
-  const { tenantContextAccessor } = require("../multiTenancy");
+  const { tenantContextAccessor } = require('@totalsoft/multitenancy-core');
   const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
@@ -9,7 +9,7 @@ const { messageBus } = require('@totalsoft/message-bus')
 const { tracingPublish } = require("./middleware");
 <%_}_%>
 const { concat, run, pipelineBuilder } = require("../utils/pipeline");
-const { correlationManager } = require("../correlation");
+const { correlationManager } = require("@totalsoft/correlation");
 
 const publishPipeline = pipelineBuilder().use(<%if(addTracing){%>tracingPublish()<%}%>).build();
 

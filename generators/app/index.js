@@ -86,8 +86,6 @@ module.exports = class extends Generator {
     if (dataLayer === 'knex' && withMultiTenancy)
       ignoreFiles = concat(
         [
-          '**/multiTenancy/tenantContextAccessor.js',
-          '**/multiTenancy/index.js',
           '**/db/dbInstanceFactory.js',
           '**/startup/middleware'
         ],

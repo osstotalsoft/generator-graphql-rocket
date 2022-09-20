@@ -1,5 +1,5 @@
 const opentracing = require('opentracing')
-const { getActiveSpan } = require('./spanManager')
+const { spanManager } = require("@totalsoft/opentracing");
 const queryExecutor = require('knex/lib/execution/internal/query-executioner')
 
 function createKnexTracer(knex) {
@@ -9,7 +9,7 @@ function createKnexTracer(knex) {
   return knex.on('query', handleQuery).on('query-error', handleQueryError).on('query-response', handleQueryResponse)
 
   function handleQuery({ __knexQueryUid: queryId, sql, method, bindings }) {
-    const activeSpan = getActiveSpan()
+    const activeSpan = spanManager.getActiveSpan()
 
     const span = tracer.startSpan('sqlClient ' + method, {
       childOf: activeSpan

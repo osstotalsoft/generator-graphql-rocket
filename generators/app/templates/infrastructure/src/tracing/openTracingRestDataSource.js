@@ -1,9 +1,8 @@
 const { RESTDataSource } = require('apollo-datasource-rest')
 const opentracing = require('opentracing')
-const { getActiveSpan } = require('./spanManager')
+const { spanManager, traceError } = require("@totalsoft/opentracing");
 // eslint-disable-next-line node/no-extraneous-require
 const { Headers } = require('apollo-server-env')
-const { traceError } = require('./tracingUtils')
 
 class OpenTracingRESTDataSource extends RESTDataSource {
   constructor() {
@@ -12,7 +11,7 @@ class OpenTracingRESTDataSource extends RESTDataSource {
 
   async fetch(request) {
     const tracer = opentracing.globalTracer()
-    const activeSpan = getActiveSpan()
+    const activeSpan = spanManager.getActiveSpan()
 
     if (!(request.headers && request.headers instanceof Headers)) {
       request.headers = new Headers(request.headers || Object.create(null))

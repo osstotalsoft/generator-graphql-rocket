@@ -1,8 +1,7 @@
 const opentracing = require('opentracing');
 const { shouldTracerSkipLogging } = require("../../tracing/gqlTracer");
-const { getExternalSpan, traceError } = require('../../tracing/tracingUtils');
-const { useSpanManager } = require('../../tracing/spanManager');
-const { correlationManager } = require("../../correlation");
+const { spanManager, traceError, getExternalSpan } = require("@totalsoft/opentracing");
+const { correlationManager } = require("@totalsoft/correlation");
 
 const tracingMiddleWare = () => async (ctx, next) => {
 
@@ -45,7 +44,7 @@ const tracingMiddleWare = () => async (ctx, next) => {
         }
         res.on('finish', finishSpan);
 
-        await useSpanManager(span, async () => {
+        await spanManager.useSpanManager(span, async () => {
             await next()
         })
     }

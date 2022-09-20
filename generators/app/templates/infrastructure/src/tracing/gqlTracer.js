@@ -1,18 +1,9 @@
 const jaeger = require('jaeger-client')
-const { correlationManager } = require("../correlation");
-const spanManager = require('./spanManager')
+const { correlationManager } = require("@totalsoft/correlation");
+const { spanManager } = require("@totalsoft/opentracing");
 const CORRELATION_ID = 'nbb.correlation_id'
 
-const initGqlTracer = () => {
-  const logger = {
-    info: function info(msg) {
-      console.log('INFO', msg)
-    },
-    error: function error(msg) {
-      console.log('ERROR ', msg)
-    }
-  }
-
+const initGqlTracer = ({ logger = console } = {}) => {
   const tracer = jaeger.initTracerFromEnv({}, { logger: logger })
   return tracer
 }

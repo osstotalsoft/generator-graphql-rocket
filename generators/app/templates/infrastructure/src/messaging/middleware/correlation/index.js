@@ -1,4 +1,4 @@
-const { correlationManager } = require("../../../correlation");
+const { correlationManager } = require('@totalsoft/correlation')
 const { envelope } = require('@totalsoft/message-bus')
 
 const correlation = () => async (ctx, next) => {

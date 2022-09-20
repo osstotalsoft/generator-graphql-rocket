@@ -15,11 +15,11 @@ const dbInstanceCache = new Map();
 const mutex = new Mutex();
 const { KNEX_LOGGING, KNEX_DEBUG } = process.env;
 
-const logger = (_format, duration, query) => {
-    console.log(`${duration} ${query}`)
+const knexLogger = logger => (_format, duration, query) => {
+  logger.debug(`${duration} ${query}`)
 }
 
-const tenantDbInstanceFactory = async tenantId => {
+const tenantDbInstanceFactory = async (tenantId, { logger = console } = {}) => {
 
     return await dbInstanceGetOrAdd(tenantId, async () => {
         const dbConfig = await dbConfigService.getDbConfig(tenantId);
@@ -35,7 +35,7 @@ const tenantDbInstanceFactory = async tenantId => {
         }
 
         if (JSON.parse(KNEX_LOGGING)) {
-            knexTinyLogger(dbInstance, { logger });
+            knexTinyLogger(dbInstance, { logger: knexLogger(logger) })
         }
         <%_ if(addTracing){ _%>
         if (!JSON.parse(JAEGER_DISABLED)) {

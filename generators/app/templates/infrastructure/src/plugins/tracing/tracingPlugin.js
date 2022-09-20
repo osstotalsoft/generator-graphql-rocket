@@ -1,4 +1,4 @@
-const { getExternalSpan, traceError, traceErrors } = require("../../tracing/tracingUtils");
+const { getExternalSpan, traceError, traceErrors } = require('@totalsoft/opentracing');
 const SpanContext = require("./spanContext");
 const opentracing = require("opentracing");
 
