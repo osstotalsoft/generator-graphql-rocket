@@ -98,6 +98,7 @@ module.exports = class extends Generator {
       ignoreFiles = concat(
         [
           '**/features/tenant/**',
+          '**/multiTenancy/**',
           '**/middleware/tenantIdentification/**',
           '**/subscriptions/middleware/tenantContext.js',
           '**/prisma/tenancyFilter.js',
