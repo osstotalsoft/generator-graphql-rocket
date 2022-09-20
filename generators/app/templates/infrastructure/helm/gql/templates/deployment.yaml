@@ -14,7 +14,7 @@ metadata:
 <%_ if(addTracing){ _%>
   {{- if $global.jaeger.enabled | and $global.jaeger.agentAutoInject }}
   annotations:
-    sidecar.jaegertracing.io/inject: "true"
+    sidecar.jaegertracing.io/inject: "{{ $global.jaeger.agentAutoInject }}"
   {{- end }}
 <%_}_%>
 spec:
