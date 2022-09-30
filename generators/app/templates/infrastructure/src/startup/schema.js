@@ -7,9 +7,7 @@ const { join } = require('path')
 <%_ if(withRights || (dataLayer === "prisma" && withMultiTenancy)){ _%>
 const { applyMiddleware } = require('graphql-middleware')
 <%_}_%>
-<%_ if(dataLayer === "prisma" && withMultiTenancy){ _%>
-const { tenantIdentification } = require('./middleware/tenantIdentification')
-<%_}_%>
+
 <%_ if(withRights){ _%>
 const { permissionsMiddleware } = require('../middleware/permissions/index')
 <%_}_%>

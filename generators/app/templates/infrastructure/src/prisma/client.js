@@ -2,7 +2,7 @@ const { camelizeKeys } = require('humps')
 const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
-const { tenantContextAccessor } = require('../multiTenancy')
+const { tenantContextAccessor } = require('@totalsoft/multitenancy-core')
 <%_ if(hasSharedDb){ _%>
   const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
 <%_}else{_%>
