@@ -80,7 +80,7 @@ function prisma() {
         .replace('{user}', userName)
         .replace('{password}', password)
 
-      prismaClient = new PrismaClient({ datasources: { db: { url } } }, prismaOptions)
+      prismaClient = new PrismaClient({ ...prismaOptions, datasources: { db: { url } } })
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_}_%>

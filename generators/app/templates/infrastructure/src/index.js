@@ -68,7 +68,7 @@ const
 // MultiTenancy
 const { publicRoute } = require('./utils/functions'),
   ignore = require('koa-ignore'),
-  { tenantService, tenantContextAccessor } = require("@totalsoft/multitenancy-core"),
+  { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
   isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
