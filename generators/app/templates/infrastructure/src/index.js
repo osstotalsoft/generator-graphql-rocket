@@ -37,6 +37,11 @@ const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy)
 const { ApolloLoggerPlugin } = require("@totalsoft/pino-apollo"),
   { logger } = require("./startup");
 
+<%_ if(dataLayer == 'prisma') {_%>
+const { initialize } = require('./prisma')
+initialize({ logger })
+<%_}_%>
+
 <%_ if(addTracing){ _%>
 // Tracing
 const tracingPlugin = require('./plugins/tracing/tracingPlugin'),

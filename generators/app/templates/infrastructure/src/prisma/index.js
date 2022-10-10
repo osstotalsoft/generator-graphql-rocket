@@ -1,3 +1,3 @@
-const { prisma } = require('./client')
+const { prisma, initialize } = require('./client')
 
-module.exports = { prisma }
+module.exports = { prisma, initialize }

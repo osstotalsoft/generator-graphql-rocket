@@ -10,16 +10,27 @@ const { sanitizeConnectionInfo } = require('../utils/functions')
 <%_}_%>
 const isMultiTenant = JSON.parse(IS_MULTITENANT)
 <%_}_%>
+const isDebug = JSON.parse(PRISMA_DEBUG ?? false)
 
 const cacheMap = new Map()
-const prismaOptions = { log: JSON.parse(PRISMA_DEBUG ?? false) ? ['query'] : ['error'] }
+const prismaOptions = {
+  log: isDebug ? [{ emit: 'event', level: 'query' }] : [{ emit: 'event', level: 'error' }]
+}
+let logger = console
 
 const applyMiddleware = prismaClient => {
+  if (isDebug) {
+    prismaClient.$on('query', async e => {
+      logger.debug(`[${e.duration} ms] ${e.query} ${e.params}`)
+    })
+  }
+
   prismaClient.$on('warn', e => {
-    console.log(e)
+    logger.warn(e, e.message)
   })
+
   prismaClient.$on('error', e => {
-    console.log(e)
+    logger.error(e, e.message)
   })
 
   prismaClient.$use(async (params, next) => {
@@ -89,4 +100,10 @@ function prisma() {
   return prismaClient
 }
 
-module.exports = { prisma }
+function initialize(options = {}) {
+  if (options.logger) {
+    logger = options.logger
+  }
+}
+
+module.exports = { prisma, initialize }
