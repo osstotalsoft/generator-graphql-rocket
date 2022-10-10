@@ -71,8 +71,8 @@ const publicRoute = (ctx, publicRoutes = []) => {
   if (
     ctx.method === 'GET' ||
     ctx.request.body.operationName === 'IntrospectionQuery' ||
-    || (ctx.request.body.query && ctx.request.body.query.includes("IntrospectionQuery"))
-    || publicRoutes.includes(ctx.path.toLowerCase())
+    (ctx.request.body.query && ctx.request.body.query.includes("IntrospectionQuery")) ||
+    publicRoutes.includes(ctx.path.toLowerCase())
   ) {
     return true
   } else {

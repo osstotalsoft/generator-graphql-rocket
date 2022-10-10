@@ -58,6 +58,7 @@ global:
     natsDurableName: durable
     transport: "<%= messagingTransport %>"
 <%_}_%>
+<%_ if(dataLayer == "knex"){ _%>
   db:
     host: "[DB_HOST]"
     database: "[DB_NAME]"
@@ -66,6 +67,7 @@ global:
     password: "[DB_PASSWORD]"
     instanceName: ""
     trustServerCertificate: "false"
+<%_}_%>
 
 gql:
   enabled: true

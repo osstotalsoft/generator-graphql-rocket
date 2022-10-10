@@ -11,8 +11,7 @@ const tenantContext = async (ctx, next) => {
     throw new Error(`Tenant not configured on ws connect!`);
   }
 
-  const connectionInfo = await tenantConfiguration.getConnectionInfo(tenant.id, '<%= dbConnectionName %>');
-  const tenantContext = { tenant, connectionInfo };
+  const tenantContext = { tenant };
 
   return await tenantContextAccessor.useTenantContext(tenantContext, next);
 };

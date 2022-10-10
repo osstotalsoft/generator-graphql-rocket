@@ -99,13 +99,8 @@ async function startServer(httpServer) {
   <%_ if(addTracing){ _%>
   tracingEnabled && app.use(tracingMiddleware());
   <%_}_%>
-  app.use(cors());
-  <%_ if(withMultiTenancy){ _%>
-  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification, tenantIdentification()).if(ctx => publicRoute(ctx)))
-  <%_} else {_%>
-  app.use(jwtTokenValidation);
-  app.use(jwtTokenUserIdentification);
-  <%_}_%>
+  app.use(cors({ credentials: true }));
+  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
   <%_ if(dataLayer == "knex") {_%>
   app.use(contextDbInstance());
   <%_}_%>
