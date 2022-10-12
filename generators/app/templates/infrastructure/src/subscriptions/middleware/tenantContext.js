@@ -1,4 +1,4 @@
-const { tenantConfiguration, tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
 const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT);
 
 const tenantContext = async (ctx, next) => {
@@ -11,8 +11,7 @@ const tenantContext = async (ctx, next) => {
     throw new Error(`Tenant not configured on ws connect!`);
   }
 
-  const connectionInfo = await tenantConfiguration.getConnectionInfo(tenant.id, "leasingDatabase");
-  const tenantContext = { tenant, connectionInfo };
+  const tenantContext = { tenant };
 
   return await tenantContextAccessor.useTenantContext(tenantContext, next);
 };

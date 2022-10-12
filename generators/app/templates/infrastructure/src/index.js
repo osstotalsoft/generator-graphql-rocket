@@ -37,6 +37,11 @@ const { msgHandlers <% if(dataLayer == "knex" || addTracing || withMultiTenancy)
 const { ApolloLoggerPlugin } = require("@totalsoft/pino-apollo"),
   { logger } = require("./startup");
 
+<%_ if(dataLayer == 'prisma') {_%>
+const { initialize } = require('./prisma')
+initialize({ logger })
+<%_}_%>
+
 <%_ if(addTracing){ _%>
 // Tracing
 const tracingPlugin = require('./plugins/tracing/tracingPlugin'),
@@ -61,9 +66,9 @@ const
 
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
-const { introspectionRoute } = require('./utils/functions'),
+const { publicRoute } = require('./utils/functions'),
   ignore = require('koa-ignore'),
-  { tenantService, tenantContextAccessor } = require("@totalsoft/multitenancy-core"),
+  { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
   isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
@@ -84,9 +89,14 @@ const { jwtTokenValidation, jwtTokenUserIdentification, <% if(dataLayer == "knex
 
 let apolloServer;
 
+const loggingMiddleware = async (ctx, next) => {
+  ctx.logger = logger;
+  await next();
+};
+
 async function startServer(httpServer) {
   const app = new Koa();
-
+  app.use(loggingMiddleware)
   app.use(errorHandlingMiddleware())
   app.use(bodyParser());
   app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
@@ -94,13 +104,8 @@ async function startServer(httpServer) {
   <%_ if(addTracing){ _%>
   tracingEnabled && app.use(tracingMiddleware());
   <%_}_%>
-  app.use(cors());
-  <%_ if(withMultiTenancy){ _%>
-  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification, tenantIdentification()).if(ctx => introspectionRoute(ctx)))
-  <%_} else {_%>
-  app.use(jwtTokenValidation);
-  app.use(jwtTokenUserIdentification);
-  <%_}_%>
+  app.use(cors({ credentials: true }));
+  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
   <%_ if(dataLayer == "knex") {_%>
   app.use(contextDbInstance());
   <%_}_%>
@@ -218,7 +223,7 @@ apolloServer = new ApolloServer({
     plugins,
     dataSources: getDataSources,
     context: async ({ ctx }) => {
-      const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, correlationId, request, requestSpan } = ctx;
+      const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
       return {
         token,
         <%_ if(dataLayer == "knex") {_%>
@@ -230,7 +235,6 @@ apolloServer = new ApolloServer({
         tenant,
         <%_}_%>
         externalUser,
-        correlationId,
         request,
         requestSpan,
         logger
@@ -259,10 +263,6 @@ httpServer.listen(port, () => {
 const skipMiddleware = (_ctx, next) => next()
 <%_}_%>
 <%_ if(addMessaging) {_%>
-const loggingMiddleware = async (ctx, next) => {
-  ctx.logger = logger;
-  await next();
-};
 
 const msgHost = messagingHost();
 msgHost

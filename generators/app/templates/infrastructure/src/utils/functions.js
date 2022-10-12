@@ -67,11 +67,12 @@ const sanitizeConnectionInfo = connectionInfo => {
   return connectionInfo
 }
 
-const introspectionRoute = ctx => {
+const publicRoute = (ctx, publicRoutes = []) => {
   if (
     ctx.method === 'GET' ||
     ctx.request.body.operationName === 'IntrospectionQuery' ||
-    (ctx.request.body.query && ctx.request.body.query.includes('IntrospectionQuery'))
+    (ctx.request.body.query && ctx.request.body.query.includes("IntrospectionQuery")) ||
+    publicRoutes.includes(ctx.path.toLowerCase())
   ) {
     return true
   } else {
@@ -79,4 +80,4 @@ const introspectionRoute = ctx => {
   }
 }
 
-module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, sanitizeConnectionInfo, introspectionRoute };
+module.exports = { randomCharacters, formatArrayUrlParams, JSONConverter, postProcessDbResponse, parseConnectionString, sanitizeConnectionInfo, publicRoute };

@@ -109,6 +109,7 @@
     "koa-jwt": "^4.0.3",
     "lodash.merge": "^4.6.2",
     "mime-types": "^2.1.35",
+    "numeral": "^2.0.6",
     "path": "^0.12.7",
     "ramda": "^0.28.0",
     "tedious": "^14.7.0",

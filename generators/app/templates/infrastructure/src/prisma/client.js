@@ -2,7 +2,7 @@ const { camelizeKeys } = require('humps')
 const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
-const { tenantContextAccessor } = require('../multiTenancy')
+const { tenantContextAccessor, tenantConfiguration } = require('@totalsoft/multitenancy-core')
 <%_ if(hasSharedDb){ _%>
   const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
 <%_}else{_%>
@@ -10,16 +10,27 @@ const { sanitizeConnectionInfo } = require('../utils/functions')
 <%_}_%>
 const isMultiTenant = JSON.parse(IS_MULTITENANT)
 <%_}_%>
+const isDebug = JSON.parse(PRISMA_DEBUG ?? false)
 
 const cacheMap = new Map()
-const prismaOptions = { log: JSON.parse(PRISMA_DEBUG ?? false) ? ['query'] : ['error'] }
+const prismaOptions = {
+  log: isDebug ? [{ emit: 'event', level: 'query' }] : [{ emit: 'event', level: 'error' }]
+}
+let logger = console
 
 const applyMiddleware = prismaClient => {
+  if (isDebug) {
+    prismaClient.$on('query', async e => {
+      logger.debug(`[${e.duration} ms] ${e.query} ${e.params}`)
+    })
+  }
+
   prismaClient.$on('warn', e => {
-    console.log(e)
+    logger.warn(e, e.message)
   })
+
   prismaClient.$on('error', e => {
-    console.log(e)
+    logger.error(e, e.message)
   })
 
   prismaClient.$use(async (params, next) => {
@@ -33,10 +44,12 @@ function prisma() {
   let prismaClient
   <%_ if(withMultiTenancy){ _%>
   if (isMultiTenant) {
-    const { tenant: { id }, connectionInfo } = tenantContextAccessor.getTenantContext()
-    if (!id || !connectionInfo) throw new Error(`Could not identify tenant!`)
+    const { tenant: { id } } = tenantContextAccessor.getTenantContext()
+    if (!id) throw new Error(`Could not identify tenant!`)
 
     if (cacheMap.has(id)) return cacheMap.get(id)
+
+    const connectionInfo = tenantConfiguration.getConnectionInfo(id, '<%= dbConnectionName %>')
 
     <%_ if(hasSharedDb){ _%>
       prismaClient = new PrismaClient(prismaOptions)
@@ -67,7 +80,7 @@ function prisma() {
         .replace('{user}', userName)
         .replace('{password}', password)
 
-      prismaClient = new PrismaClient({ datasources: { db: { url } } }, prismaOptions)
+      prismaClient = new PrismaClient({ ...prismaOptions, datasources: { db: { url } } })
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_}_%>
@@ -87,4 +100,10 @@ function prisma() {
   return prismaClient
 }
 
-module.exports = { prisma }
+function initialize(options = {}) {
+  if (options.logger) {
+    logger = options.logger
+  }
+}
+
+module.exports = { prisma, initialize }

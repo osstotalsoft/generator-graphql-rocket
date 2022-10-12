@@ -31,7 +31,7 @@ const tenantDbInstanceFactory = async (tenantId, { logger = console } = {}) => {
         }
 
         if (JSON.parse(KNEX_DEBUG)) {
-            initializeTarnLogging(dbInstance.client.pool)
+            initializeTarnLogging(dbInstance.client.pool, { logger })
         }
 
         if (JSON.parse(KNEX_LOGGING)) {
