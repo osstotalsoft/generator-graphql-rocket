@@ -7,12 +7,9 @@ const { loadTypedefsSync } = require('@graphql-tools/load'),
   { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader'),
   { join } = require('path')
 
-<%_ if(withRights || (dataLayer === "prisma" && withMultiTenancy)){ _%>
-const { applyMiddleware } = require('graphql-middleware')
-<%_}_%>
-
 <%_ if(withRights){ _%>
-const { permissionsMiddleware } = require('../middleware/permissions/index')
+const { applyMiddleware } = require('graphql-middleware'),
+ { permissionsMiddleware } = require('../middleware/permissions/index')
 <%_}_%>
 
 
@@ -22,8 +19,8 @@ const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
 const typeDefs = sources.map(source => source.document)
 const resolvers = mergeResolvers(loadFilesSync(join(__dirname, '../**/resolvers.{js,ts}')))
 
-<%_ if(withRights || (dataLayer === "prisma" && withMultiTenancy)){ _%>
-module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers })<% if(withRights){ %>, permissionsMiddleware<%}%>);
+<%_ if(withRights){ _%>
+module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissionsMiddleware)
 <%_} else { _%>
 module.exports = makeExecutableSchema({ typeDefs, resolvers });
 <%_}_%>
