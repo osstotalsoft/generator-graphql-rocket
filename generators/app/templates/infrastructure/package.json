@@ -31,6 +31,8 @@
   "dependencies": {
     "@graphql-tools/graphql-file-loader": "^7.4.0",
     "@graphql-tools/load": "^7.7.0",
+    "@graphql-tools/load-files": "^6.6.1",
+    "@graphql-tools/merge": "^8.3.6",
     "@graphql-tools/schema": "^8.5.0",
     "@koa/cors": "^3.3.0",
     "@koa/router": "^11.0.1",
