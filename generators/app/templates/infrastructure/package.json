@@ -9,7 +9,7 @@
     "<%=packageManager%>": ">= <%= packageManagerVersion %>"
   },
   "scripts": {
-    "postinstall": "npx sort-package-json",
+    "postinstall": "npx -y sort-package-json",
     "setcodepage": "run-script-os",
     "setcodepage:linux": "",
     "setcodepage:windows": "chcp 65001",
@@ -83,7 +83,7 @@
     "console-stamp": "^3.0.6",
     "dotenv": "16.0.1",
     "graphql": "15.8.0",
-    "graphql-middleware": "^6.1.31",
+    "graphql-middleware": "^6.1.33",
     <%_ if(addSubscriptions){ _%>
     "apollo-server-core": "^3.10.0",
     "graphql-redis-subscriptions": "^2.5.0",
@@ -122,7 +122,6 @@
   },
   "devDependencies": {
     "cross-env": "7.0.3",
-    "easygraphql-tester": "^6.0.1",
     "eslint": "^8.19.0",
     "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-node": "^11.1.0",
