@@ -132,11 +132,11 @@ module.exports = class extends Generator {
         this.ignoreFiles
       )
 
+    if (!addHelm) this.ignoreFiles = concat(['**/helm/**'], this.ignoreFiles)
+
     const packageManagerVersion =
       packageManager === 'npm' ? NPM_MIN_VERSION : packageManager === 'yarn' ? YARN_MIN_VERSION : NPM_MIN_VERSION
     const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
-
-    if (!addHelm) this.ignoreFiles = concat(['**/helm/**'], this.ignoreFiles)
 
     this.fs.copyTpl(
       templatePath,
