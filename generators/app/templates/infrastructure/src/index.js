@@ -63,12 +63,11 @@ const
   metrics = require("./monitoring/metrics"),
   metricsPlugin = require("./plugins/metrics/metricsPlugin")
 
-
+  const { publicRoute } = require('./utils/functions'),
+  ignore = require('koa-ignore')
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
-const { publicRoute } = require('./utils/functions'),
-  ignore = require('koa-ignore'),
-  { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
+  ,{ tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
   isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
@@ -291,9 +290,13 @@ msgHost
 
 async function cleanup() {
   await configMonitor?.close();
+  <%_ if(addMessaging) {_%>
   await msgHost?.stop();
+  <%_}_%>
   await apolloServer?.stop();
+  <%_ if(addTracing) {_%>
   defaultTracer?.close();
+  <%_}_%>
 }
 
 const { gracefulShutdown } = require('@totalsoft/graceful-shutdown');

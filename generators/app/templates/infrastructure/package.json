@@ -36,6 +36,7 @@
     "@graphql-tools/schema": "^8.5.0",
     "@koa/cors": "^3.3.0",
     "@koa/router": "^11.0.1",
+    "koa-ignore": "^1.0.1",
     <%_ if(dataLayer === "prisma") {_%>
     "@prisma/client": "^4.1.1",
     "prisma": "^4.1.1",
@@ -53,7 +54,6 @@
     "@totalsoft/pino-mssqlserver": "^1.1.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
-    "koa-ignore": "^1.0.1",
       <%_ if(addQuickStart) {_%>
     "datasource-sql": "^2.0.1",
       <%_}_%>
@@ -76,6 +76,7 @@
     "apollo-datasource": "^3.3.2",
     "apollo-datasource-rest": "^3.6.1",
     "apollo-server": "^3.10.0",
+    "apollo-server-core": "^3.10.0",
     "apollo-server-koa": "^3.10.0",
     "async-mutex": "^0.3.2",
     "bluebird": "3.7.2",
@@ -84,7 +85,6 @@
     "dotenv": "16.0.1",
     "graphql": "15.8.0",
     <%_ if(addSubscriptions){ _%>
-    "apollo-server-core": "^3.10.0",
     "graphql-redis-subscriptions": "^2.5.0",
     "graphql-subscriptions": "^2.0.0",
     "graphql-ws": "^5.9.1",
@@ -109,7 +109,6 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-jwt": "^4.0.3",
-    "lodash.merge": "^4.6.2",
     "mime-types": "^2.1.35",
     "numeral": "^2.0.6",
     "path": "^0.12.7",
