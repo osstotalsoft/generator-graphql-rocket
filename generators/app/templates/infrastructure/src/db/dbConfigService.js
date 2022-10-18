@@ -41,8 +41,8 @@ const generateKnexConfig = ({
 })
 
 const getDbConfig = <% if(withMultiTenancy){ %>async ( tenantId )<%} else { %>()<%}%> => {
-  <%_ if(withMultiTenancy){ _%>
   let connectionInfo
+  <%_ if(withMultiTenancy){ _%>
 
   if (isMultiTenant) {
     connectionInfo = await tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')

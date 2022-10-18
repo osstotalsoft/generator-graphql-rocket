@@ -1,5 +1,7 @@
 const { dbInstanceFactory } = require('../../db')
+<%_ if(withMultiTenancy){ _%>
 const { tenantContextAccessor } = require('@totalsoft/multitenancy-core')
+<%_}_%>
 
 const contextDbInstance = () => async (ctx, next) => {
   <%_ if(withMultiTenancy){ _%>

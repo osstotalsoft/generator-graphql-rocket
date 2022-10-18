@@ -1,5 +1,4 @@
 const { makeExecutableSchema } = require('@graphql-tools/schema')
-const merge = require('lodash.merge');
 
 const { loadTypedefsSync } = require('@graphql-tools/load'),
   { loadFilesSync } = require('@graphql-tools/load-files'),
