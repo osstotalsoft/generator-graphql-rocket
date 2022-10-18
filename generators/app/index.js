@@ -66,7 +66,7 @@ module.exports = class extends Generator {
     const templatePath = this.templatePath('infrastructure/**/*')
     const destinationPath = this.destinationPath()
 
-    this.ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
+    this.ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/gql/**']
 
     if (dataLayer === 'knex') this.ignoreFiles = concat(['**/prisma/**'], this.ignoreFiles)
     if (dataLayer === 'prisma')
@@ -135,6 +135,8 @@ module.exports = class extends Generator {
     const packageManagerVersion =
       packageManager === 'npm' ? NPM_MIN_VERSION : packageManager === 'yarn' ? YARN_MIN_VERSION : NPM_MIN_VERSION
     const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
+
+    if (!addHelm) this.ignoreFiles = concat(['**/helm/**'], this.ignoreFiles)
 
     this.fs.copyTpl(
       templatePath,
