@@ -25,16 +25,11 @@ const jwtTokenValidation = (ctx, next) => {
 }
 
 const jwtTokenUserIdentification = async (ctx, next) => {
-  let externalUser = {};
-  if (ctx.state?.jwtdata) {
-      externalUser = {
-        id: ctx.state.jwtdata.sub,
-        role: ctx.state.jwtdata.role,
-      };
-  }
 
-  ctx.token = ctx.state?.token
-  ctx.externalUser = externalUser;
+  const { jwtdata, token } = ctx?.state ?? {}
+  ctx.token = token
+  ctx.externalUser = jwtdata ? { id: jwtdata.sub, role: jwtdata.role } : {}
+
   await next();
 }
 

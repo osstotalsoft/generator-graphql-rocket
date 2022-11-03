@@ -7,7 +7,7 @@
       "resource": "[myServiceName]",
       "resourceType": "service",
       "ports": [4000],
-      "targetCluster": "charisma-online-aks",
+      "targetCluster": "[myCluster]",
       "targetNamespace": "[myNamespace]",
       "useKubernetesServiceEnvironmentVariables": false
     }

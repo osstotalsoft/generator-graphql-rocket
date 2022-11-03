@@ -5,19 +5,21 @@ const { TenantId, UserId, UserPassport } = require("../constants/customHttpHeade
 class ApiRESTDataSource extends NoCacheRESTDataSource {
 
   willSendRequest(request) {
+    const { jwtdata } = this.context.state ?? {}
     <%_ if(withMultiTenancy){ _%>
-    request.headers.set(TenantId, this.context.state?.jwtdata?.tid ?? "");
+    request.headers.set(TenantId, jwtdata?.tid);
     <%_}_%}
-    request.headers.set(UserPassport, this.context.state?.jwtdata ? JSON.stringify(this.context.state.jwtdata) : "");
-    request.headers.set(UserId, this.context.state?.jwtdata?.sub ?? "");
+    request.headers.set(UserPassport, jwtdata ? JSON.stringify(jwtdata) : undefined);
+    request.headers.set(UserId, jwtdata?.sub);
 
     //TODO to be removed
     if (this.context.token) {
       request.headers.set("Authorization", `Bearer ${this.context.token}`);
     }
 
-    if (this.context.request?.headers?.["accept-language"])
-      request.headers.set("Accept-Language", this.context.request.headers["accept-language"]);
+    const acceptLanguage = this.context.request?.headers?.["accept-language"]
+    if (acceptLanguage)
+      request.headers.set("Accept-Language", acceptLanguage);
 
     const correlationId = correlationManager.getCorrelationId();
     if (correlationId)

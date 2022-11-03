@@ -161,7 +161,7 @@ async function startServer(httpServer) {
             }
         <%_}_%>
 
-        ctx.state = {'jwtdata':decoded, 'token':token}
+        ctx.state = {jwtdata:decoded, token}
       },
       subscribe: subscribe({
         middleware: [subscriptionMiddleware.correlation<% if(withMultiTenancy) {%>, subscriptionMiddleware.tenantContext<%}%><% if(addTracing) {%>, subscriptionMiddleware.tracing<%}%>],
