@@ -16,7 +16,7 @@ const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
   loaders: [new GraphQLFileLoader()]
 })
 const typeDefs = sources.map(source => source.document)
-const resolvers = mergeResolvers(loadFilesSync(join(__dirname, '../**/resolvers.{js,ts}')))
+const resolvers = mergeResolvers(join(__dirname, '../**/*resolvers.{js,ts}'), { globOptions: { caseSensitiveMatch: false } })
 
 <%_ if(withRights){ _%>
 module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissionsMiddleware)

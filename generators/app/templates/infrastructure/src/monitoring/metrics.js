@@ -55,9 +55,9 @@ const requestDuration =
 const subscriptionStarted =
     meter.createCounter('gql_subscription_started', { description: 'The number of subscriptions.' });
 
-async function startServer() {
+async function startServer(logger) {
     await exporter.startServer();
-    console.log(
+    logger.info(
         `🚀 Metrics server ready at http://localhost:${port}${endpoint}`,
     );
 }
