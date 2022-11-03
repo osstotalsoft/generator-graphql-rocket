@@ -7,7 +7,7 @@ class ApiRESTDataSource extends NoCacheRESTDataSource {
   willSendRequest(request) {
     <%_ if(withMultiTenancy){ _%>
     request.headers.set(TenantId, this.context.state?.jwtdata?.tid ?? "");
-    <%_}_%}
+    <%_}_%>
     request.headers.set(UserPassport, this.context.state?.jwtdata ? JSON.stringify(this.context.state.jwtdata) : "");
     request.headers.set(UserId, this.context.state?.jwtdata?.sub ?? "");
 
