@@ -312,5 +312,5 @@ gracefulShutdown({
   timeout: 5000
 })
 
-diagnosticsEnabled && diagnostics.startServer();
-metricsEnabled && metrics.startServer();
+diagnosticsEnabled && diagnostics.startServer(logger);
+metricsEnabled && metrics.startServer(logger);

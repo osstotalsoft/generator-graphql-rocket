@@ -40,9 +40,9 @@ function index(ctx) {
 }
 
 const port = process.env.DIAGNOSTICS_PORT || 4001;
-function startServer() {
+function startServer(logger) {
   app.listen(port);
-  console.log(`🚀 Diagnostics server ready at http://localhost:${port}/`);
+  logger.info(`🚀 Diagnostics server ready at http://localhost:${port}/`);
 }
 
 module.exports = {
