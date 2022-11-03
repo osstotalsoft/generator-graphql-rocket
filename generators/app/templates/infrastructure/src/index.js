@@ -63,11 +63,9 @@ const
   metrics = require("./monitoring/metrics"),
   metricsPlugin = require("./plugins/metrics/metricsPlugin")
 
-  const { publicRoute } = require('./utils/functions'),
-  ignore = require('koa-ignore')
 <%_ if(withMultiTenancy){ _%>
 // MultiTenancy
-  ,{ tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
+const { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
   isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || 'false')
 <%_}_%>
 
@@ -92,6 +90,9 @@ const loggingMiddleware = async (ctx, next) => {
   ctx.logger = logger;
   await next();
 };
+
+const { publicRoute } = require('./utils/functions'),
+ignore = require('koa-ignore')
 
 async function startServer(httpServer) {
   const app = new Koa();
@@ -159,6 +160,8 @@ async function startServer(httpServer) {
               ctx.tenant = {};
             }
         <%_}_%>
+
+        ctx.state = {'jwtdata':decoded, 'token':token}
       },
       subscribe: subscribe({
         middleware: [subscriptionMiddleware.correlation<% if(withMultiTenancy) {%>, subscriptionMiddleware.tenantContext<%}%><% if(addTracing) {%>, subscriptionMiddleware.tracing<%}%>],
@@ -222,9 +225,10 @@ apolloServer = new ApolloServer({
     plugins,
     dataSources: getDataSources,
     context: async ({ ctx }) => {
-      const { token, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
+      const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
       return {
         token,
+        state,
         <%_ if(dataLayer == "knex") {_%>
         dbInstance,
         dbInstanceFactory,

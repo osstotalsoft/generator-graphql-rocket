@@ -66,7 +66,7 @@ module.exports = class extends Generator {
     const templatePath = this.templatePath('infrastructure/**/*')
     const destinationPath = this.destinationPath()
 
-    this.ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/gql/**']
+    this.ignoreFiles = ['.npmignore', '**/.gitignore-template', '**/helm/gql/**']
 
     if (dataLayer === 'knex') this.ignoreFiles = concat(['**/prisma/**'], this.ignoreFiles)
     if (dataLayer === 'prisma')
@@ -138,6 +138,9 @@ module.exports = class extends Generator {
       packageManager === 'npm' ? NPM_MIN_VERSION : packageManager === 'yarn' ? YARN_MIN_VERSION : NPM_MIN_VERSION
     const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
 
+    this.ignoreFiles = ['.npmignore']
+    this.ignoreFiles = this.ignoreFiles.map(f => this.templatePath(`infrastructure/${f}`).replaceAll('\\', '/'))
+
     this.fs.copyTpl(
       templatePath,
       destinationPath,
@@ -145,6 +148,12 @@ module.exports = class extends Generator {
       {},
       { globOptions: { ignore: this.ignoreFiles, dot: true } }
     )
+
+
+    const globby = require("globby");
+
+    const fromGlob = templatePath;
+    const diskFiles =  globby.sync(fromGlob, { ignore: this.ignoreFiles, dot: true }).map((file) => path.resolve(file));
 
     const gitignorePath = this.templatePath('infrastructure/.gitignore-template')
     const gitignoreDestinationPath = path.join(destinationPath, `/.gitignore`)
