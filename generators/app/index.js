@@ -15,7 +15,6 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, { ...opts, skipRegenerate: true, ignoreWhitespace: true, force: true, skipLocalCache: false })
     this.registerClientTransforms()
-    this.ignoreFiles = []
   }
 
   async prompting() {
@@ -66,11 +65,11 @@ module.exports = class extends Generator {
     const templatePath = this.templatePath('infrastructure/**/*')
     const destinationPath = this.destinationPath()
 
-    this.ignoreFiles = ['.npmignore', '**/.gitignore-template', '**/helm/gql/**']
+    let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
 
-    if (dataLayer === 'knex') this.ignoreFiles = concat(['**/prisma/**'], this.ignoreFiles)
+    if (dataLayer === 'knex') ignoreFiles = concat(['**/prisma/**'], ignoreFiles)
     if (dataLayer === 'prisma')
-      this.ignoreFiles = concat(
+      ignoreFiles = concat(
         [
           '**/src/db/**',
           '**/middleware/db/**',
@@ -82,15 +81,21 @@ module.exports = class extends Generator {
           '**/tracing/knexTracer.js',
           '**/utils/sqlDataSource.js'
         ],
-        this.ignoreFiles
+        ignoreFiles
       )
     if (dataLayer === 'knex' && withMultiTenancy)
-      this.ignoreFiles = concat(['**/db/dbInstanceFactory.js', '**/startup/middleware'], this.ignoreFiles)
-    if (!addSubscriptions) this.ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**'], this.ignoreFiles)
-    if (!addMessaging) this.ignoreFiles = append('**/messaging/**', this.ignoreFiles)
+      ignoreFiles = concat(
+        [
+          '**/db/dbInstanceFactory.js',
+          '**/startup/middleware'
+        ],
+        ignoreFiles
+      )
+    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**'], ignoreFiles)
+    if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
 
     if (!withMultiTenancy)
-      this.ignoreFiles = concat(
+      ignoreFiles = concat(
         [
           '**/features/tenant/**',
           '**/multiTenancy/**',
@@ -99,28 +104,19 @@ module.exports = class extends Generator {
           '**/prisma/tenancyFilter.js',
           '**/pubSub/middleware/tenantPublish.js'
         ],
-        this.ignoreFiles
+        ignoreFiles
       )
     if (!hasSharedDb)
-      this.ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], this.ignoreFiles)
-    if (!addTracing)
-      this.ignoreFiles = concat(
-        [
-          '**/tracing/**',
-          '**/startup/middleware/tracing.js',
-          '**/pubSub/middlware/tracingPublish.js',
-          '**/__mocks__/opentracing.js'
-        ],
-        this.ignoreFiles
-      )
+      ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
+    if (!addTracing) ignoreFiles = concat(['**/tracing/**', '**/startup/middleware/tracing.js', '**/pubSub/middlware/tracingPublish.js', '**/__mocks__/opentracing.js'], ignoreFiles)
     if (!withRights)
-      this.ignoreFiles = concat(
+      ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],
-        this.ignoreFiles
+        ignoreFiles
       )
 
     if (!addQuickStart)
-      this.ignoreFiles = concat(
+      ignoreFiles = concat(
         [
           '**/features/common/dbGenerators.js',
           '**/features/tenant/**',
@@ -129,31 +125,20 @@ module.exports = class extends Generator {
           '**/middleware/permissions/__tests__/**',
           '**/README.md'
         ],
-        this.ignoreFiles
+        ignoreFiles
       )
-
-    if (!addHelm) this.ignoreFiles = concat(['**/helm/**'], this.ignoreFiles)
 
     const packageManagerVersion =
       packageManager === 'npm' ? NPM_MIN_VERSION : packageManager === 'yarn' ? YARN_MIN_VERSION : NPM_MIN_VERSION
     const packageManagerLockFile = packageManager === 'yarn' ? 'yarn.lock' : 'package-lock.json'
-
-    this.ignoreFiles = ['.npmignore']
-    this.ignoreFiles = this.ignoreFiles.map(f => this.templatePath(`infrastructure/${f}`).replaceAll('\\', '/'))
 
     this.fs.copyTpl(
       templatePath,
       destinationPath,
       { ...this.answers, packageManagerVersion, packageManagerLockFile },
       {},
-      { globOptions: { ignore: this.ignoreFiles, dot: true } }
+      { globOptions: { ignore: ignoreFiles, dot: true } }
     )
-
-
-    const globby = require("globby");
-
-    const fromGlob = templatePath;
-    const diskFiles =  globby.sync(fromGlob, { ignore: this.ignoreFiles, dot: true }).map((file) => path.resolve(file));
 
     const gitignorePath = this.templatePath('infrastructure/.gitignore-template')
     const gitignoreDestinationPath = path.join(destinationPath, `/.gitignore`)
@@ -170,11 +155,6 @@ module.exports = class extends Generator {
         { globOptions: { dot: true } }
       )
     }
-  }
-
-  conflicts() {
-    if (!this.isLatest) return
-    this.ignoreFiles.map(f => this.deleteDestination(f, { globOptions: { onlyFiles: false, dot: true, silent: true } }))
   }
 
   install() {
