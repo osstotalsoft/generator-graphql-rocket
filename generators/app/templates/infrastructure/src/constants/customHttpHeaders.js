@@ -1,7 +1,7 @@
 const customHttpHeaders = {
-  <%_ if(withMultiTenancy){ _%>
+  <%_ if(withMultiTenancy) {_%>
   TenantId: "TenantId",
-  <%_}_%}
+  <%_}_%>
   UserId: "user-id",
   UserPassport: "user-passport"
 };

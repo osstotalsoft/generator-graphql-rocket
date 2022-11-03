@@ -10,7 +10,7 @@ module.exports = {
   correlation,
   <%_ if(addTracing) {_%>
   tracing,
-  <%_}_%
+  <%_}_%>
   <%_ if(withMultiTenancy) {_%>
   tenantContext
   <%_}_%>
