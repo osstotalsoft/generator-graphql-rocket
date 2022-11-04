@@ -3,7 +3,7 @@ const {
     isAdmin,
     canViewDashboard
   } = require('../rules')
-  const { isRuleFunction } = require('graphql-shield/dist/utils')
+  const { isRuleFunction } = require('graphql-shield/esm/utils')
   
   describe('Test permission rules to be valid rule functions', () => {
     test('isAuthenticated is valid rule function', () => {

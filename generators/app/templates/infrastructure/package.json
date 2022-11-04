@@ -75,7 +75,7 @@
     <%_}_%>
     "apollo-datasource": "^3.3.2",
     "apollo-datasource-rest": "^3.6.1",
-    "apollo-server": "^3.10.0",
+    "apollo-server": "^3.11.1",
     "apollo-server-core": "^3.10.0",
     "apollo-server-koa": "^3.10.0",
     "async-mutex": "^0.3.2",
@@ -83,7 +83,7 @@
     "colors": "^1.4.0",
     "console-stamp": "^3.0.6",
     "dotenv": "16.0.1",
-    "graphql": "15.8.0",
+    "graphql": "16.6.0",
     <%_ if(addSubscriptions){ _%>
     "graphql-redis-subscriptions": "^2.5.0",
     "graphql-subscriptions": "^2.0.0",
@@ -93,14 +93,13 @@
     <%_}_%>
     <%_ if(withRights){ _%>
     "graphql-middleware": "^6.1.33",
-    "graphql-shield": "^7.5.0",
+    "graphql-shield": "7.6.4",
     <%_}_%>
     "graphql-upload": "^13.0.0",
     "humps": "^2.0.1",
     <%_ if(addTracing){ _%>
     "jaeger-client": "^3.19.0",
     "opentracing": "^0.14.7",
-    "apollo-opentracing": "^2.1.76",
     "@totalsoft/opentracing": "^1.1.0",
     "@totalsoft/pino-opentracing": "^1.1.0",
     <%_}_%>

@@ -1,5 +1,5 @@
-const { default: isAsyncIterable } = require("graphql/jsutils/isAsyncIterable");
-const { default: mapAsyncIterator } = require("graphql/subscription/mapAsyncIterator");
+const { isAsyncIterable } = require("graphql/jsutils/isAsyncIterable");
+const { mapAsyncIterator } = require("graphql/execution/mapAsyncIterator");
 const { execute, createSourceEventStream, GraphQLError } = require("graphql");
 const { pipelineBuilder } = require("../utils/pipeline");
 
@@ -35,21 +35,6 @@ function subscribe({ middleware, filter }) {
           filter
         );
   };
-}
-/**
- * This function checks if the error is a GraphQLError. If it is, report it as
- * an ExecutionResult, containing only errors and no data. Otherwise treat the
- * error as a system-class error and re-throw it.
- */
-
-function reportGraphQLError(error) {
-  if (error instanceof GraphQLError) {
-    return {
-      errors: [error]
-    };
-  }
-
-  throw error;
 }
 
 function filterAsyncIterable(asyncIterable, predicate) {
@@ -118,8 +103,7 @@ function subscribeImpl(args, pipeline, filter) {
     return isAsyncIterable(resultOrStream)
       ? mapAsyncIterator(
           filter ? filterAsyncIterable(resultOrStream, filter(contextValue)) : resultOrStream,
-          mapSourceToResponse,
-          reportGraphQLError
+          mapSourceToResponse
         )
       : resultOrStream;
   });
