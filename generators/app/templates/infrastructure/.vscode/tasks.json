@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "bridge-to-kubernetes.resource",
+      "type": "bridge-to-kubernetes.resource",
+      "resource": "[myServiceName]",
+      "resourceType": "service",
+      "ports": [4000],
+      "targetCluster": "[myCluster]",
+      "targetNamespace": "[myNamespace]",
+      "useKubernetesServiceEnvironmentVariables": false
+    }
+  ]
+}

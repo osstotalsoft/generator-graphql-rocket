@@ -18,26 +18,17 @@ const jwtTokenValidation = (ctx, next) => {
     secret: jwksRsa.koaJwtSecret(client),
     issuer: IDENTITY_AUTHORITY,
     algorithms: ["RS256"],
-    key: 'jwtdata'
+    key: 'jwtdata',
+    tokenKey: 'token',
   });
   return validateJwtToken(ctx, next);
 }
 
 const jwtTokenUserIdentification = async (ctx, next) => {
-  const token = ctx.req.headers.authorization || "";
-  let externalUser = {};
-  if (token) {
-    const decoded = jsonwebtoken.decode(token.replace("Bearer ", ""));
-    if (decoded) {
-      externalUser = {
-        id: decoded.sub,
-        role: decoded.role
-      }
-    }
-  }
 
-  ctx.token = token;
-  ctx.externalUser = externalUser;
+  const { jwtdata, token } = ctx?.state ?? {}
+  ctx.token = token
+  ctx.externalUser = jwtdata ? { id: jwtdata.sub, role: jwtdata.role } : {}
 
   await next();
 }

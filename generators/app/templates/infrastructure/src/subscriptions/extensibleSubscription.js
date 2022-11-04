@@ -53,13 +53,23 @@ function reportGraphQLError(error) {
 }
 
 function filterAsyncIterable(asyncIterable, predicate) {
-  return (async function* () {
-    for await (const item of asyncIterable) {
-      if (predicate(item)) {
-        yield item;
+  return {
+    async next() {
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const item = await asyncIterable.next();
+        if (item.done) {
+          return { done: true };
+        }
+        if (predicate(item.value)) {
+          return item;
+        }
       }
-    }
-  })();
+    },
+    return(val) { return asyncIterable.return(val) },
+    throw() { return asyncIterable.throw() },
+    [Symbol.asyncIterator]() { return this }
+  }
 }
 
 function subscribeImpl(args, pipeline, filter) {

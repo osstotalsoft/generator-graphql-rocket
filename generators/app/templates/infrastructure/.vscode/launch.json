@@ -10,6 +10,7 @@
       "name": "Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\src\\index.js",
+      "outputCapture": "std",
       "env": {
         "NODE_ENV": "development"
       }
@@ -21,6 +22,7 @@
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\src\\index.js",
       "preLaunchTask": "bridge-to-kubernetes.resource",
+      "outputCapture": "std",
       "env": {
         "GRPC_DNS_RESOLVER": "native",
         "NODE_ENV": "development"
