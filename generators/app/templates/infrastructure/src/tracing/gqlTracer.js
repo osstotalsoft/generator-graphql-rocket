@@ -8,16 +8,11 @@ const initGqlTracer = ({ logger = console } = {}) => {
   return tracer
 }
 
-function _isPrimitive(value) {
-  if (value instanceof Date || value === null || value === undefined) return true
+function _shouldTraceFieldResolver({ info }) {
+  const { schema, parentType, path } = info || {};
 
-  return typeof value !== 'object'
-}
-
-function _shouldTraceFieldResolver({ source, info }) {
-  const isResolved = source && typeof source === 'object' && info.path.key in source
-  const isPrimitive = isResolved && _isPrimitive(source[info.path.key])
-  return !isResolved || !isPrimitive
+  const customResolver = schema?.resolvers[parentType?.name]?.[path?.key];
+  return Boolean(customResolver);
 }
 
 const _onRequestResolving = (span, _info) => {
