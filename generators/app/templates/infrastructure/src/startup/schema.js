@@ -24,3 +24,6 @@ module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), 
 module.exports = makeExecutableSchema({ typeDefs, resolvers });
 <%_}_%>
 module.exports.tests = { typeDefs, resolvers }
+module.exports.resolvers = resolvers;
+
+
