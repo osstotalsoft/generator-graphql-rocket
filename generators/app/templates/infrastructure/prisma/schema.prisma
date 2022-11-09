@@ -9,7 +9,7 @@ datasource db {
 
 // Example of generated code
 model User {
-  id    Int     @id @default(autoincrement())
-  firstName  String?
-  lastName  String?
+  Id    Int     @id @default(autoincrement())
+  FirstName  String?
+  LastName  String?
 }
