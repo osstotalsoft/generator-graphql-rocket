@@ -70,7 +70,7 @@
       <%_} _%>
     <%_}_%>
     <%_ if(addMessaging || (withMultiTenancy && addSubscriptions)) {_%>
-    "@totalsoft/message-bus": "^2.4.2",
+    "@totalsoft/message-bus": "^2.4.7",
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
     "apollo-datasource": "^3.3.2",
