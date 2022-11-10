@@ -1,6 +1,6 @@
 const { isAsyncIterable } = require("graphql/jsutils/isAsyncIterable");
 const { mapAsyncIterator } = require("graphql/execution/mapAsyncIterator");
-const { execute, createSourceEventStream, GraphQLError } = require("graphql");
+const { execute, createSourceEventStream } = require("graphql");
 const { pipelineBuilder } = require("../utils/pipeline");
 
 function subscribe({ middleware, filter }) {

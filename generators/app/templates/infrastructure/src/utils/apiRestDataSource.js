@@ -1,6 +1,6 @@
 const { correlationManager } = require("@totalsoft/correlation");
 const NoCacheRESTDataSource = require("./noCacheRESTDataSource");
-const { TenantId, UserId, UserPassport } = require("../constants/customHttpHeaders");
+const { <% if(withMultiTenancy){ %>TenantId,<%}%> UserId, UserPassport } = require("../constants/customHttpHeaders");
 
 class ApiRESTDataSource extends NoCacheRESTDataSource {
 
