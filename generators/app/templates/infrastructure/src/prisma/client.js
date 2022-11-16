@@ -59,10 +59,7 @@ function prisma() {
         prismaClient.$use(async (params, next) => {
           const tableHasColumnTenant = tableHasColumnTenantId(params.model)
           if (tableHasColumnTenant) {
-            const { id } = getTenantContext()
-
             addTenantFilter(params, id)
-
             const result = await next(params)
             return result
           }
