@@ -18,10 +18,12 @@ require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l, utc)'
   })
 
-const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('apollo-server-koa'),
+const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('@apollo/server'),
   Koa = require("koa"),
-  { ApolloServerPluginDrainHttpServer } = require("apollo-server-core"),
+  { ApolloServerPluginDrainHttpServer } = require("@apollo/server/plugin/drainHttpServer"),
   { createServer } = require('http')
+
+const { koaMiddleware } = require('@as-integrations/koa')
 
 // Auth
 const cors = require("@koa/cors");
@@ -82,9 +84,7 @@ const { dbInstanceFactory } = require("./db")
 <%_}_%>
 const { jwtTokenValidation, jwtTokenUserIdentification, <% if(dataLayer == "knex") {%>contextDbInstance, <%}%> <% if(addSubscriptions){ %>validateWsToken,  <%}%>
   <% if(withMultiTenancy){ %>tenantIdentification, <%}%>correlationMiddleware, <% if(addTracing){ %>tracingMiddleware ,<%}%> errorHandlingMiddleware } = require("./middleware"),
-  { schema, <% if(addSubscriptions){ %>initializedDataSources, <%}%>getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index')
-
-let apolloServer;
+  { schema, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>} = require('./startup/index')
 
 const loggingMiddleware = async (ctx, next) => {
   ctx.logger = logger;
@@ -95,42 +95,6 @@ const { publicRoute } = require('./utils/functions'),
 ignore = require('koa-ignore')
 
 async function startServer(httpServer) {
-  const app = new Koa();
-  app.use(loggingMiddleware)
-  app.use(errorHandlingMiddleware())
-  app.use(bodyParser());
-  app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
-  app.use(correlationMiddleware());
-  <%_ if(addTracing){ _%>
-  tracingEnabled && app.use(tracingMiddleware());
-  <%_}_%>
-  app.use(cors({ credentials: true }));
-  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
-  <%_ if(dataLayer == "knex") {_%>
-  app.use(contextDbInstance());
-  <%_}_%>
-
-  const plugins = [
-    ApolloServerPluginDrainHttpServer({ httpServer }),
-    new ApolloLoggerPlugin({ logger, securedMessages: false }),
-    <%_ if(addSubscriptions) {_%>
-    {
-        async serverWillStart() {
-            return {
-            async drainServer() {
-                await subscriptionServer.dispose();
-            }
-            };
-        }
-    },
-    <%_}_%>
-    <%_ if(addTracing){ _%>
-        tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {},
-    <%_}_%>
-    metricsEnabled ? metricsPlugin() : {}
-  ]
-
-
   <%_ if(addSubscriptions){ _%>
   logger.info('Creating Subscription Server...')
   const subscriptionServer = useServer(
@@ -185,7 +149,7 @@ async function startServer(httpServer) {
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
             }
         <%_}_%>
-        const dataSources = getDataSources()
+        const dataSources = getDataSources(ctx)
         const subscriptionLogger = logger.child({ operationName: msg?.payload?.operationName });
 
         return {
@@ -217,39 +181,80 @@ async function startServer(httpServer) {
   );
   <%_}_%>
 
-logger.info("Creating Apollo Server...");
-apolloServer = new ApolloServer({
+  const plugins = [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    new ApolloLoggerPlugin({ logger, securedMessages: false }),
+    <%_ if(addSubscriptions) {_%>
+    {
+        async serverWillStart() {
+            return {
+            async drainServer() {
+                await subscriptionServer.dispose();
+            }
+            };
+        }
+    },
+    <%_}_%>
+    <%_ if(addTracing){ _%>
+        tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {},
+    <%_}_%>
+    metricsEnabled ? metricsPlugin() : {}
+  ]
+
+  logger.info("Creating Apollo Server...");
+  const apolloServer = new ApolloServer({
     schema,
     stopOnTerminationSignals: false,
     uploads: false,
-    plugins,
-    dataSources: getDataSources,
-    context: async ({ ctx }) => {
-      const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
-      return {
-        token,
-        state,
-        <%_ if(dataLayer == "knex") {_%>
-        dbInstance,
-        dbInstanceFactory,
-        dataLoaders: getDataLoaders(dbInstance),
-        <%_}_%>
-        <%_ if(withMultiTenancy){ _%>
-        tenant,
-        <%_}_%>
-        externalUser,
-        request,
-        requestSpan,
-        logger
-      }
-    }
+    plugins
   })
 
   await apolloServer.start()
-  apolloServer.getMiddleware({ cors: {} })
-  apolloServer.applyMiddleware({ app })
+  
+  const app = new Koa();
+  app.use(loggingMiddleware)
+  app.use(errorHandlingMiddleware())
+  app.use(bodyParser());
+  app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
+  app.use(correlationMiddleware());
+  <%_ if(addTracing){ _%>
+  tracingEnabled && app.use(tracingMiddleware());
+  <%_}_%>
+  app.use(cors({ credentials: true }));
+  app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
+  <%_ if(dataLayer == "knex") {_%>
+  app.use(contextDbInstance());
+  <%_}_%>
+  app.use(
+    koaMiddleware(apolloServer,{
+      context: async ({ ctx }) => {
+        const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
+        const { cache } = apolloServer
+        const dataSources = getDataSources({ ...ctx, cache })
+        return {
+          token,
+          state,
+          <%_ if(dataLayer == "knex") {_%>
+          dbInstance,
+          dbInstanceFactory,
+          dataLoaders: getDataLoaders(dbInstance),
+          <%_}_%>
+          <%_ if(withMultiTenancy){ _%>
+          tenant,
+          <%_}_%>
+          externalUser,
+          request,
+          requestSpan,
+          logger,
+          dataSources
+        }
+      }
+    })
+  )
+  
   httpServer.on('request', app.callback())
 
+  return apolloServer
 }
 
 const httpServer = createServer()
