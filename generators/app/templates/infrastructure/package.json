@@ -57,9 +57,6 @@
     "@totalsoft/pino-mssqlserver": "^1.1.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
-      <%_ if(addQuickStart) {_%>
-    "datasource-sql": "^2.0.1",
-      <%_}_%>
     "@totalsoft/multitenancy-core": "^1.1.0",
     "@totalsoft/pino-multitenancy": "^1.1.0",
     <%_}_%>

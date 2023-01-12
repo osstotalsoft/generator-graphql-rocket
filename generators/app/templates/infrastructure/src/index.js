@@ -18,10 +18,14 @@ require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l, utc)'
   })
 
-const { ApolloServer<% if(addSubscriptions){ %>, ForbiddenError <%}%>} = require('@apollo/server'),
+const { ApolloServer } = require('@apollo/server'),
   Koa = require("koa"),
   { ApolloServerPluginDrainHttpServer } = require("@apollo/server/plugin/drainHttpServer"),
   { createServer } = require('http')
+
+<% if(addSubscriptions){ %>
+  const { GraphQLError } = require("graphql")
+<%_}_%>
 
 const { koaMiddleware } = require('@as-integrations/koa')
 
@@ -104,7 +108,7 @@ async function startServer(httpServer) {
         const connectionParams = ctx?.connectionParams;
         const token = connectionParams.authorization.replace("Bearer ", "");
         if (!token) {
-          throw new ForbiddenError("401 Unauthorized");
+          throw new GraphQLError("401 Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
         }
         ctx.token = token;
 
@@ -161,14 +165,14 @@ async function startServer(httpServer) {
             dbInstance,
             <%_ if(withMultiTenancy){ _%>
             dataSources: tenantContextAccessor.useTenantContext({ tenant }, async () =>
-              initializedDataSources(ctx, dbInstance, dataSources)
+              getDataSources(ctx)
             ),
             <%_} else {_%>
-            dataSources: initializedDataSources(ctx, dbInstance, dataSources),
+            dataSources,
             <%_}_%>
             dataLoaders: getDataLoaders(dbInstance),
             <%_}else{_%>
-            dataSources: initializedDataSources(ctx, dataSources),
+            dataSources,
             <%_}_%>
             logger: subscriptionLogger
         }
@@ -258,7 +262,7 @@ async function startServer(httpServer) {
 }
 
 const httpServer = createServer()
-startServer(httpServer)
+const apolloServer = startServer(httpServer)
 const port = process.env.PORT || 4000;
 httpServer.listen(port, () => {
   logger.info(`🚀 Server ready at http://localhost:${port}/graphql`)
@@ -302,7 +306,7 @@ async function cleanup() {
   <%_ if(addMessaging) {_%>
   await msgHost?.stop();
   <%_}_%>
-  await apolloServer?.stop();
+  await (await apolloServer)?.stop();
   <%_ if(addTracing) {_%>
   defaultTracer?.close();
   <%_}_%>

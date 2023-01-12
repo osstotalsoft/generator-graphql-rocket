@@ -1,16 +1,18 @@
 const { NoCacheRESTDataSource } = require('../../../utils/noCacheRESTDataSource');
+const { assoc } = require('ramda')
 
 class UserApi extends NoCacheRESTDataSource {
 
-    constructor() {
-        super();
+    constructor(context) {
+        super(context);
         this.baseURL = `${process.env.API_URL}user`;
+        this.context = context
     }
 
     willSendRequest(request) {
-        request.headers.set('Authorization', this.context.token);
+        request.headers = assoc('Authorization', this.context.token, request.headers)
         <%_ if(withMultiTenancy){ _%>
-        request.headers.set('TenantId', this.context.tenantId);
+        request.headers = assoc('TenantId', this.context.tenantId, request.headers)
         <%_}_%>
     }
 

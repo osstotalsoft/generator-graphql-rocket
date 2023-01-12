@@ -1,10 +1,10 @@
 // Define your shield rules using graphql-shield (see docs https://github.com/maticzav/graphql-shield)
 <%_if(addQuickStart){ _%>
 const { rule } = require('graphql-shield')
-const { includes, intersection } = require('ramda');
+const { includes, intersection } = require('ramda')
 const { admin, globalAdmin } = require('../../constants/identityUserRoles')
 const { viewDashboard } = require('../../constants/permissions')
-const { ForbiddenError } = require('apollo-server-koa');
+const { GraphQLError } = require('graphql')
 <%_ if(dataLayer == "prisma") {_%>
 const { prisma } = require('../../prisma')
 <%_}_%>
@@ -34,7 +34,7 @@ const checkForPermission = async (permissions, { dbInstance, externalUser }) => 
         return intersection(permissions, rights.map(x => x.right)).length > 0
     }
     catch (error) {
-        throw new ForbiddenError(`Authorization check failed! The following error was encountered: ${error}`)
+        throw new GraphQLError(`Authorization check failed! The following error was encountered: ${error}`)
     }
 }
 <%_} else if(dataLayer == "prisma") {_%>
@@ -46,7 +46,7 @@ const checkForPermission = async (permissions, { externalUser }) => {
   
       return intersection(permissions, rights).length > 0
     } catch (error) {
-      throw new ForbiddenError(`Authorization check failed! The following error was encountered: ${error}`)
+      throw new GraphQLError(`Authorization check failed! The following error was encountered: ${error}`)
     }
 }
 <%_}_%>

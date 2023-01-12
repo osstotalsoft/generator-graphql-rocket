@@ -1,7 +1,7 @@
 <%_if(addQuickStart){ _%>
 const { shield, and } = require('graphql-shield')
 const { isAuthenticated, isAdmin } = require('./rules')
-const { ForbiddenError } = require('apollo-server-koa');
+const { GraphQLError } = require('graphql')
 
 const permissionsMiddleware = shield({
     User: {
@@ -18,7 +18,7 @@ const permissionsMiddleware = shield({
         debug: true,
         allowExternalErrors: true,
         fallbackError: (_thrownThing, _parent, _args, _context, info) => {
-            return new ForbiddenError(`You are not authorized to execute this operation! [operation name: "${info.operation.name.value || ''}, field: ${info.fieldName}"]`, 'ERR_INTERNAL_SERVER')
+            return new GraphQLError(`You are not authorized to execute this operation! [operation name: "${info.operation.name.value || ''}, field: ${info.fieldName}"]`, { extensions: { code:'ERR_INTERNAL_SERVER' }} )
         },
     })
 
