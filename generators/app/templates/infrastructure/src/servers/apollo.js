@@ -1,0 +1,113 @@
+const { ApolloServer } = require("@apollo/server"),
+  Koa = require("koa"),
+  { ApolloServerPluginDrainHttpServer } = require("@apollo/server/plugin/drainHttpServer"),
+  { ApolloLoggerPlugin } = require("@totalsoft/pino-apollo"),
+  bodyParser = require("koa-bodyparser"),
+  {
+    errorHandlingMiddleware,
+    correlationMiddleware,
+    tracingMiddleware,
+    jwtTokenValidation,
+    jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%><% if(dataLayer == "knex") {%>,contextDbInstance <%}%>
+  } = require("../middleware"),
+  loggingMiddleware = require("../middleware/logger/loggingMiddleware"),
+  { graphqlUploadKoa } = require("graphql-upload"),
+  cors = require("@koa/cors"),
+  { publicRoute } = require("../utils/functions"),
+  ignore = require("koa-ignore"),
+  { koaMiddleware } = require("@as-integrations/koa"),
+  { schema, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>, logger } = require("../startup"),
+  <%_ if(addTracing){ _%>
+  tracingPlugin = require("../plugins/tracing/tracingPlugin"),
+  { getApolloTracerPluginConfig, initGqlTracer } = require("../tracing/gqlTracer"),
+  defaultTracer = initGqlTracer({ logger }),
+  { JAEGER_DISABLED, METRICS_ENABLED } = process.env,
+  tracingEnabled = !JSON.parse(JAEGER_DISABLED),
+  <%_}_%>
+  metricsPlugin = require("../plugins/metrics/metricsPlugin"),
+  metricsEnabled = JSON.parse(METRICS_ENABLED);
+  <%_ if(dataLayer == "knex") {_%>
+  const { dbInstanceFactory } = require("../db");
+  <%_}_%>
+
+const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
+    return [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+        new ApolloLoggerPlugin({ logger, securedMessages: false }),
+        <%_ if(addSubscriptions) {_%>
+        {
+            async serverWillStart() {
+                return {
+                async drainServer() {
+                    await subscriptionServer.dispose();
+                }
+                };
+            }
+        },
+        <%_}_%>
+        <%_ if(addTracing){ _%>
+            tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {},
+        <%_}_%>
+        metricsEnabled ? metricsPlugin() : {}
+    ];
+};
+
+logger.info("Creating Apollo Server...");
+
+const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
+    const apolloServer = new ApolloServer({
+        schema,
+        stopOnTerminationSignals: false,
+        uploads: false,
+        plugins: plugins(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
+      })
+    
+      await apolloServer.start()
+      
+      const app = new Koa();
+      app.use(loggingMiddleware)
+      app.use(errorHandlingMiddleware())
+      app.use(bodyParser());
+      app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
+      app.use(correlationMiddleware());
+      <%_ if(addTracing){ _%>
+      tracingEnabled && app.use(tracingMiddleware());
+      <%_}_%>
+      app.use(cors({ credentials: true }));
+      app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
+      <%_ if(dataLayer == "knex") {_%>
+      app.use(contextDbInstance());
+      <%_}_%>
+      app.use(
+        koaMiddleware(apolloServer,{
+          context: async ({ ctx }) => {
+            const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
+            const { cache } = apolloServer
+            const dataSources = getDataSources({ ...ctx, cache })
+            return {
+              token,
+              state,
+              <%_ if(dataLayer == "knex") {_%>
+              dbInstance,
+              dbInstanceFactory,
+              dataLoaders: getDataLoaders(dbInstance),
+              <%_}_%>
+              <%_ if(withMultiTenancy){ _%>
+              tenant,
+              <%_}_%>
+              externalUser,
+              request,
+              requestSpan,
+              logger,
+              dataSources
+            }
+          }
+        })
+      )
+      
+    httpServer.on('request', app.callback())
+    
+    return apolloServer
+  };
+  
+module.exports = { startApolloServer, plugins };  

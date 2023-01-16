@@ -52,7 +52,7 @@
     "@totalsoft/key-per-file-configuration": "^1.1.0",
     "@totalsoft/graceful-shutdown": "^1.1.0",
     "@totalsoft/correlation": "^1.1.0",
-    "@totalsoft/pino-apollo": "^1.1.0",
+    "@totalsoft/pino-apollo": "^2.0.0",
     "@totalsoft/pino-correlation": "^1.1.0",
     "@totalsoft/pino-mssqlserver": "^1.1.0",
     <%_ if(withMultiTenancy) {_%>

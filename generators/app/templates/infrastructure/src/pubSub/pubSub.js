@@ -2,7 +2,7 @@ const { RedisPubSub } = require('graphql-redis-subscriptions')
 const { PubSub } = require('graphql-subscriptions');
 const RedisClient = require('ioredis');
 const { REDIS_DOMAIN_NAME, REDIS_PORT_NUMBER } = process.env;
-const { applyPublishMiddleware, correlationPublish<% if(addTracing) {%>, tenantPublish<%}%><% if(withMultiTenancy) {%>, tracingPublish<%}%> } = require('./middleware')
+const { applyPublishMiddleware, correlationPublish<% if(addTracing) {%>, tracingPublish<%}%><% if(withMultiTenancy) {%>, tenantPublish<%}%> } = require('./middleware')
 
 const options = {
   host: REDIS_DOMAIN_NAME,
