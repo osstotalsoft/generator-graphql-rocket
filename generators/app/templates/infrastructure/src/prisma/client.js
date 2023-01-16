@@ -2,7 +2,7 @@ const { camelizeKeys } = require('humps')
 const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
-const { tenantContextAccessor, tenantConfiguration } = require('@totalsoft/multitenancy-core')
+const { tenantContextAccessor <% if(!hasSharedDb) {%>, tenantConfiguration<%}%> } = require('@totalsoft/multitenancy-core')
 <%_ if(hasSharedDb){ _%>
   const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
 <%_}else{_%>
@@ -49,8 +49,6 @@ function prisma() {
 
     if (cacheMap.has(id)) return cacheMap.get(id)
 
-    const connectionInfo = tenantConfiguration.getConnectionInfo(id, '<%= dbConnectionName %>')
-
     <%_ if(hasSharedDb){ _%>
       prismaClient = new PrismaClient(prismaOptions)
 
@@ -70,6 +68,7 @@ function prisma() {
       applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_} else { _%>
+      const connectionInfo = tenantConfiguration.getConnectionInfo(id, '<%= dbConnectionName %>')
       const { server, port, database, userName, password } = sanitizeConnectionInfo(connectionInfo)
       const url = PRISMA_DB_URL_PATTERN.replace('{server}', server)
         .replace('{port}', port)

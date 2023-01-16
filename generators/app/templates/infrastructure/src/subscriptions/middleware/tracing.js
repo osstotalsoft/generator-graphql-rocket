@@ -1,7 +1,9 @@
 const { envelope } = require("@totalsoft/message-bus");
 const opentracing = require("opentracing");
 const { spanManager, traceError, traceErrors, getExternalSpan } = require("@totalsoft/opentracing");
+<%_ if(withMultiTenancy) {_%>
 const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+<%_}_%>
 const { correlationManager } = require("@totalsoft/correlation");
 const messagingEnvelopeHeaderSpanTagPrefix = "pubSub_header"
 
@@ -14,7 +16,9 @@ const tracing = async (ctx, next) => {
   });
 
   span.setTag("nbb.correlation_id", correlationManager.getCorrelationId());
+  <%_ if(withMultiTenancy) {_%>
   span.setTag(envelope.headers.tenantId, tenantContextAccessor.getTenantContext()?.tenant?.id);
+  <%_}_%>
   span.setTag(opentracing.Tags.SPAN_KIND, "consumer");
   span.setTag(opentracing.Tags.COMPONENT, "gql-pub-sub");
 
