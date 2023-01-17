@@ -1,4 +1,3 @@
-const { DataSource } = require('apollo-datasource')
 const { messageBus } = require('@totalsoft/message-bus')
 <%_ if(withMultiTenancy){ _%>
   const { tenantContextAccessor } = require('@totalsoft/multitenancy-core');
@@ -13,23 +12,15 @@ const { correlationManager } = require("@totalsoft/correlation");
 
 const publishPipeline = pipelineBuilder().use(<%if(addTracing){%>tracingPublish()<%}%>).build();
 
-class MessagingDataSource extends DataSource {
-  constructor() {
-    super()
-
-    this.context
-    this.envelopeCustomizer
-    this.msgBus
-  }
-  initialize(config) {
-    const ctx = config.context
+class MessagingDataSource {
+  constructor(context) {
     this.context = {
         <%_ if(withMultiTenancy){ _%>
         tenantId: isMultiTenant ? tenantContextAccessor.getTenantContext().tenant?.id : undefined,
         <%_}_%>
         correlationId: correlationManager.getCorrelationId(),
-        token: ctx.token,
-        externalUser: ctx.externalUser
+        token: context.token,
+        externalUser: context.externalUser
     }
     this.envelopeCustomizer = headers => ({ ...headers, UserId: this.context.externalUser.id })
     this.msgBus = messageBus()

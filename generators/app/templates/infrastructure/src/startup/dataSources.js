@@ -8,29 +8,15 @@ const TenantIdentityApi = require('../features/tenant/dataSources/tenantIdentity
 <%_}_%>
 <%_}_%>
 
-module.exports.getDataSources = () => ({
+module.exports.getDataSources = context => ({
 // Instantiate your data sources here. e.g.: userApi: new UserApi()
 <%_if(addQuickStart){ _%>
-    userApi: new UserApi()
+    userApi: new UserApi(context)
     <%_ if(dataLayer == "knex") {_%>,
-    userDb: new UserDb()
+    userDb: new UserDb(context)
     <%_}_%>
     <%_ if(withMultiTenancy){ _%>,
-    tenantIdentityApi: new TenantIdentityApi()
+    tenantIdentityApi: new TenantIdentityApi(context)
     <%_}_%>
 <%_}_%>
 })
-
-module.exports.initializedDataSources = (context <% if(dataLayer == "knex") {%>, dbInstance<%}%>, dataSources) => {
-// You need to initialize you datasources here e.g.: dataSources.userApi.initialize({ context })
-<%_if(addQuickStart){ _%>
-    dataSources.userApi.initialize({ context })
-    <%_ if(dataLayer == "knex") {_%>
-    dataSources.userDb.initialize({ context: { dbInstance } })
-    <%_}_%>
-    <%_ if(withMultiTenancy){ _%>,
-    dataSources.tenantIdentityApi.initialize({ context })
-    <%_}_%>
-<%_}_%>
-return dataSources
-}

@@ -29,12 +29,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/datasource-rest": "^4.3.2",
+    "@apollo/server": "^4.1.1",
+    "@as-integrations/koa": "^0.2.1",
     "@graphql-tools/graphql-file-loader": "^7.4.0",
     "@graphql-tools/load": "^7.7.0",
     "@graphql-tools/load-files": "^6.6.1",
     "@graphql-tools/merge": "^8.3.6",
     "@graphql-tools/schema": "^8.5.0",
-    "@koa/cors": "^3.3.0",
+    "@koa/cors": "^4.0.0",
     "@koa/router": "^11.0.1",
     "koa-ignore": "^1.0.1",
     <%_ if(dataLayer === "prisma") {_%>
@@ -49,14 +52,11 @@
     "@totalsoft/key-per-file-configuration": "^1.1.0",
     "@totalsoft/graceful-shutdown": "^1.1.0",
     "@totalsoft/correlation": "^1.1.0",
-    "@totalsoft/pino-apollo": "^1.1.0",
+    "@totalsoft/pino-apollo": "^2.0.0",
     "@totalsoft/pino-correlation": "^1.1.0",
     "@totalsoft/pino-mssqlserver": "^1.1.0",
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
-      <%_ if(addQuickStart) {_%>
-    "datasource-sql": "^2.0.1",
-      <%_}_%>
     "@totalsoft/multitenancy-core": "^1.1.0",
     "@totalsoft/pino-multitenancy": "^1.1.0",
     <%_}_%>
@@ -73,11 +73,6 @@
     "@totalsoft/message-bus": "^2.4.7",
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
-    "apollo-datasource": "^3.3.2",
-    "apollo-datasource-rest": "^3.6.1",
-    "apollo-server": "^3.11.1",
-    "apollo-server-core": "^3.10.0",
-    "apollo-server-koa": "^3.10.0",
     "async-mutex": "^0.3.2",
     "bluebird": "3.7.2",
     "colors": "^1.4.0",

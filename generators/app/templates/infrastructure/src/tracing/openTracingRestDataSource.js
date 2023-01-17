@@ -1,39 +1,38 @@
-const { RESTDataSource } = require('apollo-datasource-rest')
+const { RESTDataSource } = require('@apollo/datasource-rest')
 const opentracing = require('opentracing')
 const { spanManager, traceError } = require("@totalsoft/opentracing");
-// eslint-disable-next-line node/no-extraneous-require
-const { Headers } = require('apollo-server-env')
+const { assoc } = require('ramda')
 
 class OpenTracingRESTDataSource extends RESTDataSource {
-  constructor() {
-    super()
+  constructor(options) {
+    super(options)
   }
 
-  async fetch(request) {
+  async fetch(path, request) {
     const tracer = opentracing.globalTracer()
     const activeSpan = spanManager.getActiveSpan()
 
-    if (!(request.headers && request.headers instanceof Headers)) {
-      request.headers = new Headers(request.headers || Object.create(null))
+    if (!request.headers) {
+      request.headers = {}
     }
 
-    const networkSpan = tracer.startSpan(`REST ${request.method} ${request.path}`, {
+    const networkSpan = tracer.startSpan(`REST ${request.method} ${path}`, {
       childOf: activeSpan
     })
 
     networkSpan.setTag(opentracing.Tags.SPAN_KIND, 'client')
     networkSpan.setTag(opentracing.Tags.HTTP_METHOD, request.method)
-    networkSpan.setTag(opentracing.Tags.HTTP_URL, this.baseURL + request.path)
+    networkSpan.setTag(opentracing.Tags.HTTP_URL, this.baseURL + path)
     networkSpan.setTag(opentracing.Tags.COMPONENT, "gql-rest-data-source");
 
     let injectHeaders = {}
     tracer.inject(networkSpan, opentracing.FORMAT_HTTP_HEADERS, injectHeaders)
     for (const [key, value] of Object.entries(injectHeaders)) {
-      request.headers.set(key, value)
+      request.headers = assoc(key, value, request.headers)
     }
 
     try {
-      return await super.fetch(request)
+      return await super.fetch(path, request)
     } catch (error) {
       traceError(networkSpan, error)
       throw error

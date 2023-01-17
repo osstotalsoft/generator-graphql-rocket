@@ -1,7 +1,7 @@
 <%_ if(addTracing){ _%>
   const { OpenTracingRESTDataSource } = require("../tracing/openTracingRestDataSource");
 <%_ } else { _%>
-  const { RESTDataSource } = require('apollo-datasource-rest')
+  const { RESTDataSource } = require('@apollo/datasource-rest')
 <%_ } _%>
 
 <%_ if(addTracing){ _%>

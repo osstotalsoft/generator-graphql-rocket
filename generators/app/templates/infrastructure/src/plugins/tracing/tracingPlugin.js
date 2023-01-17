@@ -29,13 +29,13 @@ module.exports = ({
 }) => {
     return {
         requestDidStart(requestInfo) {
-            const { request, context } = requestInfo;
+            const { request, contextValue } = requestInfo;
 
             if (!shouldTraceRequest(requestInfo)) {
                 return;
             }
 
-            const activeSpan = context.requestSpan || getExternalSpan(tracer, request)
+            const activeSpan = contextValue.requestSpan || getExternalSpan(tracer, request)
             const requestSpan =
                 tracer.startSpan("request " + request.operationName, {
                     childOf: activeSpan || undefined,

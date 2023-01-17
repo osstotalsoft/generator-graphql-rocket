@@ -91,8 +91,8 @@ module.exports = class extends Generator {
         ],
         ignoreFiles
       )
-    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**'], ignoreFiles)
-    if (!addMessaging) ignoreFiles = append('**/messaging/**', ignoreFiles)
+    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**', '**/servers/subscription.js'], ignoreFiles)
+    if (!addMessaging) ignoreFiles = concat(['**/messaging/**', '**/servers/messaging.js'], ignoreFiles)
 
     if (!withMultiTenancy)
       ignoreFiles = concat(
