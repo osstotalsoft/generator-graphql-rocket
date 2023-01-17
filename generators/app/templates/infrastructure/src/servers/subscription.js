@@ -71,7 +71,7 @@ const startSubscriptionServer = httpServer =>
                 throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
             }
         <%_}_%>
-        <%_ if(!withMultiTenancy) {_%>
+        <%_ if(!withMultiTenancy || dataLayer == "prisma") {_%>
         const dataSources = getDataSources(ctx)
         <%_}_%>
         const subscriptionLogger = logger.child({ operationName: msg?.payload?.operationName });
@@ -79,17 +79,17 @@ const startSubscriptionServer = httpServer =>
         return {
             ...ctx,
             <%_ if(withMultiTenancy){ _%>
-              tenant,
+            tenant,
             <%_}_%>
             <%_ if(dataLayer == "knex") {_%>
             dbInstance,
-            <%_ if(withMultiTenancy){ _%>
+              <%_ if(withMultiTenancy){ _%>
             dataSources: tenantContextAccessor.useTenantContext({ tenant }, async () =>
               getDataSources(ctx)
             ),
-            <%_} else {_%>
+              <%_} else {_%>
             dataSources,
-            <%_}_%>
+              <%_}_%>
             dataLoaders: getDataLoaders(dbInstance),
             <%_}else{_%>
             dataSources,
