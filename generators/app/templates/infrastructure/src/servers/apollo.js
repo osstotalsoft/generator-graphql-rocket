@@ -53,7 +53,6 @@ const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
 };
 
 logger.info("Creating Apollo Server...");
-
 const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
     const apolloServer = new ApolloServer({
         schema,

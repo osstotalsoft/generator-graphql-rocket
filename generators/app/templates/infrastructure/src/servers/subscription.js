@@ -17,7 +17,6 @@ const { GraphQLError } = require("graphql"),
   metrics = require("../monitoring/metrics");
 
 logger.info('Creating Subscription Server...')
-
 const startSubscriptionServer = httpServer => 
   useServer(
     {
