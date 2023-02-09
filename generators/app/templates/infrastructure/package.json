@@ -22,6 +22,10 @@
     "lint": "eslint --fix --ext .js .",
     "prettier": "prettier --write **/*.js",
     "prepack": "husky install"
+    <%_ if(dataLayer === "prisma") {_%>,
+    "prisma": "npx prisma db pull && npm run prisma:format && npx prisma generate",
+    "prisma:format": "npx prisma-case-format --file ./prisma/schema.prisma --table-case pascal --field-case camel"
+    <%_} _%>
   },
   "lint-staged": {
     "**/*.+(js|md|css|graphql|json)": "prettier --write"
@@ -41,8 +45,9 @@
     "@koa/router": "^11.0.1",
     "koa-ignore": "^1.0.1",
     <%_ if(dataLayer === "prisma") {_%>
-    "@prisma/client": "^4.1.1",
-    "prisma": "^4.1.1",
+    "@prisma/client": "^4.10.0",
+    "prisma": "^4.10.0",
+    "prisma-case-format": "^1.2.0",
       <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "lodash.set": "^4.3.2",
       <%_} _%>

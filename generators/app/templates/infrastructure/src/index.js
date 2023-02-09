@@ -18,9 +18,7 @@ require('console-stamp')(global.console, {
   })
 
 const { createServer } = require("http"),
-  { logger } = require("./startup"),
-  { initGqlTracer } = require("./tracing/gqlTracer"),
-  defaultTracer = initGqlTracer({ logger });
+  { logger } = require("./startup")
 
 const { startApolloServer } = require("./servers/apollo");
 <%_ if(addMessaging) {_%>

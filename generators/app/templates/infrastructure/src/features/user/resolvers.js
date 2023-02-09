@@ -6,7 +6,6 @@ const { envelope } = require("@totalsoft/message-bus")
 const { withFilter } = require('graphql-subscriptions')
 <%_}_%>
 <%_ if(dataLayer == "prisma") {_%>
-const { pascalizeKeys } = require('humps')
 const { prisma } = require('../../prisma')
 <%_}_%>
 
@@ -53,12 +52,12 @@ const userResolvers = {
     Query: {
         userData: async (_, { id, externalId }, _ctx, _info) => {
             if (externalId) {
-              return await prisma().user.findUnique({ where: { ExternalId: externalId } })
-            } else return await prisma().user.findUnique({ where: { Id: id } })
+              return await prisma().user.findUnique({ where: { externalId } })
+            } else return await prisma().user.findUnique({ where: { id } })
         },
         userList: async (_parent, { pager, filters }, _ctx) => {
-        const { pageSize, afterId, sortBy, direction } = pager
-        const orderBy = pascalizeKeys(sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { Id: 'asc' })
+        const { pageSize, afterId, sortBy = 'firstName', direction } = pager
+        const orderBy = sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { id: 'asc' }
 
         const values = await prisma().user.findMany({
             take: pageSize ? pageSize + 1 : undefined,
@@ -67,7 +66,7 @@ const userResolvers = {
                 Id: afterId
                 }
             : undefined,
-            where: filters ? pascalizeKeys(filters) : undefined,
+            where: filters ?? undefined,
             orderBy
         })
 
@@ -77,8 +76,8 @@ const userResolvers = {
     User: {
         rights: async ({ id }, _params, _ctx, _info) => {
           const userRights = await prisma().userRight.findUnique({
-            where: { UserId: id },
-            include: { Right: true }
+            where: { userId: id },
+            include: { right: true }
           })
           return userRights.map(r => r?.right?.name)
         }
@@ -93,13 +92,13 @@ const userResolvers = {
             if (!afterId) return res
 
             const prevPageValues = await prisma().user.findMany({
-              select: { Id: true },
+              select: { id: true },
               skip: 1,
               take: -pageSize,
               cursor: {
                 Id: afterId
               },
-              where: filters ? pascalizeKeys(filters) : undefined,
+              where: filters ?? undefined,
               orderBy
             })
             const prevPage = { ...pager, afterId: prevPageValues?.[0]?.id }
@@ -112,7 +111,8 @@ const userResolvers = {
     //Not working! Only for demonstration
     Mutation: {
         updateUser: async (_, { input }, _ctx, _info) => {
-            return prisma().user.update({ data: pascalizeKeys(input), where: { Id: input?.id } })
+            const { id } = input
+            return prisma().user.update({ data: input, where: { id } })
         }
     },
     <%_}_%>

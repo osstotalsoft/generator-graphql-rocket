@@ -6,7 +6,9 @@ const { ApolloServer } = require("@apollo/server"),
   {
     errorHandlingMiddleware,
     correlationMiddleware,
+  <%_ if(addTracing) {_%>
     tracingMiddleware,
+  <%_}_%>
     jwtTokenValidation,
     jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%><% if(dataLayer == "knex") {%>,contextDbInstance <%}%>
   } = require("../middleware"),
@@ -17,11 +19,11 @@ const { ApolloServer } = require("@apollo/server"),
   ignore = require("koa-ignore"),
   { koaMiddleware } = require("@as-integrations/koa"),
   { schema, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>, logger } = require("../startup"),
+  { <% if(addTracing){ %>JAEGER_DISABLED,<% } %> METRICS_ENABLED } = process.env,
   <%_ if(addTracing){ _%>
   tracingPlugin = require("../plugins/tracing/tracingPlugin"),
   { getApolloTracerPluginConfig, initGqlTracer } = require("../tracing/gqlTracer"),
   defaultTracer = initGqlTracer({ logger }),
-  { JAEGER_DISABLED, METRICS_ENABLED } = process.env,
   tracingEnabled = !JSON.parse(JAEGER_DISABLED),
   <%_}_%>
   metricsPlugin = require("../plugins/metrics/metricsPlugin"),
