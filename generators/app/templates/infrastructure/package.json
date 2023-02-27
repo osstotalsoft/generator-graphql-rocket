@@ -79,6 +79,7 @@
     "@totalsoft/messaging-host": "^2.4.2",
     <%_}_%>
     "async-mutex": "^0.4.0",
+    "bluebird": "^3.7.2",
     "colors": "^1.4.0",
     "console-stamp": "^3.1.1",
     "dotenv": "16.0.1",

@@ -38,7 +38,7 @@ const httpServer = createServer();
 <%_ if(addSubscriptions){ _%>
 const subscriptionServer = startSubscriptionServer(httpServer);
 <%_}_%>
-const apolloServer = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
+const { cleanup: cleanupApolloServer } = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
 <%_ if(addMessaging) {_%>
 const msgHost = startMsgHost();
 <%_}_%>
@@ -56,10 +56,7 @@ async function cleanup() {
   <%_ if(addMessaging) {_%>
   await msgHost?.stop();
   <%_}_%>
-  await (await apolloServer)?.stop();
-  <%_ if(addTracing) {_%>
-  defaultTracer?.close();
-  <%_}_%>
+  await cleanupApolloServer()
 }
 
 const { gracefulShutdown } = require('@totalsoft/graceful-shutdown');

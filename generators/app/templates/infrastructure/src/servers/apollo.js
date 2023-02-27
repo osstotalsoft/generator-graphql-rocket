@@ -108,7 +108,14 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
       
     httpServer.on('request', app.callback())
     
-    return apolloServer
+    const cleanup = async () => {
+      await (await apolloServer)?.stop()
+      <%_ if(addTracing) {_%>
+        defaultTracer?.close();
+      <%_}_%>
+    }
+  
+    return { apolloServer, cleanup }
   };
   
 module.exports = { startApolloServer, plugins };  
