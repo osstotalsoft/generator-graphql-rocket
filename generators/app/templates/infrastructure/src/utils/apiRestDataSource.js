@@ -1,11 +1,15 @@
 const { correlationManager } = require("@totalsoft/correlation");
-const NoCacheRESTDataSource = require("./noCacheRESTDataSource");
+const { NoCacheRESTDataSource } = require("./noCacheRESTDataSource");
 const { <% if(withMultiTenancy){ %>TenantId,<%}%> UserId, UserPassport } = require("../constants/customHttpHeaders");
 const { assoc } = require('ramda')
 
 class ApiRESTDataSource extends NoCacheRESTDataSource {
+  constructor(context) {
+    super(context)
+    this.context = context
+  }
 
-  willSendRequest(request) {
+  willSendRequest(_path, request) {
     const { jwtdata } = this.context.state ?? {}
     <%_ if(withMultiTenancy){ _%>
     request.headers = assoc(TenantId, jwtdata?.tid, request.headers)
@@ -15,7 +19,7 @@ class ApiRESTDataSource extends NoCacheRESTDataSource {
 
     //TODO to be removed
     if (this.context.token) {
-      request.headers.Authorization = `Bearer ${this.context.token}`
+      request.headers = assoc('Authorization', this.context.token, request.headers)
     }
 
     const acceptLanguage = this.context.request?.headers?.["accept-language"]

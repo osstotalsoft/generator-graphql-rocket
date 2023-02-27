@@ -10,18 +10,23 @@
   class NoCacheRESTDataSource extends RESTDataSource {
 <%_ } _%>
 
-  deleteCacheForRequest(request) {
-    this.memoizedResults.delete(this.cacheKeyFor(request))
+  cacheOptionsFor() {
+    return {
+      ttl: 0
+    }
   }
 
-  didReceiveResponse(response, request) {
-    this.deleteCacheForRequest(request)
-    return super.didReceiveResponse(response, request)
-  }
-
-  didEncounterError(error, request) {
-    this.deleteCacheForRequest(request)
-    return super.didEncounterError(error, request)
+  resolveURL(path) {
+    if (path.startsWith('/')) {
+      path = path.slice(1)
+    }
+    const baseURL = this.baseURL
+    if (baseURL) {
+      const normalizedBaseURL = baseURL.endsWith('/') ? baseURL : baseURL.concat('/')
+      return new URL(path, normalizedBaseURL)
+    } else {
+      return new URL(path)
+    }
   }
 }
 

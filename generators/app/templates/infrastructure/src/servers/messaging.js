@@ -1,14 +1,15 @@
 const { messagingHost, exceptionHandling, SubscriptionOptions, dispatcher } = require("@totalsoft/messaging-host");
 const { msgHandlers, middleware } = require("../messaging");
-const loggingMiddleware = require("../middleware/logger/loggingMiddleware");
+const loggingMiddleware = require("../middleware");
 const { logger } = require("../startup");
 <%_ if(addTracing){ _%>
 const { JAEGER_DISABLED } = process.env,
   tracingEnabled = !JSON.parse(JAEGER_DISABLED);
-<%_}_%>
-const skipMiddleware = (_ctx, next) => next();
 
-const startMsgHost = () => {
+  const skipMiddleware = (_ctx, next) => next();
+<%_}_%>
+
+module.exports = function startMsgHost() {
     const msgHost = messagingHost();
     msgHost
         .subscribe(Object.keys(msgHandlers), SubscriptionOptions.PUB_SUB)
@@ -34,5 +35,3 @@ const startMsgHost = () => {
           })
     return msgHost;
 }
-
-module.exports = startMsgHost;

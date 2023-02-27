@@ -31,6 +31,14 @@
       "rules": {
         "node/no-unpublished-require": 0
       }
+    },
+    {
+      "files": ["*.graphql"],
+      "parser": "@graphql-eslint/eslint-plugin",
+      "plugins": ["@graphql-eslint"],
+      "rules": {
+        "@graphql-eslint/known-type-names": "error"
+      }
     }
   ]
 }

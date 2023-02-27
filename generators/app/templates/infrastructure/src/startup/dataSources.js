@@ -9,7 +9,7 @@ const TenantIdentityApi = require('../features/tenant/dataSources/tenantIdentity
 <%_}_%>
 
 module.exports.getDataSources = context => ({
-// Instantiate your data sources here. e.g.: userApi: new UserApi()
+// Instantiate your data sources here. e.g.: userApi: new UserApi(context)
 <%_if(addQuickStart){ _%>
     userApi: new UserApi(context)
     <%_ if(dataLayer == "knex") {_%>,

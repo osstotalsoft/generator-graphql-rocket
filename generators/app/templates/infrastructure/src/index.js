@@ -14,19 +14,12 @@ const keyPerFileEnv = require('@totalsoft/key-per-file-configuration')
 const configMonitor = keyPerFileEnv.load()
 
 require('console-stamp')(global.console, {
-    format: ':date(yyyy/mm/dd HH:MM:ss.l, utc)'
+    format: ':date(yyyy/mm/dd HH:MM:ss.l)'
   })
 
 const { createServer } = require("http"),
+  { startApolloServer<% if(addMessaging) { %>, startMsgHost <% } %> <% if(addSubscriptions){ %>, startSubscriptionServer <% } %>} = require('./servers'),
   { logger } = require("./startup")
-
-const { startApolloServer } = require("./servers/apollo");
-<%_ if(addMessaging) {_%>
-const startMsgHost = require("./servers/messaging");
-<%_}_%>
-<%_ if(addSubscriptions){ _%>
-const startSubscriptionServer = require("./servers/subscription");
-<%_}_%>
 
 <%_ if(dataLayer == 'prisma') {_%>
 const { initialize } = require('./prisma')

@@ -9,7 +9,7 @@ class UserApi extends NoCacheRESTDataSource {
         this.context = context
     }
 
-    willSendRequest(request) {
+    willSendRequest(_path, request) {
         request.headers = assoc('Authorization', this.context.token, request.headers)
         <%_ if(withMultiTenancy){ _%>
         request.headers = assoc('TenantId', this.context.tenantId, request.headers)

@@ -9,11 +9,11 @@ const { ApolloServer } = require("@apollo/server"),
   <%_ if(addTracing) {_%>
     tracingMiddleware,
   <%_}_%>
+    loggingMiddleware,
     jwtTokenValidation,
     jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%><% if(dataLayer == "knex") {%>,contextDbInstance <%}%>
   } = require("../middleware"),
-  loggingMiddleware = require("../middleware/logger/loggingMiddleware"),
-  { graphqlUploadKoa } = require("graphql-upload"),
+  graphqlUploadKoa = require('graphql-upload/graphqlUploadKoa.js'),
   cors = require("@koa/cors"),
   { publicRoute } = require("../utils/functions"),
   ignore = require("koa-ignore"),
@@ -29,7 +29,7 @@ const { ApolloServer } = require("@apollo/server"),
   metricsPlugin = require("../plugins/metrics/metricsPlugin"),
   metricsEnabled = JSON.parse(METRICS_ENABLED);
   <%_ if(dataLayer == "knex") {_%>
-  const { dbInstanceFactory } = require("../db");
+  const { dbInstanceFactory } = require("../db")
   <%_}_%>
 
 const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
@@ -54,8 +54,8 @@ const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
     ];
 };
 
-logger.info("Creating Apollo Server...");
 const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
+  logger.info("Creating Apollo Server...");
     const apolloServer = new ApolloServer({
         schema,
         stopOnTerminationSignals: false,
