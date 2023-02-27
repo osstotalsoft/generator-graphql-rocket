@@ -12,7 +12,7 @@ class TenantIdentityApi extends NoCacheRESTDataSource {
         return `${request.url}${this.context.externalUser.id}`
     }
 
-    willSendRequest(request) {
+    willSendRequest(_path, request) {
         request.headers = assoc('Authorization', this.context.token, request.headers)
         request.headers = assoc('TenantId', this.context.tenant?.id, request.headers)
     }

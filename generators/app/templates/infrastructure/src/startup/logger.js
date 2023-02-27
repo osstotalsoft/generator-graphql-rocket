@@ -50,7 +50,8 @@ const transport = pino.transport({
     {
       target: "pino-pretty",
       options: {
-        ignore: "pid,hostname,correlationId,tenantId,requestId,operationName"
+        ignore: "pid,hostname,correlationId,tenantId,requestId,operationName",
+        translateTime: 'SYS:yyyy/mm/dd HH:MM:ss.l'
       },
       level: "trace"
     }

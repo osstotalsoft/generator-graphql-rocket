@@ -3,6 +3,38 @@ const path = require('path')
 const rimraf = require('rimraf')
 const assert = require('yeoman-assert')
 const helpers = require('yeoman-test')
+const { projectNameQ, getQuestions } = require('../generators/app/questions')
+const { findIndex } = require('ramda')
+
+describe('generator-graphql-rocket:app question validations', () => {
+  it('project name input does not have an acceptable format', () => {
+    const name = '& - a!'
+    const validationResult = projectNameQ.validate(name)
+    assert.notEqual(validationResult, true)
+  })
+
+  it('project name input has an acceptable format', () => {
+    const name = 'my-project_a'
+    const validationResult = projectNameQ.validate(name)
+    assert.equal(validationResult, true)
+  })
+
+  it('helm chart name input does not have an acceptable format', () => {
+    const name = '& - a!'
+    const questions = getQuestions('test')
+    const qIndex = findIndex(q => q.name === 'helmChartName', questions)
+    const validationResult = questions[qIndex].validate(name)
+    assert.notEqual(validationResult, true)
+  })
+
+  it('helm chart name input has an acceptable format', () => {
+    const name = 'my-chart_a'
+    const questions = getQuestions('test')
+    const qIndex = findIndex(q => q.name === 'helmChartName', questions)
+    const validationResult = questions[qIndex].validate(name)
+    assert.equal(validationResult, true)
+  })
+})
 
 describe('test package installers', () => {
   jest.setTimeout(10 * 1000)

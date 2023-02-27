@@ -14,19 +14,12 @@ const keyPerFileEnv = require('@totalsoft/key-per-file-configuration')
 const configMonitor = keyPerFileEnv.load()
 
 require('console-stamp')(global.console, {
-    format: ':date(yyyy/mm/dd HH:MM:ss.l, utc)'
+    format: ':date(yyyy/mm/dd HH:MM:ss.l)'
   })
 
 const { createServer } = require("http"),
+  { startApolloServer<% if(addMessaging) { %>, startMsgHost <% } %> <% if(addSubscriptions){ %>, startSubscriptionServer <% } %>} = require('./servers'),
   { logger } = require("./startup")
-
-const { startApolloServer } = require("./servers/apollo");
-<%_ if(addMessaging) {_%>
-const startMsgHost = require("./servers/messaging");
-<%_}_%>
-<%_ if(addSubscriptions){ _%>
-const startSubscriptionServer = require("./servers/subscription");
-<%_}_%>
 
 <%_ if(dataLayer == 'prisma') {_%>
 const { initialize } = require('./prisma')
@@ -45,7 +38,7 @@ const httpServer = createServer();
 <%_ if(addSubscriptions){ _%>
 const subscriptionServer = startSubscriptionServer(httpServer);
 <%_}_%>
-const apolloServer = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
+const { cleanup: cleanupApolloServer } = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
 <%_ if(addMessaging) {_%>
 const msgHost = startMsgHost();
 <%_}_%>
@@ -63,10 +56,7 @@ async function cleanup() {
   <%_ if(addMessaging) {_%>
   await msgHost?.stop();
   <%_}_%>
-  await (await apolloServer)?.stop();
-  <%_ if(addTracing) {_%>
-  defaultTracer?.close();
-  <%_}_%>
+  await cleanupApolloServer()
 }
 
 const { gracefulShutdown } = require('@totalsoft/graceful-shutdown');

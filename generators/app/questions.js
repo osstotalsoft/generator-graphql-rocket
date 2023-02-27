@@ -97,7 +97,7 @@ module.exports.getQuestions = projectName => [
     when: prompts => prompts.addHelm,
     default: projectName,
     validate: name => {
-      if (name.match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)) {
+      if (name.match(/^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/)) {
         return true
       }
 

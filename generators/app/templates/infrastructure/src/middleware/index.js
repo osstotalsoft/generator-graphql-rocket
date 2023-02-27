@@ -10,6 +10,8 @@ const tenantIdentification = require("./tenantIdentification");
 <%_ if(addTracing){ _%>
 const tracingMiddleware = require('./tracing/tracingMiddleware');
 <%_}_%>
+const loggingMiddleware = require('./logger/loggingMiddleware')
+
 
 module.exports = {
   ...validateToken,
@@ -23,5 +25,6 @@ module.exports = {
   <%_ if(addTracing){ _%>
   tracingMiddleware,
   <%_}_%>
-  errorHandlingMiddleware
+  errorHandlingMiddleware,
+  loggingMiddleware
 };
