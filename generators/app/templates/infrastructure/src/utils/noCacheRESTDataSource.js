@@ -1,14 +1,5 @@
-<%_ if(addTracing){ _%>
-  const { OpenTracingRESTDataSource } = require("../tracing/openTracingRestDataSource");
-<%_ } else { _%>
   const { RESTDataSource } = require('@apollo/datasource-rest')
-<%_ } _%>
-
-<%_ if(addTracing){ _%>
-  class NoCacheRESTDataSource extends OpenTracingRESTDataSource {
-<%_ } else { _%>
   class NoCacheRESTDataSource extends RESTDataSource {
-<%_ } _%>
 
   cacheOptionsFor() {
     return {

@@ -78,7 +78,6 @@ module.exports = class extends Generator {
           '**/features/common/dbGenerators.js',
           '**/features/user/dataLoaders.js',
           '**/features/user/dataSources/userDb.js',
-          '**/tracing/knexTracer.js',
           '**/utils/sqlDataSource.js'
         ],
         ignoreFiles
@@ -110,12 +109,12 @@ module.exports = class extends Generator {
       ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
     if (!addTracing) ignoreFiles = concat(
       [
-        '**/tracing/**', 
-        '**/startup/middleware/tracing.js', 
-        '**/pubSub/middleware/tracingPublish.js', 
-        '**/__mocks__/opentracing.js',
+        '**/tracing/**',
+        '**/startup/tracing.js**',
+        '**/startup/middleware/tracing.js',
+        '**/pubSub/middleware/tracingPublish.js',
         '**/subscriptions/middleware/tracing.js'
-      ], 
+      ],
       ignoreFiles)
     if (!withRights)
       ignoreFiles = concat(

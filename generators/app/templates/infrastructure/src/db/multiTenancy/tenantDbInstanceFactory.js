@@ -4,10 +4,6 @@ const { registerTenancyFilter } = require("./tenancyFilter")
 const dbConfigService = require("../dbConfigService")
 const Knex = require("knex")
 const knexTinyLogger = require("knex-tiny-logger").default;
-<%_ if(addTracing){ _%>
-const useKnexTracer = require("../../tracing/knexTracer");
-const { JAEGER_DISABLED } = process.env;
-<%_}_%>
 const { initializeTarnLogging } = require("../logging/tarnLogging");
 const { Mutex } = require('async-mutex');
 
@@ -37,11 +33,7 @@ const tenantDbInstanceFactory = async (tenantId, { logger = console } = {}) => {
         if (JSON.parse(KNEX_LOGGING)) {
             knexTinyLogger(dbInstance, { logger: knexLogger(logger) })
         }
-        <%_ if(addTracing){ _%>
-        if (!JSON.parse(JAEGER_DISABLED)) {
-            useKnexTracer(dbInstance)
-        }
-        <%_}_%>
+
         <%_ if(hasSharedDb){ _%>
         await registerTenancyFilter("TenantId", tenantId, dbInstance)
         <%_}_%>

@@ -1,3 +1,6 @@
+<%_ if(addTracing) {_%>
+const tracer = require("./tracing") // should be imported first to patch other modules
+<%_}_%>
 <%_ if(dataLayer == "knex") {_%>
 const getDataLoaders = require("./dataLoaders");
 <%_}_%>
@@ -10,6 +13,9 @@ module.exports = {
   getDataSources,
   <%_ if(dataLayer == "knex") {_%>
   getDataLoaders,
+  <%_}_%>
+  <%_ if(addTracing) {_%>
+  tracer,
   <%_}_%>
   logger
 };

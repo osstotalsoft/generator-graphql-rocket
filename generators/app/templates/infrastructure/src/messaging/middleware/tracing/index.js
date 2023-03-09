@@ -1,77 +1,87 @@
-const { envelope } = require('@totalsoft/message-bus')
-const opentracing = require('opentracing')
-const { spanManager, traceError, getExternalSpan } = require("@totalsoft/opentracing");
+const { trace, context, propagation, SpanKind, SpanStatusCode } = require("@opentelemetry/api");
 <%_ if(withMultiTenancy){ _%>
 const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
 <%_}_%>
 const { correlationManager } = require("@totalsoft/correlation");
+const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
+const attributeNames = require("../../../constants/tracingAttributes");
 
 const messagingEnvelopeHeaderSpanTagPrefix = "messaging_header";
 const componentName = "nodebb-messaging";
+const tracer = trace.getTracer(componentName);
 
 
 const tracing = () => async (ctx, next) => {
-    const tracer = opentracing.globalTracer()
+  const otelContext = propagation.extract(context.active(), ctx.received.msg.headers);
+  const span = tracer.startSpan(
+    `${ctx.received.topic} receive`,
+    {
+      attributes: {
+        [attributeNames.correlationId]: correlationManager.getCorrelationId(),
+        <%_ if(withMultiTenancy){ _%>
+        [attributeNames.tenantId]: tenantContextAccessor.getTenantContext()?.tenant?.id,
+        <%_}_%>
+        [SemanticAttributes.MESSAGE_BUS_DESTINATION]: ctx.received.topic
+      },
+      kind: SpanKind.CONSUMER
+    },
+    otelContext
+  );
 
-    const externalSpan = getExternalSpan(tracer, ctx.received.msg)
-    const span = tracer.startSpan('messagingHost ' + ctx.received.topic, {
-        childOf: externalSpan ? externalSpan : undefined
-    })
+  ctx.requestSpan = span;
+  span.addEvent({ event: "message", message: ctx.received.msg });
 
-    ctx.requestSpan = span
-    span.log({ event: 'message', message: ctx.received.msg })
+  for (const header in ctx.received.msg.headers) {
+    span.setAttribute(
+      `${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`,
+      ctx.received.msg.headers[header]
+    );
+  }
 
-    span.setTag("nbb.correlation_id", correlationManager.getCorrelationId());
-    <%_ if(withMultiTenancy){ _%>
-    span.setTag(envelope.headers.tenantId, tenantContextAccessor.getTenantContext()?.tenant?.id);
-    <%_}_%>
-    span.setTag(opentracing.Tags.SPAN_KIND, "consumer");
-    span.setTag(opentracing.Tags.COMPONENT, componentName);
-    span.setTag(opentracing.Tags.MESSAGE_BUS_DESTINATION, ctx.received.topic);
+  try {
+    const ctx = trace.setSpan(context.active(), span);
+    await context.with(ctx, next);
+  } catch (error) {
+    span.setStatus({ code: SpanStatusCode.ERROR, message: error?.message });
+    span.recordException(error);
 
-    for (const header in ctx.received.msg.headers) {
-      span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, ctx.received.msg.headers[header]);
-    }
-
-    try {
-      await spanManager.useSpanManager(span, next);
-    } catch (error) {
-      traceError(span, error);
-      throw error;
-    } finally {
-      span.finish();
-    }
+    throw error;
+  } finally {
+    span.end();
+  }
 }
 
 const tracingPublish = () => async (ctx, next) => {
-  const activeSpan = spanManager.getActiveSpan();
-  const tracer = opentracing.globalTracer();
-  const span = tracer.startSpan(`messageBus publish ${ctx.topic}`, {
-    childOf: activeSpan
+  const span = tracer.startSpan(`${ctx.topic} send`, {
+    attributes: {
+      [SemanticAttributes.MESSAGE_BUS_DESTINATION]: ctx.topic,
+      [attributeNames.correlationId]: correlationManager.getCorrelationId(),
+      <%_ if(withMultiTenancy){ _%>
+      [attributeNames.tenantId]: tenantContextAccessor.getTenantContext()?.tenant?.id
+      <%_}_%>
+    },
+    kind: SpanKind.PRODUCER
   });
-  span.setTag(opentracing.Tags.SPAN_KIND, "producer");
-  span.setTag(opentracing.Tags.MESSAGE_BUS_DESTINATION, ctx.topic);
-  span.setTag(opentracing.Tags.COMPONENT, componentName);
-  span.setTag("nbb.correlation_id", correlationManager.getCorrelationId());
-  span.setTag(envelope.headers.tenantId, tenantContextAccessor.getTenantContext()?.tenant?.id);
 
   const existingCustomizer = ctx.envelopeCustomizer;
   ctx.envelopeCustomizer = headers => {
-    tracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, headers);
+    propagation.inject(context.active(), headers);
 
     for (const header in headers) {
-      span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, headers[header]);
+      span.setAttribute(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, headers[header]);
     }
 
     return existingCustomizer(headers);
   };
   try {
-    return await next();
+    const ctx = trace.setSpan(context.active(), span);
+    return await context.with(ctx, next);
   } catch (error) {
-    traceError(span, error);
+    span.setStatus({ code: SpanStatusCode.ERROR, message: error?.message });
+    span.recordException(error);
     throw error;
   } finally {
-    span.finish();
+    span.end();
   }
 };
 
