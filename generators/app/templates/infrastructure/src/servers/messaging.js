@@ -1,7 +1,7 @@
 const { messagingHost, exceptionHandling, SubscriptionOptions, dispatcher } = require("@totalsoft/messaging-host");
 const { msgHandlers, middleware } = require("../messaging");
 const { loggingMiddleware } = require("../middleware");
-const { logger, getDataLoaders } = require("../startup");
+const { logger<% if(dataLayer == "knex") {%>, getDataLoaders<%}%> } = require("../startup");
 <%_ if(addTracing){ _%>
 const { JAEGER_DISABLED } = process.env,
   tracingEnabled = !JSON.parse(JAEGER_DISABLED);

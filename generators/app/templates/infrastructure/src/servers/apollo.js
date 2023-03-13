@@ -71,7 +71,7 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
         tracingEnabled && app.use(tracingMiddleware());
       <%_}_%>
       <%_ if(dataLayer == "knex") {_%>
-      app.use(contextDbInstance({ logger }));
+      app.use(contextDbInstance());
       <%_}_%>
       app.use(
         koaMiddleware(apolloServer,{

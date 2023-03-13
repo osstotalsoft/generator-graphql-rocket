@@ -51,6 +51,9 @@
       <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "lodash.set": "^4.3.2",
       <%_} _%>
+      <%_ if(addTracing){ _%>
+    "@prisma/instrumentation": "^4.11.0",
+      <%_}_%>
     <%_} _%>
     "@opentelemetry/api": "^1.4.0",
     "@opentelemetry/auto-instrumentations-node": "^0.36.0",

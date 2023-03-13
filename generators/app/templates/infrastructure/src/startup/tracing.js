@@ -7,6 +7,9 @@ const { OTEL_EXPORTER_JAEGER_SERVICE_NAME } = process.env;
 const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger");
 const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws");
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
+<%_ if(dataLayer == 'prisma') {_%>
+const { PrismaInstrumentation }  = require("@prisma/instrumentation");
+<%_}_%>
 
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
@@ -32,7 +35,10 @@ const sdk = new opentelemetry.NodeSDK({
         startOutgoingSpanHook: r => ({ [SemanticAttributes.PEER_SERVICE]: r.host || r.hostname })
       }
     }),
-    new WSInstrumentation()
+    new WSInstrumentation(),
+    <%_ if(dataLayer == 'prisma') {_%>
+    new PrismaInstrumentation()
+    <%_}_%>
   ]
 });
 
