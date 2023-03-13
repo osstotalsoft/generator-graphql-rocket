@@ -1,9 +1,5 @@
 const Knex = require("knex")
 const knexTinyLogger = require("knex-tiny-logger").default
-<%_ if(addTracing){ _%>
-const useKnexTracer = require("../tracing/knexTracer")
-const { JAEGER_DISABLED } = process.env
-<%_}_%>
 const { generateKnexConfig } = require('./dbConfigService')
 const { initializeTarnLogging } = require("./logging/tarnLogging")
 const { Mutex } = require('async-mutex')
@@ -41,11 +37,7 @@ const dbInstanceFactory = async ({ logger = console } = {}) => {
     if (JSON.parse(KNEX_LOGGING)) {
         knexTinyLogger(dbInstance, { logger: knexLogger(logger) })
     }
-    <%_ if(addTracing){ _%>
-    if (!JSON.parse(JAEGER_DISABLED)) {
-        useKnexTracer(dbInstance)
-    }
-    <%_}_%>
+
     return dbInstance
   })
 }

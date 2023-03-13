@@ -3,7 +3,7 @@ const errorHandlingMiddleware = () => async (ctx, next) => {
     await next();
   } catch (err) {
 
-    ctx.logger.error(err)
+    ctx.logger.error(err, `error from ${ctx.req?.url}`)
 
     // will only respond with JSON
     ctx.status = err.statusCode || err.status || 500;

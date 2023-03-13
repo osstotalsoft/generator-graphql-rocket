@@ -1,12 +1,22 @@
 const { messagingHost, exceptionHandling, SubscriptionOptions, dispatcher } = require("@totalsoft/messaging-host");
 const { msgHandlers, middleware } = require("../messaging");
-const loggingMiddleware = require("../middleware");
-const { logger } = require("../startup");
+const { loggingMiddleware } = require("../middleware");
+const { logger<% if(dataLayer == "knex") {%>, getDataLoaders<%}%> } = require("../startup");
 <%_ if(addTracing){ _%>
 const { JAEGER_DISABLED } = process.env,
   tracingEnabled = !JSON.parse(JAEGER_DISABLED);
 
   const skipMiddleware = (_ctx, next) => next();
+<%_}_%>
+
+<%_ if(dataLayer == "knex") {_%>
+const dataLoadersMiddleware = async (ctx, next) => {
+  const { dbInstance } = ctx;
+  if (dbInstance) {
+    ctx.dataLoaders = getDataLoaders(dbInstance);
+  }
+  await next();
+}
 <%_}_%>
 
 module.exports = function startMsgHost() {
@@ -24,6 +34,7 @@ module.exports = function startMsgHost() {
         .use(loggingMiddleware)
         <%_ if(dataLayer == "knex") {_%>
         .use(middleware.dbInstance())
+        .use(dataLoadersMiddleware)
         <%_}_%>
         .use(dispatcher(msgHandlers))
         .start()

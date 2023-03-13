@@ -51,7 +51,15 @@
       <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "lodash.set": "^4.3.2",
       <%_} _%>
+      <%_ if(addTracing){ _%>
+    "@prisma/instrumentation": "^4.11.0",
+      <%_}_%>
     <%_} _%>
+    "@opentelemetry/api": "^1.4.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.36.0",
+    "@opentelemetry/resources": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.35.0",
+    "@opentelemetry/semantic-conventions": "^1.9.0",
     "@opentelemetry/exporter-prometheus": "^0.35.1",
     "@opentelemetry/sdk-metrics": "^1.9.1",
     "@totalsoft/key-per-file-configuration": "^1.1.0",
@@ -63,7 +71,7 @@
     <%_ if(withMultiTenancy) {_%>
     "object-path": "^0.11.8",
     "@totalsoft/multitenancy-core": "^1.1.0",
-    "@totalsoft/pino-multitenancy": "^1.1.0",
+    "@totalsoft/pino-multitenancy": "^1.2.0",
     <%_}_%>
     <%_ if(dataLayer === "knex") {_%>
     "dataloader": "^2.1.0",
@@ -93,15 +101,18 @@
     <%_}_%>
     <%_ if(withRights){ _%>
     "graphql-middleware": "^6.1.33",
-    "graphql-shield": "7.6.4",
+    "graphql-shield": "7.6.2",
     <%_}_%>
     "graphql-upload": "^15.0.2",
     "humps": "^2.0.1",
     <%_ if(addTracing){ _%>
     "jaeger-client": "^3.19.0",
-    "opentracing": "^0.14.7",
-    "@totalsoft/opentracing": "^1.1.0",
-    "@totalsoft/pino-opentracing": "^1.1.0",
+    "@opentelemetry/sdk-trace-base": "^1.9.0",
+    "@opentelemetry/sdk-trace-node": "^1.9.0",
+    "@opentelemetry/propagator-jaeger": "^1.9.0",
+    "@opentelemetry/exporter-jaeger": "^1.8.0",
+    "@totalsoft/opentelemetry-instrumentation-ws": "^2.0.0",
+    "@totalsoft/pino-opentelemetry": "^2.0.0",
     <%_}_%>
     "jsonwebtoken": "9.0.0",
     "jwks-rsa": "^3.0.1",

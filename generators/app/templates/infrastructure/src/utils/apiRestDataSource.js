@@ -19,7 +19,7 @@ class ApiRESTDataSource extends NoCacheRESTDataSource {
 
     //TODO to be removed
     if (this.context.token) {
-      request.headers = assoc('Authorization', this.context.token, request.headers)
+      request.headers = assoc('Authorization', `Bearer ${this.context.token}`, request.headers)
     }
 
     const acceptLanguage = this.context.request?.headers?.["accept-language"]

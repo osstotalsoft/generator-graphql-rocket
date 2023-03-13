@@ -3,6 +3,7 @@ const { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> 
 isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || "false");
 <%_}_%>
 const { WebSocketServer } = require("ws");
+const WebSocket = require("ws"); // workaround for opentelemetry-instrumentation-ws
 <%_ if(dataLayer == "knex") {_%>
 const { dbInstanceFactory } = require("../db")
 <%_}_%>
@@ -17,7 +18,7 @@ const { GraphQLError } = require("graphql"),
   metrics = require("../monitoring/metrics");
 
 logger.info('Creating Subscription Server...')
-const startSubscriptionServer = httpServer => 
+const startSubscriptionServer = httpServer =>
   useServer(
     {
       schema,
@@ -83,8 +84,8 @@ const startSubscriptionServer = httpServer =>
             <%_ if(dataLayer == "knex") {_%>
             dbInstance,
               <%_ if(withMultiTenancy){ _%>
-            dataSources: tenantContextAccessor.useTenantContext({ tenant }, async () =>
-              getDataSources(ctx)
+            dataSources: tenantContextAccessor.useTenantContext({ tenant }, () =>
+              getDataSources({ ...ctx, dbInstance })
             ),
               <%_} else {_%>
             dataSources,
@@ -99,7 +100,8 @@ const startSubscriptionServer = httpServer =>
     },
     new WebSocketServer({
       server: httpServer,
-      path: "/graphql"
+      path: "/graphql",
+      WebSocket
     })
   );
 

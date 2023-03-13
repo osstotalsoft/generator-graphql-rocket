@@ -1,33 +1,41 @@
-const opentracing = require('opentracing')
-const { correlationManager } = require('@totalsoft/correlation')
-const { spanManager, traceError } = require('@totalsoft/opentracing')
-const messagingEnvelopeHeaderSpanTagPrefix = 'pubSub_header'
+const messagingEnvelopeHeaderSpanTagPrefix = "pubSub_header";
+const { trace, context, propagation, SpanKind, SpanStatusCode } = require("@opentelemetry/api");
+const { correlationManager } = require("@totalsoft/correlation");
+const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+const attributeNames = require("../../constants/tracingAttributes");
+const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
 
+const componentName = "gql-pub-sub";
+const tracer = trace.getTracer(componentName);
 
 const tracingPublish = async (ctx, next) => {
-  const activeSpan = spanManager.getActiveSpan()
-  const tracer = opentracing.globalTracer()
-  const span = tracer.startSpan(`pub-sub publish ${ctx.clientTopic}`, {
-    childOf: activeSpan
-  })
-  span.setTag(opentracing.Tags.SPAN_KIND, 'producer')
-  span.setTag(opentracing.Tags.COMPONENT, 'gql-pub-sub')
-  span.setTag('nbb.correlation_id', correlationManager.getCorrelationId())
+  const span = tracer.startSpan(`${ctx.clientTopic} send`, {
+    attributes: {
+      [SemanticAttributes.MESSAGE_BUS_DESTINATION]: ctx.topic,
+      [attributeNames.correlationId]: correlationManager.getCorrelationId(),
+      [attributeNames.tenantId]: tenantContextAccessor.getTenantContext()?.tenant?.id
+    },
+    kind: SpanKind.PRODUCER
+  });
 
-  tracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, ctx.message.headers)
+  const messageHeaders = ctx.message.headers;
 
-  for (const header in ctx.message.headers) {
-    span.setTag(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, ctx.message.headers[header])
+  for (const header in ctx.messageHeaders) {
+    span.setAttribute(`${messagingEnvelopeHeaderSpanTagPrefix}.${header.toLowerCase()}`, ctx.message.headers[header]);
   }
 
   try {
-    return next()
-  } catch (err) {
-    traceError(err)
-    throw err
-  } finally {
-    span.finish()
-  }
-}
+    const ctx = trace.setSpan(context.active(), span);
+    propagation.inject(ctx, messageHeaders);
 
-module.exports = { tracingPublish }
+    return await context.with(ctx, next);
+  } catch (error) {
+    span.setStatus({ code: SpanStatusCode.ERROR, message: error?.message });
+    span.recordException(error);
+    throw error;
+  } finally {
+    span.end();
+  }
+};
+
+module.exports = { tracingPublish };

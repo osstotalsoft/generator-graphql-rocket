@@ -21,9 +21,6 @@ const { ApolloServer } = require("@apollo/server"),
   { schema, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>, logger } = require("../startup"),
   { <% if(addTracing){ %>JAEGER_DISABLED,<% } %> METRICS_ENABLED } = process.env,
   <%_ if(addTracing){ _%>
-  tracingPlugin = require("../plugins/tracing/tracingPlugin"),
-  { getApolloTracerPluginConfig, initGqlTracer } = require("../tracing/gqlTracer"),
-  defaultTracer = initGqlTracer({ logger }),
   tracingEnabled = !JSON.parse(JAEGER_DISABLED),
   <%_}_%>
   metricsPlugin = require("../plugins/metrics/metricsPlugin"),
@@ -47,9 +44,6 @@ const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
             }
         },
         <%_}_%>
-        <%_ if(addTracing){ _%>
-            tracingEnabled ? tracingPlugin(getApolloTracerPluginConfig(defaultTracer)) : {},
-        <%_}_%>
         metricsEnabled ? metricsPlugin() : {}
     ];
 };
@@ -62,20 +56,20 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
         uploads: false,
         plugins: plugins(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
       })
-    
+
       await apolloServer.start()
-      
+
       const app = new Koa();
       app.use(loggingMiddleware)
       app.use(errorHandlingMiddleware())
       app.use(bodyParser());
       app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
       app.use(correlationMiddleware());
-      <%_ if(addTracing){ _%>
-      tracingEnabled && app.use(tracingMiddleware());
-      <%_}_%>
       app.use(cors({ credentials: true }));
       app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
+      <%_ if(addTracing){ _%>
+        tracingEnabled && app.use(tracingMiddleware());
+      <%_}_%>
       <%_ if(dataLayer == "knex") {_%>
       app.use(contextDbInstance());
       <%_}_%>
@@ -105,17 +99,10 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
           }
         })
       )
-      
+
     httpServer.on('request', app.callback())
-    
-    const cleanup = async () => {
-      await (await apolloServer)?.stop()
-      <%_ if(addTracing) {_%>
-        defaultTracer?.close();
-      <%_}_%>
-    }
-  
-    return { apolloServer, cleanup }
+
+    return apolloServer
   };
-  
-module.exports = { startApolloServer, plugins };  
+
+module.exports = { startApolloServer, plugins };

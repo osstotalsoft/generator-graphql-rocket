@@ -17,9 +17,10 @@ require('console-stamp')(global.console, {
     format: ':date(yyyy/mm/dd HH:MM:ss.l)'
   })
 
-const { createServer } = require("http"),
-  { startApolloServer<% if(addMessaging) { %>, startMsgHost <% } %> <% if(addSubscriptions){ %>, startSubscriptionServer <% } %>} = require('./servers'),
-  { logger } = require("./startup")
+const { logger<% if(addTracing) {%>, tracer<%}%> } = require("./startup"),
+{ createServer } = require("http"),
+{ startApolloServer<% if(addMessaging) { %>, startMsgHost <% } %> <% if(addSubscriptions){ %>, startSubscriptionServer <% } %>} = require('./servers')
+
 
 <%_ if(dataLayer == 'prisma') {_%>
 const { initialize } = require('./prisma')
@@ -28,17 +29,24 @@ initialize({ logger })
 
 // Metrics, diagnostics
 const
-  { DIAGNOSTICS_ENABLED, METRICS_ENABLED } = process.env,
+  { DIAGNOSTICS_ENABLED, METRICS_ENABLED<% if(addTracing) {%>, JAEGER_DISABLED<%}%> } = process.env,
+  <%_ if(addTracing) {_%>
+  tracingEnabled = !JSON.parse(JAEGER_DISABLED),
+  <%_}_%>
   diagnosticsEnabled = JSON.parse(DIAGNOSTICS_ENABLED),
   metricsEnabled = JSON.parse(METRICS_ENABLED),
   diagnostics = require("./monitoring/diagnostics"),
   metrics = require("./monitoring/metrics");
 
+<%_ if(addTracing) {_%>
+tracingEnabled && tracer.start({ logger });
+<%_}_%>
+
 const httpServer = createServer();
 <%_ if(addSubscriptions){ _%>
 const subscriptionServer = startSubscriptionServer(httpServer);
 <%_}_%>
-const { cleanup: cleanupApolloServer } = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
+const apolloServerPromise = startApolloServer(httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>);
 <%_ if(addMessaging) {_%>
 const msgHost = startMsgHost();
 <%_}_%>
@@ -56,7 +64,10 @@ async function cleanup() {
   <%_ if(addMessaging) {_%>
   await msgHost?.stop();
   <%_}_%>
-  await cleanupApolloServer()
+  await (await apolloServerPromise)?.stop();
+  <%_ if(addTracing) {_%>
+    await tracer?.shutdown({ logger });
+  <%_}_%>
 }
 
 const { gracefulShutdown } = require('@totalsoft/graceful-shutdown');

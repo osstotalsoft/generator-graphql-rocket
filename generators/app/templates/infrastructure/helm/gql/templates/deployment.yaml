@@ -122,15 +122,15 @@ spec:
           - name: METRICS_PORT
             value: {{ $global.metrics.port | quote }}
 <%_ if(addTracing){ _%>
-          - name: JAEGER_SERVICE_NAME
+          - name: OTEL_EXPORTER_JAEGER_SERVICE_NAME
             value: {{ $global.jaeger.serviceName | quote }}
-          - name: JAEGER_AGENT_HOST
+          - name: OTEL_EXPORTER_JAEGER_AGENT_HOST
             value: {{ $global.jaeger.agentHost | quote }}
-          - name: JAEGER_AGENT_PORT
+          - name: OTEL_EXPORTER_JAEGER_AGENT_PORT
             value: {{ $global.jaeger.agentPort | quote }}
-          - name: JAEGER_SAMPLER_TYPE
+          - name: OTEL_EXPORTER_JAEGER_SAMPLER_TYPE
             value: {{ $global.jaeger.samplerType | quote }}
-          - name: JAEGER_SAMPLER_PARAM
+          - name: OTEL_EXPORTER_JAEGER_SAMPLER_PARAM
             value: {{ $global.jaeger.samplerParam | quote }}
           - name: JAEGER_DISABLED
           {{- if $global.jaeger.enabled }}

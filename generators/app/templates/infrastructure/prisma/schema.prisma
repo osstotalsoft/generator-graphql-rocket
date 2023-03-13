@@ -1,5 +1,8 @@
 generator client {
   provider = "prisma-client-js"
+  <%_ if(addTracing){ _%>
+  previewFeatures = ["tracing"]
+  <%_}_%>
 }
 
 datasource db {

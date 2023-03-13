@@ -1,9 +1,10 @@
 <%_ if(withMultiTenancy) {_%>
-const { tenantIdMixin } = require("@totalsoft/pino-multitenancy");
+const { tenantIdMixin, tenantCodeMixin } = require("@totalsoft/pino-multitenancy");
+const isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || "false");
 <%_}_%>
 const { correlationMixin } = require("@totalsoft/pino-correlation");
 <%_ if(addTracing) {_%>
-const { opentracingTransport } = require("@totalsoft/pino-opentracing");
+const { openTelemetryTracingTransport } = require("@totalsoft/pino-opentelemetry");
 <%_}_%>
 
 // General settings
@@ -17,10 +18,10 @@ const { LOG_DATABASE, LOG_DATABASE_MINLEVEL, LOG_DATABASE_ENABLED } = process.en
 
 <%_ if(addTracing) {_%>
 // OpenTracing transport settings
-const { LOG_OPENTRACING_ENABLED, LOG_OPENTRACING_MINLEVEL, JAEGER_DISABLED } = process.env,
+const { LOG_OPENTELEMETRY_TRACING_ENABLED, LOG_OPENTELEMETRY_TRACING_MINLEVEL, JAEGER_DISABLED } = process.env,
   tracingEnabled = !JSON.parse(JAEGER_DISABLED),
-  logOpenTracingEnabled = tracingEnabled && JSON.parse(LOG_OPENTRACING_ENABLED || "false"),
-  logOpenTracingMinLevel = LOG_OPENTRACING_MINLEVEL || "info";
+  logOpenTelemetryTracingEnabled = tracingEnabled && JSON.parse(LOG_OPENTELEMETRY_TRACING_ENABLED || "false"),
+  logOpenTelemetryTracingMinLevel = LOG_OPENTELEMETRY_TRACING_MINLEVEL || "info";
 <%_}_%>
 
 const pino = require("pino");
@@ -29,7 +30,7 @@ const options = {
   level: logMinLevel,
   timestamp: pino.stdTimeFunctions.isoTime,
   mixin(_context, _level) {
-    return { ...correlationMixin()<% if(withMultiTenancy) {%>, ...tenantIdMixin()<%}%> };
+    return { ...correlationMixin()<% if(withMultiTenancy) {%>, ...tenantIdMixin(), ...tenantCodeMixin()<%}%> };
   }
 };
 const transport = pino.transport({
@@ -50,8 +51,11 @@ const transport = pino.transport({
     {
       target: "pino-pretty",
       options: {
-        ignore: "pid,hostname,correlationId,tenantId,requestId,operationName",
-        translateTime: 'SYS:yyyy/mm/dd HH:MM:ss.l'
+        ignore: "pid,hostname,correlationId,tenantId,tenantCode,requestId,operationName,trace_id,span_id,trace_flags",
+        translateTime: 'SYS:yyyy/mm/dd HH:MM:ss.l',
+        <%_ if(withMultiTenancy) {_%>
+        messageFormat: isMultiTenant ? "[{tenantCode}] {msg}" : false
+        <%_}_%>
       },
       level: "trace"
     }
@@ -61,7 +65,7 @@ const transport = pino.transport({
 <%_ if(addTracing) { _%>
 var streams = pino.multistream([
   { stream: transport, level: "trace" },
-  ...(logOpenTracingEnabled ? [{ stream: opentracingTransport(), level: logOpenTracingMinLevel }] : [])
+  ...(logOpenTelemetryTracingEnabled ? [{ stream: openTelemetryTracingTransport(), level: logOpenTelemetryTracingMinLevel }] : [])
 ]);
 
 const logger = pino(options, streams);
