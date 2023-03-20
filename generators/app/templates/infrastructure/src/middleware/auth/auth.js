@@ -7,20 +7,23 @@ const { CloseCode } = require("graphql-ws");
 const { IDENTITY_AUTHORITY, IDENTITY_OPENID_CONFIGURATION } = process.env;
 
 const client = {
-  cache: true,
+  cache: true, // Default Value
+  cacheMaxEntries: 5, // Default value
+  cacheMaxAge: 600000, // Defaults to 10m
   rateLimit: true,
-  jwksRequestsPerMinute: 2,
+  jwksRequestsPerMinute: 10, // Default value
   jwksUri: `${IDENTITY_AUTHORITY}${IDENTITY_OPENID_CONFIGURATION}`
 }
-
-const jwtTokenValidation = (ctx, next) => {
-  const validateJwtToken = jwt({
+const jwksRsaClient = jwksRsa(client);
+const validateJwtToken = jwt({
     secret: jwksRsa.koaJwtSecret(client),
     issuer: IDENTITY_AUTHORITY,
     algorithms: ["RS256"],
     key: 'jwtdata',
     tokenKey: 'token',
   });
+
+const jwtTokenValidation = (ctx, next) => {
   return validateJwtToken(ctx, next);
 }
 
@@ -37,7 +40,7 @@ const validateToken = async (token) => {
   const decoded = jsonwebtoken.decode(token, { complete: true });
 
   const Promise = require("bluebird");
-  const getKey = Promise.promisify(jwksRsa(client).getSigningKey);
+  const getKey = Promise.promisify(jwksRsaClient.getSigningKey);
   const key = await getKey(decoded.header.kid);
 
   return jsonwebtoken.verify(token, key.getPublicKey());
