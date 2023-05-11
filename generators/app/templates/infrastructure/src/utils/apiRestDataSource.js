@@ -28,7 +28,6 @@ class ApiRESTDataSource extends NoCacheRESTDataSource {
 
     const correlationId = correlationManager.getCorrelationId();
     if (correlationId) request.headers['x-correlation-id'] = correlationId
-      request.headers['content-type'] = 'application/json'
   }
 }
 
