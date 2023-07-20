@@ -2,8 +2,5 @@
   "javascript.validate.enable": false,
   "javascript.format.enable": true,
   "typescript.format.enable": false,
-  "cSpell.words": [
-    "totalsoft",
-    "yorc"
-  ],
+  "cSpell.words": ["totalsoft", "Uncapitalize", "yorc"]
 }

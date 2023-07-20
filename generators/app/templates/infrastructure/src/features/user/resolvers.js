@@ -6,7 +6,7 @@ const { envelope } = require("@totalsoft/message-bus")
 const { withFilter } = require('graphql-subscriptions')
 <%_}_%>
 <%_ if(dataLayer == "prisma") {_%>
-const { prisma } = require('../../prisma')
+const { prisma, prismaPaginated } = require('../../prisma')
 <%_}_%>
 
 const userResolvers = {
@@ -50,28 +50,9 @@ const userResolvers = {
     },
     <%_} else if(dataLayer == "prisma"){_%>
     Query: {
-        userData: async (_, { id, externalId }, _ctx, _info) => {
-            if (externalId) {
-              return await prisma().user.findUnique({ where: { externalId } })
-            } else return await prisma().user.findUnique({ where: { id } })
-        },
-        userList: async (_parent, { pager, filters }, _ctx) => {
-        const { pageSize, afterId, sortBy = 'firstName', direction } = pager
-        const orderBy = sortBy ? { [sortBy]: direction ? 'asc' : 'desc' } : { id: 'asc' }
-
-        const values = await prisma().user.findMany({
-            take: pageSize ? pageSize + 1 : undefined,
-            cursor: afterId
-            ? {
-                Id: afterId
-                }
-            : undefined,
-            where: filters ?? undefined,
-            orderBy
-        })
-
-        return pageSize ? { values: values?.slice(0, pageSize), orderBy, nextAfterId: values?.[pageSize]?.id } : { values }
-        }
+        userData: (_, { id }, _ctx, _info) => prisma().user.findUnique({ where: { id } }),
+        userList: (_parent, { pager, filters }, _ctx) => 
+            prismaPaginated(prisma().user, pager, { where: { name: { contains: filters?.name } } })
     },
     User: {
         rights: async ({ id }, _params, _ctx, _info) => {
@@ -81,32 +62,6 @@ const userResolvers = {
           })
           return userRights.map(r => r?.right?.name)
         }
-    },
-    UserList: {
-        pagination: async ({ orderBy, nextAfterId }, { pager, filters }, _ctx) => {
-            const { pageSize, afterId } = pager
-            if (!pageSize) return
-
-            let res = { dbContext: prisma().userInformation, nextPage: { ...pager, afterId: nextAfterId ?? null } }
-
-            if (!afterId) return res
-
-            const prevPageValues = await prisma().user.findMany({
-              select: { id: true },
-              skip: 1,
-              take: -pageSize,
-              cursor: {
-                Id: afterId
-              },
-              where: filters ?? undefined,
-              orderBy
-            })
-            const prevPage = { ...pager, afterId: prevPageValues?.[0]?.id }
-            return { ...res, prevPage }
-        }
-    },
-    Pagination: {
-        totalCount: ({ dbContext }) => dbContext.count()
     },
     //Not working! Only for demonstration
     Mutation: {
