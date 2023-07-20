@@ -1,3 +1,3 @@
 const { prisma, initialize } = require('./client')
-
-module.exports = { prisma, initialize }
+const { prismaPaginated } = require('./utils')
+module.exports = { prisma, initialize, prismaPaginated }
