@@ -1,3 +1,23 @@
+function cursorPaginationOptions(pager, direction = pager?.direction || 1) {
+  const { afterId, pageSize, sortBy = 'name' } = pager
+  const options = afterId
+    ? {
+        skip: 1,
+        cursor: {
+          id: afterId
+        }
+      }
+    : {}
+
+  return {
+    ...options,
+    take: pageSize,
+    orderBy: {
+      [sortBy]: direction ? 'asc' : 'desc'
+    }
+  }
+}
+
 /**
  *
  * @param prismaModel Prisma queried model
