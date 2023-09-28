@@ -37,14 +37,12 @@ function cursorPaginationOptions(pager, direction = pager?.direction || 1) {
  * }`
  * @returns `{ values: object[], pagination: Pagination }`
  */
-async function prismaPaginated(prismaModel, pager, metadata = {}) {
+async function prismaPaginated(prismaModel, pager = {}, metadata = {}) {
   const { pageSize, direction } = pager
+  const options = { ...metadata, ...cursorPaginationOptions(pager) }
   const [values, totalCount, prevPageValues] = await Promise.all([
-    await prismaModel.findMany({
-      ...metadata,
-      ...cursorPaginationOptions(pager)
-    }),
-    await prismaModel.count(),
+    await prismaModel.findMany(options),
+    await prismaModel.count(options),
     await prismaModel.findMany({
       ...metadata,
       ...cursorPaginationOptions(pager, !direction),
@@ -64,4 +62,4 @@ async function prismaPaginated(prismaModel, pager, metadata = {}) {
   return result
 }
 
-module.exports = { prismaPaginated }
+module.exports = { cursorPaginationOptions, prismaPaginated }
