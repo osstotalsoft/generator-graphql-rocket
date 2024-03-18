@@ -1,4 +1,6 @@
-function cursorPaginationOptions(pager, direction = pager?.direction || 1) {
+const { defaultTo } = require('ramda')
+
+function cursorPaginationOptions(pager, direction = defaultTo(1, pager?.direction)) {
   const { afterId, pageSize, sortBy = 'name' } = pager
   const options = afterId
     ? {
@@ -42,7 +44,7 @@ async function prismaPaginated(prismaModel, pager = {}, metadata = {}) {
   const options = { ...metadata, ...cursorPaginationOptions(pager) }
   const [values, totalCount, prevPageValues] = await Promise.all([
     await prismaModel.findMany(options),
-    await prismaModel.count(options),
+    await prismaModel.count({ where: metadata.where }),
     await prismaModel.findMany({
       ...metadata,
       ...cursorPaginationOptions(pager, !direction),

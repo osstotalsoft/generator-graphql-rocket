@@ -5,7 +5,7 @@ async function getTablesWithColumn(column, prisma) {
   const data = await prisma.$queryRaw`
     SELECT DISTINCT TABLE_NAME as [table], TABLE_SCHEMA as [schema] 
     FROM INFORMATION_SCHEMA.COLUMNS 
-    WHERE COLUMN_NAME = ${column}`
+    WHERE UPPER(COLUMN_NAME) = UPPER(${column})`
   return data
 }
 
@@ -47,28 +47,13 @@ async function buildTableHasColumnPredicate(column, prisma) {
   }
 }
 
-const addTenantProperty = tenantId => obj => ({ ...obj, TenantId: tenantId })
+const addTenantProperty = tenantId => obj => ({ ...obj, tenantId })
 
 const addTenantFilter = (params, tenantId) => {
   let { action, args } = params
   const fn = addTenantProperty(tenantId)
 
   R.cond([
-    [
-      R.equals('findUnique'),
-      () => {
-        set(params, 'action', 'findFirst')
-        R.forEachObjIndexed((val, key) => {
-          const isComposedUnique = key.match(/[[a-zA-Z]*_[a-zA-z]*/)
-          if (isComposedUnique) {
-            params.args.where = { ...params.args.where, ...val }
-            delete params.args.where[key]
-          }
-        }, params.args.where)
-        set(params, 'args.where', fn(args.where))
-        return params.args
-      }
-    ],
     [R.equals('create'), () => set(params, 'args.data', fn(args.data))],
     [
       R.equals('createMany'),

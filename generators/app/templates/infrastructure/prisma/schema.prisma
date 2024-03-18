@@ -11,8 +11,9 @@ datasource db {
 }
 
 // Example of generated code
+// Property names MUST be camelCase!
+// To automatically convert PascalCase to camelCase, use the following npm script: npm run prisma:format 
 model User {
-  Id    Int     @id @default(autoincrement())
-  FirstName  String?
-  LastName  String?
+  id    String  @id(map: "PK_User") @map("Id") @db.UniqueIdentifier
+  name  String  @map("Name") @db.NVarChar(128)
 }

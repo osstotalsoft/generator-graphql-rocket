@@ -1,4 +1,3 @@
-const { camelizeKeys } = require('humps')
 const { PRISMA_DEBUG<% if(withMultiTenancy){ %>, IS_MULTITENANT<%if(!hasSharedDb){%>, PRISMA_DB_URL_PATTERN <%}%><%}%>} = process.env
 const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
@@ -32,12 +31,6 @@ const applyMiddleware = prismaClient => {
   prismaClient.$on('error', e => {
     logger.error(e, e.message)
   })
-
-  prismaClient.$use(async (params, next) => {
-    const result = await next(params)
-    const resultData = camelizeKeys(result)
-    return resultData
-  })
 }
 
 function prisma() {
@@ -53,7 +46,7 @@ function prisma() {
       prismaClient = new PrismaClient(prismaOptions)
 
       // tenancy where filter
-      buildTableHasColumnPredicate('TenantId', prismaClient).then(tableHasColumnTenantId => {
+      buildTableHasColumnPredicate('tenantId', prismaClient).then(tableHasColumnTenantId => {
         prismaClient.$use(async (params, next) => {
           const tableHasColumnTenant = tableHasColumnTenantId(params.model)
           if (tableHasColumnTenant) {
