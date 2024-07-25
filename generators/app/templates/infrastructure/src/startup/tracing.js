@@ -1,54 +1,87 @@
 const opentelemetry = require("@opentelemetry/sdk-node");
-const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
-const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
 const { Resource } = require("@opentelemetry/resources");
 const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventions");
-const { OTEL_EXPORTER_JAEGER_SERVICE_NAME } = process.env;
+const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY } = process.env;
 const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger");
+<%_ if(addSubscriptions) {_%>
 const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws");
+<%_} _%>
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
+const { ParentBasedSampler, AlwaysOnSampler } = require('@opentelemetry/sdk-trace-node')
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
+const { PinoInstrumentation } = require('@opentelemetry/instrumentation-pino')
+const { IORedisInstrumentation } = require('@opentelemetry/instrumentation-ioredis')
+const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql')
+const { context, trace } = require('@opentelemetry/api')
+const { getRPCMetadata, RPCType } = require('@opentelemetry/core')
+const instrumentation = require('@opentelemetry/instrumentation')
 <%_ if(dataLayer == 'prisma') {_%>
 const { PrismaInstrumentation }  = require("@prisma/instrumentation");
 <%_}_%>
 
+const otelTraceProxy = JSON.parse(OTEL_TRACE_PROXY || 'false')
+
+class CustomGraphQLInstrumentation extends GraphQLInstrumentation {
+  init() {
+    const module = new instrumentation.InstrumentationNodeModuleDefinition('graphql', ['>=14'])
+    module.files.push(this._addPatchingExecute())
+    return module
+  }
+}
+
+const isGraphQLRoute = url => url?.startsWith('/graphql')
+const isTelemetryRoute = url => url?.startsWith('/metrics') || url?.startsWith('/livez') || url?.startsWith('/readyz')
+
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
-const traceExporter = new JaegerExporter();
+const traceExporter = new OTLPTraceExporter()
 const sdk = new opentelemetry.NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: OTEL_EXPORTER_JAEGER_SERVICE_NAME
+    [SemanticResourceAttributes.SERVICE_NAME]: OTEL_SERVICE_NAME
   }),
+  sampler: new ParentBasedSampler({ root: new AlwaysOnSampler() }),
   traceExporter,
   textMapPropagator: new JaegerPropagator(),
   instrumentations: [
-    getNodeAutoInstrumentations({
-      "@opentelemetry/instrumentation-koa": { ignoreLayersType: ["middleware"] },
-      "@opentelemetry/instrumentation-fs": { enabled: false },
-      "@opentelemetry/instrumentation-graphql": { ignoreTrivialResolveSpans: true, mergeItems: true },
-      "@opentelemetry/instrumentation-net": { enabled: false },
-      "@opentelemetry/instrumentation-dns": { enabled: false },
-      "@opentelemetry/instrumentation-dataloader": { enabled: false },
-      "@opentelemetry/instrumentation-tedious": { enabled: false },
-      "@opentelemetry/instrumentation-grpc": { enabled: false },
-      "@opentelemetry/instrumentation-http": {
-        ignoreIncomingRequestHook: r => r.method == "OPTIONS",
-        startOutgoingSpanHook: r => ({ [SemanticAttributes.PEER_SERVICE]: r.host || r.hostname })
+    new HttpInstrumentation({
+      ignoreIncomingRequestHook: r =>
+        r.method == 'OPTIONS' || (otelTraceProxy ? isTelemetryRoute(r.url) : !isGraphQLRoute(r.url)),
+      ignoreOutgoingRequestHook: _ => !trace.getSpan(context.active()), // ignore outgoing requests without parent span
+      startOutgoingSpanHook: r => ({ [SemanticAttributes.PEER_SERVICE]: r.host || r.hostname })
+    }),
+    new CustomGraphQLInstrumentation({
+      ignoreTrivialResolveSpans: true,
+      mergeItems: true,
+      responseHook: (span, _) => {
+        const rpcMetadata = getRPCMetadata(context.active())
+
+        if (rpcMetadata?.type === RPCType.HTTP) {
+          rpcMetadata?.span?.updateName(`${rpcMetadata?.span?.name} ${span.name}`)
+        }
       }
     }),
+    new PinoInstrumentation(),
+    new IORedisInstrumentation(),
+    <%_ if(addSubscriptions) {_%>
     new WSInstrumentation(),
+    <%_} _%>
     <%_ if(dataLayer == 'prisma') {_%>
     new PrismaInstrumentation()
     <%_}_%>
   ]
 });
 
+
 function start({ logger = console } = {}) {
   // initialize the SDK and register with the OpenTelemetry API
   // this enables the API to record telemetry
-  return sdk
-    .start()
-    .then(() => logger.info("Tracing initialized"))
-    .catch(error => logger.error(error, "Error initializing tracing"));
+  try {
+    sdk.start()
+    logger.info('Tracing initialized')
+  } catch (error) {
+    logger.error(error, 'Error initializing tracing')
+  }
 }
 
 function shutdown({ logger = console } = {}) {

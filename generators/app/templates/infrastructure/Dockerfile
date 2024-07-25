@@ -30,9 +30,4 @@ USER $imageUser
 
 EXPOSE 4000
 
-<%_ if(addVaultConfigs){ _%>
-CMD ["/bin/bash", "-c", "test -f /vault/secrets/credentials.vault && echo 'INFO: Vault credentials loaded.' && \
-    source /vault/secrets/credentials.vault || echo 'INFO: Vault file not loaded.' && <%=packageManager%> run start:production"]
-<%_} else {_%>
 CMD [ "<%=packageManager%>", "run", "start:production"]
-<%_}_%>

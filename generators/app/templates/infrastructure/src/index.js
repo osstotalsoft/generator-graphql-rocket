@@ -29,9 +29,9 @@ initialize({ logger })
 
 // Metrics, diagnostics
 const
-  { DIAGNOSTICS_ENABLED, METRICS_ENABLED<% if(addTracing) {%>, JAEGER_DISABLED<%}%> } = process.env,
+  { DIAGNOSTICS_ENABLED, METRICS_ENABLED<% if(addTracing) {%>, OTEL_TRACING_ENABLED<%}%> } = process.env,
   <%_ if(addTracing) {_%>
-  tracingEnabled = !JSON.parse(JAEGER_DISABLED),
+  tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED),
   <%_}_%>
   diagnosticsEnabled = JSON.parse(DIAGNOSTICS_ENABLED),
   metricsEnabled = JSON.parse(METRICS_ENABLED),
