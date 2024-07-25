@@ -2,5 +2,10 @@
   "javascript.validate.enable": false,
   "javascript.format.enable": true,
   "typescript.format.enable": false,
-  "cSpell.words": ["totalsoft", "Uncapitalize", "yorc"]
+  "cSpell.words": [
+    "OTEL",
+    "totalsoft",
+    "Uncapitalize",
+    "yorc"
+  ]
 }

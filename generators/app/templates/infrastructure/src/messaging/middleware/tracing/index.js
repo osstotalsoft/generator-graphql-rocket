@@ -29,7 +29,7 @@ const tracing = () => async (ctx, next) => {
   );
 
   ctx.requestSpan = span;
-  span.addEvent({ event: "message", message: ctx.received.msg });
+  span.addEvent('message', { 'message-payload': JSON.stringify(ctx.received.msg.payload).substring(0, 500) })
 
   for (const header in ctx.received.msg.headers) {
     span.setAttribute(

@@ -5,16 +5,6 @@ global:
   imagePullSecrets:
   - name: "registrykey"
 
-<%_ if(addVaultConfigs){ _%>
-  vaultEnvironment: "false"
-
-  vaultConfigs:
-    sa: "sa"
-    role: "role"
-    secret: "secret"
-    key: key
-<%_}_%>
-
   runtimeConfiguration:
     enabled: false
     configMap: <%= helmChartName %>-runtime-config
@@ -38,17 +28,9 @@ global:
 <%_}_%>
 
 <%_ if(addTracing){ _%>
-  jaeger:
+  otlp:
     enabled: true
-    agentAutoInject: "false"
-    agentHost: localhost
-    agentPort: 6832
-    agentImageTag: 1.16.0
-    collectorHost: "[COLECTOR_SERVICE_NAME].[NAMESPACE]"
-    collectorPort: 14267
-    serviceName: <%= projectName %>
-    samplerType: const
-    samplerParam: 1
+    endpoint: http://localhost:4317
 <%_}_%>
 <%_ if(addMessaging) { _%>
   messaging:

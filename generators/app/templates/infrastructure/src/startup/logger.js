@@ -18,8 +18,8 @@ const { LOG_DATABASE, LOG_DATABASE_MINLEVEL, LOG_DATABASE_ENABLED } = process.en
 
 <%_ if(addTracing) {_%>
 // OpenTracing transport settings
-const { LOG_OPENTELEMETRY_TRACING_ENABLED, LOG_OPENTELEMETRY_TRACING_MINLEVEL, JAEGER_DISABLED } = process.env,
-  tracingEnabled = !JSON.parse(JAEGER_DISABLED),
+const { LOG_OPENTELEMETRY_TRACING_ENABLED, LOG_OPENTELEMETRY_TRACING_MINLEVEL, OTEL_TRACING_ENABLED } = process.env,
+  tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED || 'false'),
   logOpenTelemetryTracingEnabled = tracingEnabled && JSON.parse(LOG_OPENTELEMETRY_TRACING_ENABLED || "false"),
   logOpenTelemetryTracingMinLevel = LOG_OPENTELEMETRY_TRACING_MINLEVEL || "info";
 <%_}_%>
