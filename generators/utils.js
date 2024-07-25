@@ -1,11 +1,11 @@
-const boxen = require('boxen')
-const { UpdateNotifier } = require('update-notifier')
-const pkg = require('../package.json')
-const chalk = require('chalk')
+import boxen from 'boxen'
+import updateNotifier from 'update-notifier'
+import pkg from '../package.json' with { type: 'json' }
+import chalk from 'chalk'
 
-const notifier = new UpdateNotifier({ pkg, updateCheckInterval: 0 })
+const notifier = updateNotifier({ pkg, updateCheckInterval: 0 })
 
-async function checkForLatestVersion() {
+export async function checkForLatestVersion() {
   const updateInfo = await notifier.fetchInfo()
   if (updateInfo.current !== '0.0.0') console.log(updateInfo.current)
   if (updateInfo && updateInfo.current !== '0.0.0' && updateInfo.current < updateInfo.latest) {
@@ -35,9 +35,7 @@ ${chalk.cyanBright(`npm install -g @totalsoft/generator-graphql-rocket`)}
   return true
 }
 
-async function getCurrentVersion() {
+export async function getCurrentVersion() {
   const updateInfo = await notifier.fetchInfo()
   return updateInfo.current
 }
-
-module.exports = { checkForLatestVersion, getCurrentVersion }

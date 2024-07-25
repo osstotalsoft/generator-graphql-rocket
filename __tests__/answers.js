@@ -1,12 +1,16 @@
 'use strict'
-const path = require('path')
-const rimraf = require('rimraf')
-const assert = require('yeoman-assert')
-const helpers = require('yeoman-test')
-const { projectNameQ, getQuestions } = require('../generators/app/questions')
-const { findIndex } = require('ramda')
+import assert from 'yeoman-assert'
+import helpers from 'yeoman-test'
+import { findIndex } from 'ramda'
+import { projectNameQ, getQuestions } from '../generators/app/questions.js'
+import { rimrafSync } from 'rimraf'
+import { fileURLToPath } from 'url'
+import path, { dirname } from 'path'
 
-describe('generator-graphql-rocket:app question validations', () => {
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+describe('question validations', () => {
   it('project name input does not have an acceptable format', () => {
     const name = '& - a!'
     const validationResult = projectNameQ.validate(name)
@@ -37,7 +41,6 @@ describe('generator-graphql-rocket:app question validations', () => {
 })
 
 describe('test package installers', () => {
-  jest.setTimeout(10 * 1000)
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const dbConnectionName = 'testDatabase'
@@ -56,18 +59,18 @@ describe('test package installers', () => {
     packageManager: 'npm'
   }
 
-  beforeAll(() => {
-    rimraf.sync(path.join(__dirname, tempRoot))
+  before(() => {
+    rimrafSync(path.join(__dirname, tempRoot))
   })
 
   afterEach(() => {
-    rimraf.sync(path.join(__dirname, tempRoot))
+    rimrafSync(path.join(__dirname, tempRoot))
   })
 
-  it('does not creat project if projectName is invalid', () => {
+  it('does not create project if projectName is invalid', async () => {
     const invalidProjectName = '111#@'
 
-    return helpers
+    await helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
       .withPrompts({
@@ -75,9 +78,8 @@ describe('test package installers', () => {
         projectName: invalidProjectName
       })
       .run()
-      .then(() => {
-        assert.noFile(path.join(__dirname, invalidProjectName))
-      })
+
+    assert.noFile(path.join(__dirname, invalidProjectName))
   })
 
   it('does not contain subscriptions', () =>
@@ -198,4 +200,4 @@ describe('test package installers', () => {
         )
       })
   })
-})
+}).timeout(10 * 1000)

@@ -1,11 +1,14 @@
 'use strict'
-const path = require('path')
-const assert = require('yeoman-assert')
-const helpers = require('yeoman-test')
-const rimraf = require('rimraf')
+import assert from 'yeoman-assert'
+import helpers from 'yeoman-test'
+import { rimraf } from 'rimraf'
+import { fileURLToPath } from 'url'
+import path, { dirname } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 describe('generator-graphql-rocket:app', () => {
-  jest.setTimeout(10 * 1000)
   const tempRoot = `../.tmp`
   const projectName = 'test-graphql'
   const helmChartName = 'test-helm'
@@ -24,7 +27,7 @@ describe('generator-graphql-rocket:app', () => {
     packageManager: 'npm'
   }
 
-  beforeAll(() => {
+  before(() => {
     rimraf.sync(path.join(__dirname, tempRoot))
   })
 
@@ -135,9 +138,7 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const valuesYaml = path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
-        assert.fileContent([
-          [valuesYaml, `transport: "rusi"`]
-        ])
+        assert.fileContent([[valuesYaml, `transport: "rusi"`]])
 
         const deploymentYaml = path.join(
           __dirname,
@@ -148,4 +149,4 @@ describe('generator-graphql-rocket:app', () => {
           [deploymentYaml, `rusi.io/enabled: {{ lower $global.messaging.transport | eq "rusi" | quote }}`]
         ])
       }))
-})
+}).timeout(10 * 1000)

@@ -1,19 +1,22 @@
 'use strict'
-const path = require('path')
-const rimraf = require('rimraf')
-const assert = require('yeoman-assert')
-const helpers = require('yeoman-test')
-const { NPM_MIN_VERSION, YARN_MIN_VERSION } = require('../generators/app/constants')
+import { rimraf } from 'rimraf'
+import assert from 'yeoman-assert'
+import helpers from 'yeoman-test'
+import { NPM_MIN_VERSION, YARN_MIN_VERSION } from '../generators/app/constants.js'
+import { fileURLToPath } from 'url'
+import path, { dirname } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 describe('test package installers', () => {
-  jest.setTimeout(10 * 1000)
   const projectName = 'test-graphql'
   const tempRoot = `../.tmp`
   const dbConnectionName = 'testDatabase'
   const npm = `>= ${NPM_MIN_VERSION}`
   const yarn = `>= ${YARN_MIN_VERSION}`
 
-  beforeAll(() => {
+  before(() => {
     rimraf.sync(path.join(__dirname, tempRoot))
   })
 
@@ -70,4 +73,4 @@ describe('test package installers', () => {
         assert.fileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`), 'yarn')
         assert.noFileContent(path.join(__dirname, `${tempRoot}/${projectName}/Dockerfile`), 'npm')
       }))
-})
+}).timeout(10 * 1000)

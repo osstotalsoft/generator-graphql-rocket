@@ -1,0 +1,6 @@
+{
+  "recursive": true,
+  "extension": ["js"],
+  "spec": "__tests__/**/*.js",
+  "node-option": ["experimental-specifier-resolution=node"]
+}

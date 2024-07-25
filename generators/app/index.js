@@ -1,17 +1,19 @@
 'use strict'
-const Generator = require('yeoman-generator')
-require('lodash').extend(Generator.prototype, require('yeoman-generator/lib/actions/install'))
-const chalk = require('chalk')
-const yosay = require('yosay')
-const path = require('path')
-const { append, concat, mergeLeft } = require('ramda')
-const { projectNameQ, usePrevConfigsQ, getQuestions } = require('./questions')
-const { checkForLatestVersion, getCurrentVersion } = require('../utils')
-const { prettierTransform, defaultPrettierOptions } = require('../generator-transforms')
-const filter = require('gulp-filter')
-const { YO_RC_FILE, YARN_MIN_VERSION, NPM_MIN_VERSION } = require('./constants')
+import Generator from 'yeoman-generator'
+import chalk from 'chalk'
+import yosay from 'yosay'
+import path from 'path'
+import { concat, mergeLeft } from 'ramda'
+import { projectNameQ, usePrevConfigsQ, getQuestions } from './questions.js'
+import { checkForLatestVersion, getCurrentVersion } from '../utils.js'
+import { prettierTransform, defaultPrettierOptions } from '../generator-transforms.js'
+import filter from 'gulp-filter'
+import { YO_RC_FILE, YARN_MIN_VERSION, NPM_MIN_VERSION } from './constants.js'
+// import extend from 'lodash/extend.js'
+// import install from 'yeoman-generator'
+// extend(Generator.prototype, install)
 
-module.exports = class extends Generator {
+export default class extends Generator {
   constructor(args, opts) {
     super(args, { ...opts, skipRegenerate: true, ignoreWhitespace: true, force: true, skipLocalCache: false })
     this.registerClientTransforms()
@@ -169,6 +171,8 @@ module.exports = class extends Generator {
     this.log(
       chalk.greenBright(`All the dependencies will be installed shortly using "${packageManager}" package manager...`)
     )
+
+    // this.installDependencies({ bower: false, npm: packageManager === 'npm', yarn: packageManager === 'yarn' })
     // eslint-disable-next-line no-unused-expressions
     packageManager === 'npm'
       ? this.npmInstall(null, {}, { cwd: projectName })

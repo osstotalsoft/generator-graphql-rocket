@@ -1,6 +1,6 @@
-const chalk = require('chalk')
+import chalk from 'chalk'
 
-module.exports.projectNameQ = {
+export const projectNameQ = {
   type: 'input',
   name: 'projectName',
   message: 'What is the name of your project?',
@@ -17,7 +17,7 @@ module.exports.projectNameQ = {
   default: 'new-gql-server'
 }
 
-module.exports.usePrevConfigsQ = {
+export const usePrevConfigsQ = {
   type: 'confirm',
   name: 'usePrevConfigs',
   message:
@@ -25,7 +25,7 @@ module.exports.usePrevConfigsQ = {
   default: true
 }
 
-module.exports.getQuestions = projectName => [
+export const getQuestions = projectName => [
   {
     type: 'list',
     name: 'dataLayer',

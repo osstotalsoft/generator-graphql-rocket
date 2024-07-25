@@ -1,7 +1,7 @@
-const through = require('through2')
-const prettier = require('prettier')
+import through from 'through2'
+import prettier from 'prettier'
 
-const defaultPrettierOptions = {
+export const defaultPrettierOptions = {
   printWidth: 125,
   tabWidth: 2,
   singleQuote: true,
@@ -10,7 +10,7 @@ const defaultPrettierOptions = {
   arrowParens: 'avoid'
 }
 
-const prettierTransform = function (defaultOptions) {
+export const prettierTransform = function (defaultOptions) {
   const transform = (file, encoding, callback) => {
     /* Resolve from the projects config */
     prettier.resolveConfig(file.relative).then(options => {
@@ -28,9 +28,4 @@ const prettierTransform = function (defaultOptions) {
   }
 
   return through.obj(transform)
-}
-
-module.exports = {
-  prettierTransform,
-  defaultPrettierOptions
 }

@@ -21,61 +21,48 @@
     "yeoman-generator"
   ],
   "devDependencies": {
+    "@babel/eslint-parser": "^7.24.8",
+    "@babel/plugin-syntax-import-assertions": "^7.24.7",
     "coveralls": "^3.1.1",
-    "eslint": "^8.4.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-xo": "^0.39.0",
-    "eslint-plugin-jest": "^25.3.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-xo": "^0.45.0",
+    "eslint-plugin-mocha": "^10.4.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "gh-release": "^6.0.4",
-    "lint-staged": "^13.2.1"
+    "eslint-plugin-prettier": "^5.2.1",
+    "gh-release": "^7.0.2",
+    "lint-staged": "^15.2.7",
+    "mocha": "^10.7.0"
   },
   "engines": {
-    "npm": ">= 4.0.0",
-    "node": ">= 14.15.0"
+    "npm": ">= 8.x",
+    "node": ">= 20.x"
   },
+  "type": "module",
   "dependencies": {
-    "boxen": "5.1.2",
-    "chalk": "4.1.2",
-    "ejs-lint": "^1.2.2",
-    "gulp-filter": "^7.0.0",
-    "jest": "27.0.6",
-    "jest-cli": "27.0.6",
+    "boxen": "8.0.0",
+    "chalk": "5.3.0",
+    "ejs-lint": "^2.0.0",
+    "gulp-filter": "^9.0.1",
     "lodash": "^4.17.21",
-    "prettier": "^2.5.1",
-    "ramda": "^0.28.0",
-    "rimraf": "^3.0.2",
+    "prettier": "^3.3.3",
+    "ramda": "^0.30.1",
+    "rimraf": "^6.0.1",
     "through2": "^4.0.2",
-    "update-notifier": "^5.1.0",
+    "update-notifier": "^7.1.0",
     "yeoman-assert": "^3.1.1",
-    "yeoman-generator": "^5.7.0",
-    "yeoman-test": "6.1.0",
-    "yo": "^4.3.0",
-    "yosay": "^2.0.2"
+    "yeoman-generator": "^7.3.2",
+    "yeoman-test": "^8.3.0",
+    "yo": "^5.0.0",
+    "yosay": "^3.0.0"
   },
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles --collectCoverage",
-    "test:coverage": "jest --collectCoverage",
+    "test": "mocha --reporter spec",
     "eslint:report": "eslint --fix --ext .js .",
     "ejslint": "ejslint generators/app/templates/infrastructure",
     "release": "git push --follow-tags && gh-release -y"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/generators/app/templates",
-      "<rootDir>/.tmp"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/generators/app/templates",
-      "<rootDir>/.tmp"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/generators/app/templates",
-      "<rootDir>/.tmp"
-    ]
-  },
   "repository": "https://github.com/osstotalsoft/generator-graphql-rocket.git",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
