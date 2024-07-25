@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client')
 <%_ if(withMultiTenancy){ _%>
 const { tenantContextAccessor <% if(!hasSharedDb) {%>, tenantConfiguration<%}%> } = require('@totalsoft/multitenancy-core')
 <%_ if(hasSharedDb){ _%>
-  const { buildTableHasColumnPredicate, addTenantFilter } = require('./tenancyFilter')
+  const { tenantFilterExtension } = require('./tenancyExtension')
 <%_}else{_%>
 const { sanitizeConnectionInfo } = require('../utils/functions')
 <%_}_%>
@@ -13,53 +13,23 @@ const isDebug = JSON.parse(PRISMA_DEBUG ?? false)
 
 const cacheMap = new Map()
 const prismaOptions = {
-  log: isDebug ? [{ emit: 'event', level: 'query' }] : [{ emit: 'event', level: 'error' }]
-}
-let logger = console
-
-const applyMiddleware = prismaClient => {
-  if (isDebug) {
-    prismaClient.$on('query', async e => {
-      logger.debug(`[${e.duration} ms] ${e.query} ${e.params}`)
-    })
-  }
-
-  prismaClient.$on('warn', e => {
-    logger.warn(e, e.message)
-  })
-
-  prismaClient.$on('error', e => {
-    logger.error(e, e.message)
-  })
+  log: isDebug ? ['query', 'info', 'warn', 'error'] : ['warn', 'error']
 }
 
 function prisma() {
   let prismaClient
   <%_ if(withMultiTenancy){ _%>
   if (isMultiTenant) {
-    const { tenant: { id } } = tenantContextAccessor.getTenantContext()
-    if (!id) throw new Error(`Could not identify tenant!`)
+    const tenantContext = tenantContextAccessor.getTenantContext()
+    const tenantId = tenantContext?.tenant?.id
+    if (!tenantId) throw new Error(`Could not identify tenant!`)
 
-    if (cacheMap.has(id)) return cacheMap.get(id)
+    if (cacheMap.has(tenantId)) return cacheMap.get(tenantId)
 
     <%_ if(hasSharedDb){ _%>
       prismaClient = new PrismaClient(prismaOptions)
-
-      // tenancy where filter
-      buildTableHasColumnPredicate('tenantId', prismaClient).then(tableHasColumnTenantId => {
-        prismaClient.$use(async (params, next) => {
-          const tableHasColumnTenant = tableHasColumnTenantId(params.model)
-          if (tableHasColumnTenant) {
-            addTenantFilter(params, id)
-            const result = await next(params)
-            return result
-          }
-          return next(params)
-        })
-      })
-
-      applyMiddleware(prismaClient)
-      cacheMap.set(id, prismaClient)
+      prismaClient = tenantFilterExtension(prismaClient, tenantId)
+      cacheMap.set(tenantId, prismaClient)
     <%_} else { _%>
       const connectionInfo = tenantConfiguration.getConnectionInfo(id, '<%= dbConnectionName %>')
       const { server, port, database, userName, password } = sanitizeConnectionInfo(connectionInfo)
@@ -70,29 +40,20 @@ function prisma() {
         .replace('{password}', password)
 
       prismaClient = new PrismaClient({ ...prismaOptions, datasources: { db: { url } } })
-      applyMiddleware(prismaClient)
       cacheMap.set(id, prismaClient)
     <%_}_%>
     } else {
       if (cacheMap.has('default')) return cacheMap.get('default')
       prismaClient = new PrismaClient(prismaOptions)
-      applyMiddleware(prismaClient)
       cacheMap.set('default', prismaClient)
     }
   <%_} else { _%>
     if (cacheMap.has('default')) return cacheMap.get('default')
     prismaClient = new PrismaClient(prismaOptions)
-    applyMiddleware(prismaClient)
     cacheMap.set('default', prismaClient)
   <%_}_%>
 
   return prismaClient
 }
 
-function initialize(options = {}) {
-  if (options.logger) {
-    logger = options.logger
-  }
-}
-
-module.exports = { prisma, initialize }
+module.exports = { prisma }

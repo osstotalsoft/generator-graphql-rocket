@@ -1,9 +1,6 @@
-const { makeExecutableSchema } = require('@graphql-tools/schema')
-
-const { loadTypedefsSync } = require('@graphql-tools/load'),
+const { makeExecutableSchema } = require('@graphql-tools/schema'),
   { loadFilesSync } = require('@graphql-tools/load-files'),
-  { mergeResolvers } = require('@graphql-tools/merge'),
-  { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader'),
+  { mergeResolvers, mergeTypeDefs } = require('@graphql-tools/merge'),
   { join } = require('path')
 
 <%_ if(withRights){ _%>
@@ -12,11 +9,10 @@ const { applyMiddleware } = require('graphql-middleware'),
 <%_}_%>
 
 
-const sources = loadTypedefsSync(join(__dirname, '../**/*.graphql'), {
-  loaders: [new GraphQLFileLoader()]
+const typeDefs = mergeTypeDefs(loadFilesSync(join(__dirname, '../**/*.graphql')))
+const resolvers = mergeResolvers(loadFilesSync(join(__dirname, '../**/*resolvers.{js,ts}')), {
+  globOptions: { caseSensitiveMatch: false }
 })
-const typeDefs = sources.map(source => source.document)
-const resolvers = mergeResolvers(loadFilesSync(join(__dirname, '../**/*resolvers.{js,ts}'), { globOptions: { caseSensitiveMatch: false } }))
 
 <%_ if(withRights){ _%>
 module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), permissionsMiddleware)
@@ -24,6 +20,5 @@ module.exports = applyMiddleware(makeExecutableSchema({ typeDefs, resolvers }), 
 module.exports = makeExecutableSchema({ typeDefs, resolvers });
 <%_}_%>
 module.exports.tests = { typeDefs, resolvers }
-module.exports.resolvers = resolvers;
 
 
