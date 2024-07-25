@@ -6,7 +6,7 @@ const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger");
 <%_ if(addSubscriptions) {_%>
 const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws");
 <%_} _%>
-const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
+const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions')
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { ParentBasedSampler, AlwaysOnSampler } = require('@opentelemetry/sdk-trace-node')
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
@@ -38,7 +38,7 @@ const isTelemetryRoute = url => url?.startsWith('/metrics') || url?.startsWith('
 const traceExporter = new OTLPTraceExporter()
 const sdk = new opentelemetry.NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: OTEL_SERVICE_NAME
+    [SEMRESATTRS_SERVICE_NAME.SERVICE_NAME]: OTEL_SERVICE_NAME
   }),
   sampler: new ParentBasedSampler({ root: new AlwaysOnSampler() }),
   traceExporter,
