@@ -130,7 +130,7 @@
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "cross-env": "7.0.3",
-    "eslint": "^9.7.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^28.6.0",
     "eslint-plugin-node": "^11.1.0",
