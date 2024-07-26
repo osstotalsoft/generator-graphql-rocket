@@ -108,12 +108,6 @@ module.exports.getQuestions = projectName => [
   },
   {
     type: 'confirm',
-    name: 'addVaultConfigs',
-    message: 'Would you like to generate the default vault configurations?',
-    default: false
-  },
-  {
-    type: 'confirm',
     name: 'addTracing',
     message: 'Would you like to add opentracing and integration with Jaeger?',
     default: false

@@ -19,7 +19,6 @@ describe('generator-graphql-rocket:app', () => {
     addMessaging: false,
     withRights: false,
     addHelm: false,
-    addVaultConfigs: false,
     addTracing: false,
     packageManager: 'npm'
   }
@@ -103,24 +102,6 @@ describe('generator-graphql-rocket:app', () => {
         assert.file([`${root}/index.js`, `${root}/rules.js`])
       }))
 
-  it('Contains vaultEnvironment variable set to false', () =>
-    helpers
-      .create(path.join(__dirname, '../generators/app'))
-      .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        addHelm: true,
-        helmChartName,
-        addVaultConfigs: true
-      })
-      .run()
-      .then(() => {
-        assert.fileContent(
-          path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`),
-          `vaultEnvironment: "false"`
-        )
-      }))
-
   it('Rusi messaging transport', () =>
     helpers
       .create(path.join(__dirname, '../generators/app'))
@@ -135,9 +116,7 @@ describe('generator-graphql-rocket:app', () => {
       .run()
       .then(() => {
         const valuesYaml = path.join(__dirname, `${tempRoot}/${projectName}/helm/${helmChartName}/values.yaml`)
-        assert.fileContent([
-          [valuesYaml, `transport: "rusi"`]
-        ])
+        assert.fileContent([[valuesYaml, `transport: "rusi"`]])
 
         const deploymentYaml = path.join(
           __dirname,

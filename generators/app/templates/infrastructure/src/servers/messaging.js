@@ -3,8 +3,8 @@ const { msgHandlers, middleware } = require("../messaging");
 const { loggingMiddleware } = require("../middleware");
 const { logger<% if(dataLayer == "knex") {%>, getDataLoaders<%}%> } = require("../startup");
 <%_ if(addTracing){ _%>
-const { JAEGER_DISABLED } = process.env,
-  tracingEnabled = !JSON.parse(JAEGER_DISABLED);
+const { OTEL_TRACING_ENABLED } = process.env,
+  tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED)
 
   const skipMiddleware = (_ctx, next) => next();
 <%_}_%>
