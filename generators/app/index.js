@@ -83,14 +83,9 @@ module.exports = class extends Generator {
         ignoreFiles
       )
     if (dataLayer === 'knex' && withMultiTenancy)
-      ignoreFiles = concat(
-        [
-          '**/db/dbInstanceFactory.js',
-          '**/startup/middleware'
-        ],
-        ignoreFiles
-      )
-    if (!addSubscriptions) ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**', '**/servers/subscription.js'], ignoreFiles)
+      ignoreFiles = concat(['**/db/dbInstanceFactory.js', '**/startup/middleware'], ignoreFiles)
+    if (!addSubscriptions)
+      ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**', '**/servers/subscription.js'], ignoreFiles)
     if (!addMessaging) ignoreFiles = concat(['**/messaging/**', '**/servers/messaging.js'], ignoreFiles)
 
     if (!withMultiTenancy)
@@ -100,22 +95,24 @@ module.exports = class extends Generator {
           '**/multiTenancy/**',
           '**/middleware/tenantIdentification/**',
           '**/subscriptions/middleware/tenantContext.js',
-          '**/prisma/tenancyFilter.js',
+          '**/prisma/tenancyExtension.js',
           '**/pubSub/middleware/tenantPublish.js'
         ],
         ignoreFiles
       )
     if (!hasSharedDb)
-      ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyFilter.js'], ignoreFiles)
-    if (!addTracing) ignoreFiles = concat(
-      [
-        '**/tracing/**',
-        '**/startup/tracing.js**',
-        '**/startup/middleware/tracing.js',
-        '**/pubSub/middleware/tracingPublish.js',
-        '**/subscriptions/middleware/tracing.js'
-      ],
-      ignoreFiles)
+      ignoreFiles = concat(['**/db/multiTenancy/tenancyFilter.js', '**/prisma/tenancyExtension.js'], ignoreFiles)
+    if (!addTracing)
+      ignoreFiles = concat(
+        [
+          '**/tracing/**',
+          '**/startup/tracing.js**',
+          '**/startup/middleware/tracing.js',
+          '**/pubSub/middleware/tracingPublish.js',
+          '**/subscriptions/middleware/tracing.js'
+        ],
+        ignoreFiles
+      )
     if (!withRights)
       ignoreFiles = concat(
         ['**/middleware/permissions/**', '**/constants/permissions.js', '**/constants/identityUserRoles.js'],
@@ -176,8 +173,8 @@ module.exports = class extends Generator {
     packageManager === 'npm'
       ? this.npmInstall(null, {}, { cwd: projectName })
       : packageManager === 'yarn'
-      ? this.yarnInstall(null, {}, { cwd: projectName })
-      : this.npmInstall(null, {}, { cwd: projectName })
+        ? this.yarnInstall(null, {}, { cwd: projectName })
+        : this.npmInstall(null, {}, { cwd: projectName })
   }
 
   end() {

@@ -13,7 +13,6 @@ const { ApolloServer } = require("@apollo/server"),
     jwtTokenValidation,
     jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%><% if(dataLayer == "knex") {%>,contextDbInstance <%}%>
   } = require("../middleware"),
-  graphqlUploadKoa = require('graphql-upload/graphqlUploadKoa.js'),
   cors = require("@koa/cors"),
   { publicRoute } = require("../utils/functions"),
   ignore = require("koa-ignore"),
@@ -63,7 +62,6 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
       app.use(loggingMiddleware)
       app.use(errorHandlingMiddleware())
       app.use(bodyParser());
-      app.use(graphqlUploadKoa({ maxFieldSize: 10000000, maxFiles: 2 }))
       app.use(correlationMiddleware());
       app.use(cors({ credentials: true }));
       app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))

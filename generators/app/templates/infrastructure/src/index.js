@@ -21,12 +21,6 @@ const { logger<% if(addTracing) {%>, tracer<%}%> } = require("./startup"),
 { createServer } = require("http"),
 { startApolloServer<% if(addMessaging) { %>, startMsgHost <% } %> <% if(addSubscriptions){ %>, startSubscriptionServer <% } %>} = require('./servers')
 
-
-<%_ if(dataLayer == 'prisma') {_%>
-const { initialize } = require('./prisma')
-initialize({ logger })
-<%_}_%>
-
 // Metrics, diagnostics
 const
   { DIAGNOSTICS_ENABLED, METRICS_ENABLED<% if(addTracing) {%>, OTEL_TRACING_ENABLED<%}%> } = process.env,

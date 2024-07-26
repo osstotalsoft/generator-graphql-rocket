@@ -1,7 +1,7 @@
 const { defaultTo } = require('ramda')
 
 function cursorPaginationOptions(pager, direction = defaultTo(1, pager?.direction)) {
-  const { afterId, pageSize, sortBy = 'name' } = pager
+  const { afterId, pageSize, sortBy = 'id' } = pager
   const options = afterId
     ? {
         skip: 1,
