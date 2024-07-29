@@ -60,18 +60,18 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
 
       const app = new Koa();
       app.use(loggingMiddleware)
-      app.use(errorHandlingMiddleware())
-      app.use(bodyParser());
-      app.use(correlationMiddleware());
-      app.use(cors({ credentials: true }));
-      app.use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
+        .use(errorHandlingMiddleware())
+        .use(bodyParser());
+        .use(correlationMiddleware());
+        .use(cors({ credentials: true }));
+        .use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
       <%_ if(addTracing){ _%>
         tracingEnabled && app.use(tracingMiddleware());
       <%_}_%>
       <%_ if(dataLayer == "knex") {_%>
-      app.use(contextDbInstance());
+        .use(contextDbInstance());
       <%_}_%>
-      app.use(
+        .use(
         koaMiddleware(apolloServer,{
           context: async ({ ctx }) => {
             const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;

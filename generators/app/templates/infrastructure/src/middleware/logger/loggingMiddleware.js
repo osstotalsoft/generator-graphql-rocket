@@ -1,8 +1,6 @@
-const { logger } = require("../../startup");
-
 const loggingMiddleware = async (ctx, next) => {
-  ctx.logger = logger;
-  await next();
-};
+  if (!ctx.logger) ctx.logger = require('../../startup/logger')
+  await next()
+}
 
-module.exports = loggingMiddleware;
+module.exports = loggingMiddleware
