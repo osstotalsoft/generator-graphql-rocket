@@ -61,15 +61,15 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
       const app = new Koa();
       app.use(loggingMiddleware)
         .use(errorHandlingMiddleware())
-        .use(bodyParser());
-        .use(correlationMiddleware());
-        .use(cors({ credentials: true }));
+        .use(bodyParser())
+        .use(correlationMiddleware())
+        .use(cors({ credentials: true }))
         .use(ignore(jwtTokenValidation, jwtTokenUserIdentification<% if(withMultiTenancy) {%>, tenantIdentification()<%}%>).if(ctx => publicRoute(ctx)))
       <%_ if(addTracing){ _%>
-        tracingEnabled && app.use(tracingMiddleware());
+        tracingEnabled && app.use(tracingMiddleware())
       <%_}_%>
       <%_ if(dataLayer == "knex") {_%>
-        .use(contextDbInstance());
+        .use(contextDbInstance())
       <%_}_%>
         .use(
         koaMiddleware(apolloServer,{
