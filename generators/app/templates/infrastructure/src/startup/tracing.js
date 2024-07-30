@@ -1,12 +1,10 @@
-const opentelemetry = require("@opentelemetry/sdk-node");
-const { Resource } = require("@opentelemetry/resources");
-const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventions");
-const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY } = process.env;
-const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger");
+const opentelemetry = require("@opentelemetry/sdk-node")
+const { Resource } = require("@opentelemetry/resources")
+const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger")
 <%_ if(addSubscriptions) {_%>
-const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws");
+const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws")
 <%_} _%>
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions')
+const { SEMRESATTRS_SERVICE_NAME, SEMATTRS_PEER_SERVICE } = require('@opentelemetry/semantic-conventions')
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { ParentBasedSampler, AlwaysOnSampler } = require('@opentelemetry/sdk-trace-node')
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
@@ -17,9 +15,10 @@ const { context, trace } = require('@opentelemetry/api')
 const { getRPCMetadata, RPCType } = require('@opentelemetry/core')
 const instrumentation = require('@opentelemetry/instrumentation')
 <%_ if(dataLayer == 'prisma') {_%>
-const { PrismaInstrumentation }  = require("@prisma/instrumentation");
+const { PrismaInstrumentation }  = require("@prisma/instrumentation")
 <%_}_%>
 
+const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY } = process.env
 const otelTraceProxy = JSON.parse(OTEL_TRACE_PROXY || 'false')
 
 class CustomGraphQLInstrumentation extends GraphQLInstrumentation {
@@ -48,7 +47,7 @@ const sdk = new opentelemetry.NodeSDK({
       ignoreIncomingRequestHook: r =>
         r.method == 'OPTIONS' || (otelTraceProxy ? isTelemetryRoute(r.url) : !isGraphQLRoute(r.url)),
       ignoreOutgoingRequestHook: _ => !trace.getSpan(context.active()), // ignore outgoing requests without parent span
-      startOutgoingSpanHook: r => ({ [SemanticAttributes.PEER_SERVICE]: r.host || r.hostname })
+      startOutgoingSpanHook: r => ({ [SEMATTRS_PEER_SERVICE]: r.host || r.hostname })
     }),
     new CustomGraphQLInstrumentation({
       ignoreTrivialResolveSpans: true,
