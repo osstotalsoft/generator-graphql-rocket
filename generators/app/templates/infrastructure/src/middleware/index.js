@@ -11,10 +11,16 @@ const tenantIdentification = require("./tenantIdentification");
 const tracingMiddleware = require('./tracing/tracingMiddleware');
 <%_}_%>
 const loggingMiddleware = require('./logger/loggingMiddleware')
+<%_ if(withRights){ _%>
+const permissionsMiddleware = require('./permissions')
+<%_}_%>
 
 
 module.exports = {
   ...validateToken,
+  <%_ if(withRights){ _%>
+  ...permissionsMiddleware,
+  <%_}_%>
   <%_ if(dataLayer == "knex") {_%>
   contextDbInstance,
   <%_}_%>

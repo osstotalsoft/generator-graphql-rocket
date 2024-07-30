@@ -5,7 +5,7 @@ const { makeExecutableSchema } = require('@graphql-tools/schema'),
 
 <%_ if(withRights){ _%>
 const { applyMiddleware } = require('graphql-middleware'),
- { permissionsMiddleware } = require('../middleware/permissions/index')
+ { permissionsMiddleware } = require('../middleware')
 <%_}_%>
 
 

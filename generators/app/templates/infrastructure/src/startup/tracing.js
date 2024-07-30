@@ -3,13 +3,17 @@ const { Resource } = require("@opentelemetry/resources")
 const { JaegerPropagator } = require("@opentelemetry/propagator-jaeger")
 <%_ if(addSubscriptions) {_%>
 const { WSInstrumentation } = require("@totalsoft/opentelemetry-instrumentation-ws")
+const { IORedisInstrumentation } = require('@opentelemetry/instrumentation-ioredis')
 <%_} _%>
 const { SEMRESATTRS_SERVICE_NAME, SEMATTRS_PEER_SERVICE } = require('@opentelemetry/semantic-conventions')
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { ParentBasedSampler, AlwaysOnSampler } = require('@opentelemetry/sdk-trace-node')
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
 const { PinoInstrumentation } = require('@opentelemetry/instrumentation-pino')
-const { IORedisInstrumentation } = require('@opentelemetry/instrumentation-ioredis')
+<%_ if(dataLayer == 'knex') {_%>
+  const { KnexInstrumentation } = require("@opentelemetry/instrumentation-knex");
+<%_}_%>
+const { DataloaderInstrumentation } = require("@opentelemetry/instrumentation-dataloader");
 const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql')
 const { context, trace } = require('@opentelemetry/api')
 const { getRPCMetadata, RPCType } = require('@opentelemetry/core')
@@ -54,15 +58,18 @@ const sdk = new opentelemetry.NodeSDK({
       mergeItems: true,
       responseHook: (span, _) => {
         const rpcMetadata = getRPCMetadata(context.active())
-
         if (rpcMetadata?.type === RPCType.HTTP) {
           rpcMetadata?.span?.updateName(`${rpcMetadata?.span?.name} ${span.name}`)
         }
       }
     }),
     new PinoInstrumentation(),
-    new IORedisInstrumentation(),
+    <%_ if(dataLayer == 'knex') {_%>
+    new KnexInstrumentation(),
+    <%_} _%>
+    new DataloaderInstrumentation(),
     <%_ if(addSubscriptions) {_%>
+    new IORedisInstrumentation(),
     new WSInstrumentation(),
     <%_} _%>
     <%_ if(dataLayer == 'prisma') {_%>

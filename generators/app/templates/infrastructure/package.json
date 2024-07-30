@@ -28,7 +28,7 @@
     <%_} _%>
   },
   "lint-staged": {
-    "**/*.+(js|md|css|graphql|json)": "prettier --write"
+    "**/*.+(js|md|css|graphql|json)": "prettier --write"    
   },
   "author": "",
   "license": "ISC",
@@ -65,6 +65,10 @@
     "mssql": "^8.1.2",
     "knex": "^0.95.0",
     "async-mutex": "^0.4.0",
+    "colors": "^1.4.0",
+    <%_ if(addTracing){ _%>
+    "@opentelemetry/instrumentation-knex": "^0.38.0",
+    <%_} _%>
       <%_ if(withMultiTenancy && hasSharedDb) {_%>
     "@totalsoft/knex-filters": "^2.4.1",
       <%_} _%>
@@ -74,7 +78,6 @@
     "@totalsoft/messaging-host": "^2.5.0",
     <%_}_%>
     "bluebird": "^3.7.2",
-    "colors": "^1.4.0",
     "console-stamp": "^3.1.2",
     "dotenv": "^16.4.5",
     "graphql": "^16.9.0",
@@ -84,6 +87,10 @@
     "graphql-ws": "^5.16.0",
     "ioredis": "^5.4.1",
     "ws": "^8.18.0",
+      <%_ if(addTracing){ _%>
+    "@opentelemetry/instrumentation-ioredis": "^0.42.0",
+    "@totalsoft/opentelemetry-instrumentation-ws": "^2.0.0",
+      <%_}_%>
       <%_}_%>
     <%_ if(withRights){ _%>
     "graphql-middleware": "^6.1.35",
@@ -103,14 +110,11 @@
     "@opentelemetry/instrumentation-dataloader": "^0.11.0",
     "@opentelemetry/instrumentation-graphql": "^0.42.0",
     "@opentelemetry/instrumentation-http": "^0.52.1",
-    "@opentelemetry/instrumentation-ioredis": "^0.42.0",
-    "@opentelemetry/instrumentation-knex": "^0.38.0",
     "@opentelemetry/instrumentation-koa": "^0.42.0",
     "@opentelemetry/instrumentation-pino": "^0.41.0",
     "@opentelemetry/sdk-trace-base": "^1.25.1",
     "@opentelemetry/sdk-trace-node": "^1.25.1",
     "@opentelemetry/propagator-jaeger": "^1.25.1",
-    "@totalsoft/opentelemetry-instrumentation-ws": "^2.0.0",
     "@totalsoft/pino-opentelemetry": "^2.0.0",
     <%_}_%>
     "jsonwebtoken": "9.0.2",
@@ -134,7 +138,6 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^28.6.0",
     "eslint-plugin-node": "^11.1.0",
-    "graphql-schema-linter": "^3.0.1",
     "husky": "^9.1.1",
     "jest": "^29.7.0",
     "jest-extended": "^4.0.2",
