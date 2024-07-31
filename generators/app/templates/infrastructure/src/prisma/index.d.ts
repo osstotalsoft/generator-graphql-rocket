@@ -31,4 +31,4 @@ type PaginatedResult = {
 
 type PrismaMetadata<M = PrismaModel> = ArgumentTypes<PrismaClient[Uncapitalize<M>]['findMany']>
 
-export function prismaPaginated(prismaModel: PrismaModel, pager: Pager, metadata: PrismaMetadata): PaginatedResult
+export function prismaPaginated(prismaModel: PrismaModel, pager: Pager, metadata: PrismaMetadata): Promise<PaginatedResult>
