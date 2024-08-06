@@ -19,9 +19,11 @@ spec:
       {{- include "Gql.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+    <%_ if(addMessaging) { _%>
       annotations:
         rusi.io/app-id: {{ $current.messaging.source | quote }}
         rusi.io/enabled: {{ lower $global.messaging.transport | eq "rusi" | quote }}
+    <%_}_%>
       labels:
         {{- include "Gql.selectorLabels" . | nindent 8 }}
     spec:
