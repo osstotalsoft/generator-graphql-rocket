@@ -4,8 +4,10 @@
   scalar Upload
   type Query
   type Mutation
+  <%_ if(addSubscriptions){ _%>
   type Subscription
-
+  <%_}_%>
+  
   schema {
     query: Query
     mutation: Mutation
