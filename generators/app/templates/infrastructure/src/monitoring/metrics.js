@@ -70,16 +70,17 @@ const requestDuration = meter.createHistogram('gql_request_duration', {
     unit: 'milliseconds',
     valueType: ValueType.INT
 })
+
 const requestDurationSeconds = meter.createHistogram('gql_request_duration_seconds', {
     description: 'The total duration of a request (in seconds).',
     unit: 'seconds',
     valueType: ValueType.DOUBLE
 })
       
-
+<%_ if(addSubscriptions){ _%>
 const subscriptionStarted =
     meter.createCounter('gql_subscription_started', { description: 'The number of subscriptions.' });
-
+<%_}_%>
 async function startServer(logger) {
     await exporter.startServer();
     logger.info(
@@ -115,17 +116,19 @@ function recordRequestDuration(duration, context) {
     })
 }
 
+<%_ if(addSubscriptions){ _%>
 function recordSubscriptionStarted(context, message) {
     subscriptionStarted.add(1, {
         operationName: message?.payload?.operationName,
         operationType: message?.type
     });
 }
+<%_}_%>
 
 module.exports = {
     startServer,
     recordRequestDuration,
     recordRequestStarted,
-    recordRequestFailed,
-    recordSubscriptionStarted
+    recordRequestFailed <%_ if(addSubscriptions){ _%>,
+    recordSubscriptionStarted <%_}_%>
 }
