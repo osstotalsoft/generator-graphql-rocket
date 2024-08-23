@@ -1,13 +1,21 @@
 //env
-const dotenv = require('dotenv');
-const result = dotenv.config();
+process.chdir(`${__dirname}/..`)
+const dotenv = require('dotenv')
+const result = dotenv.config()
 if (result.error) {
-    const path = `.env`;
-    dotenv.config({ path });
+  console.warn('No .env file found in current working directory:', result.error)
+  const path = `.env`
+  const pathResult = dotenv.config({ path })
+  if (pathResult.error) {
+    console.warn('No .env file found in project root directory:', pathResult.error)
+  }
 }
 
 if (process.env.NODE_ENV) {
-  dotenv.config({ path: `./.env.${process.env.NODE_ENV}`, override: true });
+  const nodeEnvResult = dotenv.config({ path: `./.env.${process.env.NODE_ENV}`, override: true })
+  if (nodeEnvResult.error) {
+    console.warn(`No .env.${process.env.NODE_ENV} file found in project root directory:`, nodeEnvResult.error)
+  }
 }
 
 const keyPerFileEnv = require('@totalsoft/key-per-file-configuration')
