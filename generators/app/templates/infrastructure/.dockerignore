@@ -3,6 +3,7 @@
 **/.gitignore
 **/Dockerfile*
 **/node_modules
+**/iisnode
 LICENSE
 README.md
 .dockerignore
