@@ -20,8 +20,6 @@ module.exports = class extends Generator {
   async prompting() {
     this.isLatest = await checkForLatestVersion()
 
-    if (!this.isLatest) return
-
     this.log(
       yosay(`Welcome to the fantabulous ${chalk.red('TotalSoft GraphQL Server')} generator! (⌐■_■)
      Out of the box I include Apollo Server, Koa and token validation.`)
