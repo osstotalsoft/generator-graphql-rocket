@@ -1,9 +1,6 @@
 const correlationMiddleware = require("./correlation/correlationMiddleware")
 const validateToken = require("./auth/auth");
 const errorHandlingMiddleware = require('./errorHandling/errorHandlingMiddleware');
-<%_ if(dataLayer == "knex") {_%>
-const contextDbInstance = require("./db/contextDbInstance");
-<%_}_%>
 <%_ if(withMultiTenancy){ _%>
 const tenantIdentification = require("./tenantIdentification");
 <%_}_%>
@@ -20,9 +17,6 @@ module.exports = {
   ...validateToken,
   <%_ if(withRights){ _%>
   ...permissionsMiddleware,
-  <%_}_%>
-  <%_ if(dataLayer == "knex") {_%>
-  contextDbInstance,
   <%_}_%>
   <%_ if(withMultiTenancy){ _%>
   tenantIdentification,

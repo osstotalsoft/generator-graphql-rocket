@@ -1,19 +1,16 @@
 <%_ if(withMultiTenancy){ _%>
-const { tenantService<% if(dataLayer == "knex") {%>, tenantContextAccessor<%}%> } = require("@totalsoft/multitenancy-core"),
+const { tenantService } = require("@totalsoft/multitenancy-core"),
 isMultiTenant = JSON.parse(process.env.IS_MULTITENANT || "false");
 <%_}_%>
 const { WebSocketServer } = require("ws");
 const WebSocket = require("ws"); // workaround for opentelemetry-instrumentation-ws
-<%_ if(dataLayer == "knex") {_%>
-const { dbInstanceFactory } = require("../db")
-<%_}_%>
 const { correlation<% if(withMultiTenancy) {%>, tenantContext<%}%><% if(addTracing) {%>, tracing<%}%> } = require("../subscriptions/middleware"),
   { subscribe } = require("../subscriptions");
 
 const { GraphQLError } = require("graphql"),
   { useServer } = require("graphql-ws/lib/use/ws"),
   { validateWsToken } = require("../middleware"),
-  { schema, logger, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%> } = require("../startup"),
+  { schema, logger, getDataSources } = require("../startup"),
   jsonwebtoken = require("jsonwebtoken"),
   metrics = require("../monitoring/metrics");
 
@@ -64,16 +61,7 @@ const startSubscriptionServer = httpServer =>
         <%_ if(withMultiTenancy){ _%>
             const { tenant } = ctx;
         <%_}_%>
-        <%_ if(dataLayer == "knex") {_%>
-            const dbInstance = await dbInstanceFactory(<% if(withMultiTenancy){ %>tenant?.id, <%}%>{ logger })
-
-            if (!dbInstance) {
-                throw new TypeError("Could not create dbInstance. Check the database configuration info and restart the server.")
-            }
-        <%_}_%>
-        <%_ if(!withMultiTenancy || dataLayer == "prisma") {_%>
         const dataSources = getDataSources(ctx)
-        <%_}_%>
         const subscriptionLogger = logger.child({ operationName: msg?.payload?.operationName });
 
         return {
@@ -81,19 +69,7 @@ const startSubscriptionServer = httpServer =>
             <%_ if(withMultiTenancy){ _%>
             tenant,
             <%_}_%>
-            <%_ if(dataLayer == "knex") {_%>
-            dbInstance,
-              <%_ if(withMultiTenancy){ _%>
-            dataSources: tenantContextAccessor.useTenantContext({ tenant }, () =>
-              getDataSources({ ...ctx, dbInstance })
-            ),
-              <%_} else {_%>
             dataSources,
-              <%_}_%>
-            dataLoaders: getDataLoaders(dbInstance),
-            <%_}else{_%>
-            dataSources,
-            <%_}_%>
             logger: subscriptionLogger
         }
       }

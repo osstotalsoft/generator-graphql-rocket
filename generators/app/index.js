@@ -58,7 +58,6 @@ module.exports = class extends Generator {
       withRights,
       packageManager,
       helmChartName,
-      dataLayer,
       addQuickStart
     } = this.answers
 
@@ -67,23 +66,6 @@ module.exports = class extends Generator {
 
     let ignoreFiles = ['**/.npmignore', '**/.gitignore-template', '**/helm/**']
 
-    if (dataLayer === 'knex') ignoreFiles = concat(['**/prisma/**'], ignoreFiles)
-    if (dataLayer === 'prisma')
-      ignoreFiles = concat(
-        [
-          '**/src/db/**',
-          '**/middleware/db/**',
-          '**/messaging/middleware/dbInstance.js',
-          '**/startup/dataLoaders.js',
-          '**/features/common/dbGenerators.js',
-          '**/features/user/dataLoaders.js',
-          '**/features/user/dataSources/userDb.js',
-          '**/utils/sqlDataSource.js'
-        ],
-        ignoreFiles
-      )
-    if (dataLayer === 'knex' && withMultiTenancy)
-      ignoreFiles = concat(['**/db/dbInstanceFactory.js', '**/startup/middleware'], ignoreFiles)
     if (!addSubscriptions)
       ignoreFiles = concat(['**/pubSub/**', '**/subscriptions/**', '**/servers/subscription.js'], ignoreFiles)
     if (!addMessaging) ignoreFiles = concat(['**/messaging/**', '**/servers/messaging.js'], ignoreFiles)

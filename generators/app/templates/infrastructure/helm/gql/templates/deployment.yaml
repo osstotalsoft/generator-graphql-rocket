@@ -52,18 +52,6 @@ spec:
           resources:
             {{- toYaml $current.resources | trim | nindent 12 }}
           env:
-<%_ if(dataLayer == "knex"){ _%>
-          - name: DB_HOST
-            value: {{ $global.db.host | quote }}
-          - name: DB_PORT
-            value: {{ $global.db.port | quote }}
-          - name: DB_DATABASE
-            value: {{ $global.db.database | quote }}
-          - name: DB_INSTANCE_NAME
-            value: {{ $global.db.instanceName | quote }}
-          - name: DB_TRUST_SERVER_CERTIFICATE
-            value: {{ $global.db.trustServerCertificate | quote }}
-<%_}_%>
 <%_ if(addMessaging) { _%>
           - name: Messaging__Env
             value: {{ $global.messaging.env | quote }}

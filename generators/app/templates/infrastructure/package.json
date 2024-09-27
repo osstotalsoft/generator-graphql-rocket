@@ -21,11 +21,9 @@
     "test:ci": "cross-env CI=true <%=packageManager%> test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
     "lint": "eslint --fix --ext .js .",
     "prettier": "prettier --write **/*.js",
-    "prepack": "husky install"
-    <%_ if(dataLayer === "prisma") {_%>,
+    "prepack": "husky install",
     "prisma": "npx prisma db pull && npm run prisma:format && npx prisma generate",
     "prisma:format": "npx prisma-case-format --file ./prisma/schema.prisma --table-case pascal --field-case camel"
-    <%_} _%>
   },
   "lint-staged": {
     "**/*.+(js|md|css|graphql|json)": "prettier --write"    
@@ -41,14 +39,12 @@
     "@graphql-tools/schema": "^10.0.4",
     "@koa/cors": "^5.0.0",
     "koa-ignore": "^1.0.1",
-    <%_ if(dataLayer === "prisma") {_%>
-    "@prisma/client": "^5.17.0",
-    "prisma": "^5.17.0",
+    "@prisma/client": "^5.20.0",
+    "prisma": "^5.20.0",
     "prisma-case-format": "^2.2.1",
       <%_ if(addTracing){ _%>
     "@prisma/instrumentation": "^5.17.0",
       <%_}_%>
-    <%_} _%>
     "@totalsoft/key-per-file-configuration": "^1.1.0",
     "@totalsoft/graceful-shutdown": "^1.1.0",
     "@totalsoft/correlation": "^1.1.0",
@@ -58,20 +54,6 @@
     <%_ if(withMultiTenancy) {_%>
     "@totalsoft/multitenancy-core": "^1.2.0",
     "@totalsoft/pino-multitenancy": "^1.2.1",
-    <%_}_%>
-    <%_ if(dataLayer === "knex") {_%>
-    "dataloader": "^2.1.0",
-    "knex-tiny-logger": "^2.1.0",
-    "mssql": "^8.1.2",
-    "knex": "^0.95.0",
-    "async-mutex": "^0.4.0",
-    "colors": "^1.4.0",
-    <%_ if(addTracing){ _%>
-    "@opentelemetry/instrumentation-knex": "^0.38.0",
-    <%_} _%>
-      <%_ if(withMultiTenancy && hasSharedDb) {_%>
-    "@totalsoft/knex-filters": "^2.4.1",
-      <%_} _%>
     <%_}_%>
     <%_ if(addMessaging || (withMultiTenancy && addSubscriptions)) {_%>
     "@totalsoft/message-bus": "^2.5.0",

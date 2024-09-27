@@ -5,9 +5,7 @@ const { includes, intersection } = require('ramda')
 const { admin, globalAdmin } = require('../../constants/identityUserRoles')
 const { viewDashboard } = require('../../constants/permissions')
 const { GraphQLError } = require('graphql')
-<%_ if(dataLayer == "prisma") {_%>
 const { prisma } = require('../../prisma')
-<%_}_%>
 // strict - use when rule relies on parent or args parameter as well (field specific modifications)
 // Cannot use STRICT caching for upload types
 
@@ -23,21 +21,6 @@ const canViewDashboard = rule({ cache: 'contextual' })(
     (_parent, _args, context, _info) => checkForPermission([viewDashboard], context)
 )
 
-<%_ if(dataLayer == "knex") {_%>
-const checkForPermission = async (permissions, { dbInstance, externalUser }) => {
-    try {
-        const { id } = await dbInstance.select("Id").from("User").where("ExternalId", externalUser.id).first()
-        const rights = await dbInstance.select("Name as Right").from("UserRight")
-            .join('[Right]', { 'Right.Id': 'RightId' })
-            .where("UserRight.UserId", id)
-
-        return intersection(permissions, rights.map(x => x.right)).length > 0
-    }
-    catch (error) {
-        throw new GraphQLError(`Authorization check failed! The following error was encountered: ${error}`)
-    }
-}
-<%_} else if(dataLayer == "prisma") {_%>
 const checkForPermission = async (permissions, { externalUser }) => {
     try {
       const rights = (
@@ -49,7 +32,6 @@ const checkForPermission = async (permissions, { externalUser }) => {
       throw new GraphQLError(`Authorization check failed! The following error was encountered: ${error}`)
     }
 }
-<%_}_%>
 
 
 module.exports = {
