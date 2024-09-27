@@ -27,16 +27,6 @@ module.exports.usePrevConfigsQ = {
 
 module.exports.getQuestions = projectName => [
   {
-    type: 'list',
-    name: 'dataLayer',
-    message: 'What data integration layer technology you would like to use?',
-    choices: [
-      { name: 'Prisma', value: 'prisma' },
-      { name: 'Knex JS', value: 'knex' }
-    ],
-    default: 'prisma'
-  },
-  {
     type: 'confirm',
     name: 'withRights',
     message:

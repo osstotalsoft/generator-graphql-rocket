@@ -11,22 +11,19 @@ const { ApolloServer } = require("@apollo/server"),
   <%_}_%>
     loggingMiddleware,
     jwtTokenValidation,
-    jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%><% if(dataLayer == "knex") {%>,contextDbInstance <%}%>
+    jwtTokenUserIdentification<% if(withMultiTenancy){ %>,tenantIdentification <%}%>
   } = require("../middleware"),
   cors = require("@koa/cors"),
   { publicRoute } = require("../utils/functions"),
   ignore = require("koa-ignore"),
   { koaMiddleware } = require("@as-integrations/koa"),
-  { schema, getDataSources<% if(dataLayer == "knex") {%>, getDataLoaders <%}%>, logger } = require("../startup"),
+  { schema, getDataSources, logger } = require("../startup"),
   { <% if(addTracing){ %> OTEL_TRACING_ENABLED,<% } %> METRICS_ENABLED } = process.env,
   <%_ if(addTracing){ _%>
   tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED),
   <%_}_%>
   metricsPlugin = require("../plugins/metrics/metricsPlugin"),
   metricsEnabled = JSON.parse(METRICS_ENABLED);
-  <%_ if(dataLayer == "knex") {_%>
-  const { dbInstanceFactory } = require("../db")
-  <%_}_%>
 
 const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
     return [
@@ -68,23 +65,15 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
       <%_ if(addTracing){ _%>
         tracingEnabled && app.use(tracingMiddleware())
       <%_}_%>
-      <%_ if(dataLayer == "knex") {_%>
-        .use(contextDbInstance())
-      <%_}_%>
         .use(
         koaMiddleware(apolloServer,{
           context: async ({ ctx }) => {
-            const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%><% if(dataLayer == "knex") {%>dbInstance,<%}%> externalUser, request, requestSpan } = ctx;
+            const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%>externalUser, request, requestSpan } = ctx;
             const { cache } = apolloServer
             const dataSources = getDataSources({ ...ctx, cache })
             return {
               token,
               state,
-              <%_ if(dataLayer == "knex") {_%>
-              dbInstance,
-              dbInstanceFactory,
-              dataLoaders: getDataLoaders(dbInstance),
-              <%_}_%>
               <%_ if(withMultiTenancy){ _%>
               tenant,
               <%_}_%>

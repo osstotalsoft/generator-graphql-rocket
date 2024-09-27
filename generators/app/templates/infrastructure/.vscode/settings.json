@@ -3,9 +3,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
-  <%_ if(dataLayer == "prisma") {_%>,
+  },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
-  }<%_}_%>
 }

@@ -1,7 +1,7 @@
 const { messagingHost, exceptionHandling, SubscriptionOptions, dispatcher } = require("@totalsoft/messaging-host");
 const { msgHandlers, middleware } = require("../messaging");
 const { loggingMiddleware } = require("../middleware");
-const { logger<% if(dataLayer == "knex") {%>, getDataLoaders<%}%> } = require("../startup");
+const { logger } = require("../startup");
 <%_ if(addTracing){ _%>
 const { OTEL_TRACING_ENABLED } = process.env,
   tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED)
@@ -9,15 +9,6 @@ const { OTEL_TRACING_ENABLED } = process.env,
   const skipMiddleware = (_ctx, next) => next();
 <%_}_%>
 
-<%_ if(dataLayer == "knex") {_%>
-const dataLoadersMiddleware = async (ctx, next) => {
-  const { dbInstance } = ctx;
-  if (dbInstance) {
-    ctx.dataLoaders = getDataLoaders(dbInstance);
-  }
-  await next();
-}
-<%_}_%>
 
 module.exports = function startMsgHost() {
     const msgHost = messagingHost();
@@ -32,10 +23,6 @@ module.exports = function startMsgHost() {
         .use(tracingEnabled ? middleware.tracing() : skipMiddleware)
         <%_}_%>
         .use(loggingMiddleware)
-        <%_ if(dataLayer == "knex") {_%>
-        .use(middleware.dbInstance())
-        .use(dataLoadersMiddleware)
-        <%_}_%>
         .use(dispatcher(msgHandlers))
         .start()
         .catch((err) => {

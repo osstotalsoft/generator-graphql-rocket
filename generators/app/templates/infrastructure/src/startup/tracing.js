@@ -10,17 +10,12 @@ const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { ParentBasedSampler, AlwaysOnSampler } = require('@opentelemetry/sdk-trace-node')
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
 const { PinoInstrumentation } = require('@opentelemetry/instrumentation-pino')
-<%_ if(dataLayer == 'knex') {_%>
-  const { KnexInstrumentation } = require("@opentelemetry/instrumentation-knex");
-<%_}_%>
 const { DataloaderInstrumentation } = require("@opentelemetry/instrumentation-dataloader");
 const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql')
 const { context, trace } = require('@opentelemetry/api')
 const { getRPCMetadata, RPCType } = require('@opentelemetry/core')
 const instrumentation = require('@opentelemetry/instrumentation')
-<%_ if(dataLayer == 'prisma') {_%>
 const { PrismaInstrumentation }  = require("@prisma/instrumentation")
-<%_}_%>
 
 const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY } = process.env
 const otelTraceProxy = JSON.parse(OTEL_TRACE_PROXY || 'false')
@@ -64,17 +59,12 @@ const sdk = new opentelemetry.NodeSDK({
       }
     }),
     new PinoInstrumentation(),
-    <%_ if(dataLayer == 'knex') {_%>
-    new KnexInstrumentation(),
-    <%_} _%>
     new DataloaderInstrumentation(),
     <%_ if(addSubscriptions) {_%>
     new IORedisInstrumentation(),
     new WSInstrumentation(),
     <%_} _%>
-    <%_ if(dataLayer == 'prisma') {_%>
     new PrismaInstrumentation()
-    <%_}_%>
   ]
 });
 

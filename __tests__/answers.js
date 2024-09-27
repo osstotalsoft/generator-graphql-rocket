@@ -44,7 +44,6 @@ describe('test package installers', () => {
   const messageBus = /^@totalsoft[/]message-bus/
   const defaultAnswers = {
     projectName,
-    dataLayer: 'knex',
     withMultiTenancy: false,
     hasSharedDb: false,
     dbConnectionName,
@@ -165,10 +164,7 @@ describe('test package installers', () => {
     await helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        dataLayer: 'prisma'
-      })
+      .withPrompts(defaultAnswers)
       .run()
       .then(() => {
         assert.noFile(files)
@@ -185,10 +181,7 @@ describe('test package installers', () => {
     await helpers
       .create(path.join(__dirname, '../generators/app'))
       .inDir(path.join(__dirname, tempRoot))
-      .withPrompts({
-        ...defaultAnswers,
-        dataLayer: 'prisma'
-      })
+      .withPrompts(defaultAnswers)
       .run()
       .then(() => {
         assert.file(files)
