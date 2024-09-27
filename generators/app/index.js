@@ -4,7 +4,7 @@ require('lodash').extend(Generator.prototype, require('yeoman-generator/lib/acti
 const chalk = require('chalk')
 const yosay = require('yosay')
 const path = require('path')
-const { append, concat, mergeLeft } = require('ramda')
+const { concat, mergeLeft } = require('ramda')
 const { projectNameQ, usePrevConfigsQ, getQuestions } = require('./questions')
 const { checkForLatestVersion, getCurrentVersion } = require('../utils')
 const { prettierTransform, defaultPrettierOptions } = require('../generator-transforms')
@@ -155,8 +155,8 @@ module.exports = class extends Generator {
     packageManager === 'npm'
       ? this.npmInstall(null, {}, { cwd: projectName })
       : packageManager === 'yarn'
-        ? this.yarnInstall(null, {}, { cwd: projectName })
-        : this.npmInstall(null, {}, { cwd: projectName })
+      ? this.yarnInstall(null, {}, { cwd: projectName })
+      : this.npmInstall(null, {}, { cwd: projectName })
   }
 
   end() {
