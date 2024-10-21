@@ -32,7 +32,9 @@ extend type Mutation {
     updateUser(input: UserInputType!): String
 }
 
+<%_ if(addSubscriptions){ _%>
 # Not working! Only for demonstration
 extend type Subscription {
     userChanged: String
 }
+<%_}_%>
