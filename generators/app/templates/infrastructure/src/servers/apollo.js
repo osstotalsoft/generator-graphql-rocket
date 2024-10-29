@@ -65,7 +65,7 @@ const startApolloServer = async (httpServer<% if(addSubscriptions) {%>, subscrip
       <%_ if(addTracing){ _%>
         tracingEnabled && app.use(tracingMiddleware())
       <%_}_%>
-        .use(
+      app.use(
         koaMiddleware(apolloServer,{
           context: async ({ ctx }) => {
             const { token, state, <% if(withMultiTenancy){ %>tenant, <%}%>externalUser, request, requestSpan } = ctx;
