@@ -17,7 +17,7 @@ const { getRPCMetadata, RPCType } = require('@opentelemetry/core')
 const instrumentation = require('@opentelemetry/instrumentation')
 const { PrismaInstrumentation }  = require("@prisma/instrumentation")
 
-const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY } = process.env
+const { OTEL_SERVICE_NAME, OTEL_TRACE_PROXY , OTEL_TRACING_ENABLED} = process.env
 const otelTraceProxy = JSON.parse(OTEL_TRACE_PROXY || 'false')
 
 class CustomGraphQLInstrumentation extends GraphQLInstrumentation {
@@ -34,7 +34,8 @@ const isTelemetryRoute = url => url?.startsWith('/metrics') || url?.startsWith('
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
 const traceExporter = new OTLPTraceExporter()
-const sdk = new opentelemetry.NodeSDK({
+const tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED || 'false')
+const sdk = tracingEnabled && new opentelemetry.NodeSDK({
   resource: new Resource({
     [SEMRESATTRS_SERVICE_NAME.SERVICE_NAME]: OTEL_SERVICE_NAME
   }),
