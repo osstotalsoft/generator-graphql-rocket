@@ -41,7 +41,7 @@ const
   metrics = require("./monitoring/metrics");
 
 <%_ if(addTracing) {_%>
-tracingEnabled && tracer.start({ logger });
+  if (tracingEnabled) tracer.start({ logger })
 <%_}_%>
 
 const httpServer = createServer();
