@@ -27,7 +27,7 @@ describe('tenant identification tests:', () => {
     await tenantIdentification()(ctx, () => Promise.resolve());
 
     //assert
-    expect(tenantContextAccessor.useTenantContext).toBeCalledWith(
+    expect(tenantContextAccessor.useTenantContext).toHaveBeenCalledWith(
       { tenant: expect.objectContaining({ id: tenantId }) },
       expect.anything()
     );
@@ -46,7 +46,7 @@ describe('tenant identification tests:', () => {
     await tenantIdentification()(ctx, () => Promise.resolve())
 
     //assert
-    expect(tenantContextAccessor.useTenantContext).toBeCalledWith(
+    expect(tenantContextAccessor.useTenantContext).toHaveBeenCalledWith(
       { tenant: expect.objectContaining({ id: tenantId }) },
       expect.anything()
     );
