@@ -1,7 +1,9 @@
 const messagingEnvelopeHeaderSpanTagPrefix = "pubSub_header";
 const { trace, context, propagation, SpanKind, SpanStatusCode } = require("@opentelemetry/api");
 const { correlationManager } = require("@totalsoft/correlation");
+<%_ if(withMultiTenancy){ _%>
 const { tenantContextAccessor } = require("@totalsoft/multitenancy-core");
+<%_}_%>
 const attributeNames = require("../../constants/tracingAttributes");
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
 
@@ -12,8 +14,10 @@ const tracingPublish = async (ctx, next) => {
   const span = tracer.startSpan(`${ctx.clientTopic} send`, {
     attributes: {
       [SemanticAttributes.MESSAGE_BUS_DESTINATION]: ctx.topic,
-      [attributeNames.correlationId]: correlationManager.getCorrelationId(),
+      [attributeNames.correlationId]: correlationManager.getCorrelationId()
+      <%_ if(withMultiTenancy){ _%>,
       [attributeNames.tenantId]: tenantContextAccessor.getTenantContext()?.tenant?.id
+      <%_}_%>
     },
     kind: SpanKind.PRODUCER
   });
