@@ -1,11 +1,6 @@
 {
+  "eslint.useFlatConfig": true,
   "javascript.validate.enable": false,
-  "javascript.format.enable": true,
-  "typescript.format.enable": false,
-  "cSpell.words": [
-    "OTEL",
-    "totalsoft",
-    "Uncapitalize",
-    "yorc"
-  ]
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "cSpell.words": ["OTEL", "totalsoft", "Uncapitalize", "yorc"]
 }

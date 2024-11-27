@@ -12,11 +12,11 @@ RUN addgroup --system --gid $imageUserGroupId $imageUserGroup && \
     adduser --system --uid $imageUserId --ingroup $imageUserGroup $imageUser
 
 # Install app dependencies
-COPY --chown=$imageUser:$imageUserGroup package.json <%=packageManagerLockFile%> ./
+COPY --chown=$imageUser:$imageUserGroup package.json package-lock.json ./
 
-RUN <%=packageManager%> install
+RUN npm install
 # If you are building your code for production
-# RUN <%=packageManager%> install --only=production
+# RUN npm install --only=production
 
 # Bundle app source
 COPY --chown=$imageUser:$imageUserGroup . .
@@ -28,4 +28,4 @@ USER $imageUser
 
 EXPOSE 4000
 
-CMD [ "<%=packageManager%>", "run", "start:production"]
+CMD [ "npm", "run", "start:production"]

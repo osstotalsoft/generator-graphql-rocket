@@ -1,14 +1,14 @@
-const chalk = require('chalk')
+import chalk from 'chalk'
 
-module.exports.projectNameQ = {
+const projectNameRegex = /^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/
+
+export const projectNameQ = {
   type: 'input',
   name: 'projectName',
   message: 'What is the name of your project?',
   validate: appName => {
-    const pass = appName.match(/^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/)
-    if (pass) {
-      return true
-    }
+    const isValid = projectNameRegex.test(appName)
+    if (isValid) return true
 
     return `${chalk.red(
       "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
@@ -17,7 +17,7 @@ module.exports.projectNameQ = {
   default: 'new-gql-server'
 }
 
-module.exports.usePrevConfigsQ = {
+export const usePrevConfigsQ = {
   type: 'confirm',
   name: 'usePrevConfigs',
   message:
@@ -25,7 +25,7 @@ module.exports.usePrevConfigsQ = {
   default: true
 }
 
-module.exports.getQuestions = projectName => [
+export const getQuestions = projectName => [
   {
     type: 'confirm',
     name: 'withRights',
@@ -107,12 +107,5 @@ module.exports.getQuestions = projectName => [
     name: 'addQuickStart',
     message: 'Would you like to include quick start examples?',
     default: false
-  },
-  {
-    type: 'list',
-    name: 'packageManager',
-    message: 'What package manager would you like to use?',
-    choices: ['npm', 'yarn'],
-    default: 'npm'
   }
 ]

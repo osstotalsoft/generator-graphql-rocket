@@ -6,7 +6,7 @@
   "type": "commonjs",
   "engines": {
     "node": ">=20.x",
-    "<%=packageManager%>": ">= <%= packageManagerVersion %>"
+    "npm": ">= 9.x"
   },
   "scripts": {
     "postinstall": "npx -y sort-package-json",
@@ -16,9 +16,9 @@
     "start": "npm run setcodepage && npm run lint && cross-env NODE_ENV=development nodemon src/index.js",
     "start:production": "cross-env NODE_ENV=production node src/index.js",
     "test": "jest --collectCoverage --passWithNoTests",
-    "test:watchAll": "<%=packageManager%> run test -- --watchAll",
-    "test:watch": "<%=packageManager%> run test -- --watch",
-    "test:ci": "cross-env CI=true <%=packageManager%> test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
+    "test:watchAll": "npm run test -- --watchAll",
+    "test:watch": "npm run test -- --watch",
+    "test:ci": "cross-env CI=true npm test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
     "lint": "eslint --fix --ext .js .",
     "prettier": "prettier --write **/*.js",
     "prepack": "husky install",
