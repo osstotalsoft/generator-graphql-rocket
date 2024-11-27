@@ -1,6 +1,6 @@
 /* eslint-disable node/no-unpublished-import */
 import through from 'through2'
-import prettier from 'prettier'
+import { format, resolveConfig } from 'prettier'
 
 const defaultPrettierOptions = {
   printWidth: 125,

@@ -3,7 +3,7 @@
 import path, { dirname } from 'path'
 import assert from 'yeoman-assert'
 // eslint-disable-next-line node/no-missing-import
-import helpers, { result } from 'yeoman-test'
+import helpers from 'yeoman-test'
 import { projectNameQ, getQuestions } from '../app/questions.js'
 import { findIndex } from 'ramda'
 import { expect } from 'chai'

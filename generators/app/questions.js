@@ -8,7 +8,6 @@ export const projectNameQ = {
   message: 'What is the name of your project?',
   validate: appName => {
     const isValid = projectNameRegex.test(appName)
-    console.log('isValid', isValid)
     if (isValid) return true
 
     return `${chalk.red(
