@@ -2,3 +2,4 @@ node_modules
 coverage
 act
 **/__tests__/test-graphql
+.tmp*
