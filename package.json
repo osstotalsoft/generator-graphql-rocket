@@ -32,6 +32,7 @@
     "ejslint": "ejslint generators/app/templates/infrastructure"
   },
   "dependencies": {
+    "@totalsoft/metrics": "file:../rocket-toolkit/packages/metrics/totalsoft-metrics-1.0.0.tgz",
     "boxen": "^8.0.1",
     "chalk": "^5.3.0",
     "gulp-filter": "^9.0.1",

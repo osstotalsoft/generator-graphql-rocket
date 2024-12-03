@@ -37,8 +37,7 @@ const
   <%_}_%>
   diagnosticsEnabled = JSON.parse(DIAGNOSTICS_ENABLED),
   metricsEnabled = JSON.parse(METRICS_ENABLED),
-  diagnostics = require("./monitoring/diagnostics"),
-  metrics = require("./monitoring/metrics");
+  {startMetrics, startDiagnostics} = require('@totalsoft/metrics')
 
 <%_ if(addTracing) {_%>
   if (tracingEnabled) tracer.start({ logger })
@@ -81,5 +80,5 @@ gracefulShutdown({
   timeout: 5000
 })
 
-diagnosticsEnabled && diagnostics.startServer(logger);
-metricsEnabled && metrics.startServer(logger);
+diagnosticsEnabled && startDiagnostics(logger);
+metricsEnabled && startMetrics(logger);

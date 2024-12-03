@@ -12,7 +12,8 @@ const { GraphQLError } = require("graphql"),
   { validateWsToken } = require("../middleware"),
   { schema, logger, getDataSources } = require("../startup"),
   jsonwebtoken = require("jsonwebtoken"),
-  metrics = require("../monitoring/metrics");
+  {recordSubscriptionStarted} = require("@totalsoft/metrics"),
+  metricsEnabled = JSON.parse(METRICS_ENABLED);
 
 logger.info('Creating Subscription Server...')
 const startSubscriptionServer = httpServer =>
@@ -52,7 +53,7 @@ const startSubscriptionServer = httpServer =>
       }),
       onSubscribe: async (ctx, msg) => {
         await validateWsToken(ctx?.token, ctx?.extra?.socket);
-        metrics.recordSubscriptionStarted(ctx, msg);
+        metricsEnabled && recordSubscriptionStarted(msg);
       },
       onDisconnect: (_ctx, code, reason) =>
         code != 1000 && logger.info(`Subscription server disconnected! Code: ${code} Reason: ${reason}`),
