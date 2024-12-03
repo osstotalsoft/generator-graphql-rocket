@@ -13,7 +13,7 @@ const { GraphQLError } = require("graphql"),
   { schema, logger, getDataSources } = require("../startup"),
   jsonwebtoken = require("jsonwebtoken"),
   {recordSubscriptionStarted} = require("@totalsoft/metrics"),
-  metricsEnabled = JSON.parse(METRICS_ENABLED);
+  metricsEnabled = JSON.parse(process.env.METRICS_ENABLED);
 
 logger.info('Creating Subscription Server...')
 const startSubscriptionServer = httpServer =>
