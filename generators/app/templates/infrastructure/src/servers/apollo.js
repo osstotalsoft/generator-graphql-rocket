@@ -22,7 +22,7 @@ const { ApolloServer } = require("@apollo/server"),
   <%_ if(addTracing){ _%>
   tracingEnabled = JSON.parse(OTEL_TRACING_ENABLED),
   <%_}_%>
-  metricsPlugin = require("../plugins/metrics/metricsPlugin"),
+  {createMetricsPlugin} = require("@totalsoft/metrics"),
   metricsEnabled = JSON.parse(METRICS_ENABLED);
 
 const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>) => {
@@ -40,7 +40,7 @@ const plugins = (httpServer<% if(addSubscriptions) {%>, subscriptionServer<%}%>)
             }
         },
         <%_}_%>
-        metricsEnabled ? metricsPlugin() : {}
+        metricsEnabled ? createMetricsPlugin() : {}
     ];
 };
 

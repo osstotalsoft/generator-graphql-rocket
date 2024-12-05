@@ -60,6 +60,7 @@
     "@totalsoft/messaging-host": "^2.5.0",
     <%_}_%>
     "bluebird": "^3.7.2",
+    "@totalsoft/metrics": "2.0.0",
     "console-stamp": "^3.1.2",
     "dotenv": "^16.4.5",
     "graphql": "^16.9.0",
@@ -73,7 +74,7 @@
     "@opentelemetry/instrumentation-ioredis": "^0.44.0",
     "@totalsoft/opentelemetry-instrumentation-ws": "^2.0.0",
       <%_}_%>
-    <%_}_%>
+    <%_}_%>    
     <%_ if(withRights){ _%>
     "graphql-middleware": "^6.1.35",
     "graphql-shield": "7.6.2",
