@@ -7,14 +7,11 @@ import path from 'path'
 import { concat, mergeLeft } from 'ramda'
 import { projectNameQ, getQuestions, usePrevConfigsQ } from './questions.js'
 import { checkForLatestVersion, getCurrentVersion } from '../utils.js'
-import filter from 'gulp-filter'
-import { prettierTransform, defaultPrettierOptions } from '../generator-transforms.js'
 import { YO_RC_FILE } from './constants.js'
 
 export default class extends Generator {
   constructor(args, opts) {
     super(args, { ...opts, skipRegenerate: true, ignoreWhitespace: true, force: true, skipLocalCache: false })
-    this.registerClientTransforms()
   }
 
   async prompting() {
@@ -129,6 +126,7 @@ export default class extends Generator {
 
     this.log(chalk.greenBright(`All the dependencies will be installed shortly using "npm" package manager...`))
     this.spawnCommandSync('npm install')
+    this.spawnCommandSync('npx prettier --write **/*.{js,jsx,ts,tsx,css,scss,md,json}')
   }
 
   end() {
@@ -139,11 +137,5 @@ export default class extends Generator {
       Bye now!
       (*^_^*)`)
     )
-  }
-
-  registerClientTransforms() {
-    const fileFilter = filter(['**/*.{js, json}'], { restore: true })
-
-    this.queueTransformStream([fileFilter, prettierTransform(defaultPrettierOptions), fileFilter.restore])
   }
 }
