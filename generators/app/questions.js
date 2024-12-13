@@ -1,20 +1,20 @@
 import chalk from 'chalk'
 
-const projectNameRegex = /^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/
-
 export const projectNameQ = {
   type: 'input',
   name: 'projectName',
   message: 'What is the name of your project?',
   validate: appName => {
-    const isValid = projectNameRegex.test(appName)
-    if (isValid) return true
+    const pass = appName.match(/^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/)
+    if (pass) {
+      return true
+    }
 
     return `${chalk.red(
       "Provide a valid project name, only use letters and '-', '_' or '.' separators! No digits, special characters and whitespace are allowed and do not start or end with a separator!"
     )}`
   },
-  default: 'new-gql-server'
+  default: 'new-project'
 }
 
 export const usePrevConfigsQ = {
@@ -85,16 +85,17 @@ export const getQuestions = projectName => [
     name: 'helmChartName',
     message: 'What is the name of your helm chart?',
     when: prompts => prompts.addHelm,
-    default: projectName,
     validate: name => {
-      if (name.match(/^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/)) {
+      const pass = name.match(/^((?!-)[A-Za-z-._\d]{1,63}(?<!-))+$/)
+      if (pass) {
         return true
       }
 
       return `${chalk.red(
         "Provide a valid chart name, only use lower case letters, digits and '-' separators! No special characters and whitespace are allowed and do not start or end with a separator!"
       )}`
-    }
+    },
+    default: () => projectName.toLowerCase().replace('_', '-')
   },
   {
     type: 'confirm',
