@@ -1,4 +1,3 @@
-/* eslint-disable node/no-unpublished-require */
 const { fixupConfigRules } = require('@eslint/compat'),
   js = require('@eslint/js'),
   { FlatCompat } = require('@eslint/eslintrc')

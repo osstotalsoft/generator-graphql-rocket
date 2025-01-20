@@ -31,7 +31,7 @@ function prisma() {
       prismaClient = tenantFilterExtension(prismaClient, tenantId)
       cacheMap.set(tenantId, prismaClient)
     <%_} else { _%>
-      const connectionInfo = tenantConfiguration.getConnectionInfo(id, '<%= dbConnectionName %>')
+      const connectionInfo = tenantConfiguration.getConnectionInfo(tenantId, '<%= dbConnectionName %>')
       const { server, port, database, userName, password } = sanitizeConnectionInfo(connectionInfo)
       const url = PRISMA_DB_URL_PATTERN.replace('{server}', server)
         .replace('{port}', port)
@@ -40,7 +40,7 @@ function prisma() {
         .replace('{password}', password)
 
       prismaClient = new PrismaClient({ ...prismaOptions, datasources: { db: { url } } })
-      cacheMap.set(id, prismaClient)
+      cacheMap.set(tenantId, prismaClient)
     <%_}_%>
     } else {
       if (cacheMap.has('default')) return cacheMap.get('default')
