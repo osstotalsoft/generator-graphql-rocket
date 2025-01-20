@@ -19,7 +19,7 @@
     "test:watchAll": "npm run test -- --watchAll",
     "test:watch": "npm run test -- --watch",
     "test:ci": "cross-env CI=true npm test -- --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=html",
-    "lint": "eslint --fix --ext .js .",
+    "lint": "eslint .",
     "prettier": "prettier --write **/*.{js,jsx,ts,tsx,css,md,json}",
     "prepack": "husky install",
     "prisma": "npx prisma db pull && npm run prisma:format && npx prisma generate",
